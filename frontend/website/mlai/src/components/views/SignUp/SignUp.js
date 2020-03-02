@@ -17,7 +17,7 @@ import axios from "axios";
 import { connect } from 'react-redux';
 import { Redirect, withRouter } from 'react-router-dom';
 
-import SignIn from "./SignIn";
+import SignIn from "../SignIn/SignIn";
 
 function Copyright() {
   return (
