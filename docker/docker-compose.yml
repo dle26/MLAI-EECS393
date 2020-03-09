@@ -1,11 +1,19 @@
 version: '3'
 services:
-   database:
-	image: 'mongo'
-	container_name: 'mongodb'
-	ports:
-	  - '27017-27019:27017-27019'
-	volumes:
-	  - ./mongo-volume:/data/db	
-	command:
-	  /mong-seed/import.sh
+  mongodb:
+    image: mongo:4.2
+    container_name: mongodb
+    ports:
+      - 27017-27019:27017-27019
+    volumes:
+      - ./data:/data/db
+
+
+  mongo_seed:
+    image: mongo:4.2
+    links:
+      - mongodb
+    volumes:
+      - ./mongo-seed:/mongo-seed
+    command:
+      /mongo-seed/import.sh
