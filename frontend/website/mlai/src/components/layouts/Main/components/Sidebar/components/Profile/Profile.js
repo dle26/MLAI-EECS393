@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { Avatar, Typography } from '@material-ui/core';
 import { withStyles } from "@material-ui/core/styles";
+import axios from "axios";
 
 
 const styles = theme => ({
@@ -24,7 +25,24 @@ const styles = theme => ({
 
 class Profile extends Component {
   constructor(props) {
-    super(props)
+    super(props);
+    this.state = {
+      username: sessionStorage.getItem("Username")
+    }
+  }
+
+  componentDidMount() {
+    console.log("making call to get use information")
+    axios
+      .get("http://localhost:5000/userinfo", {
+        username: "phanlongboy",
+      })
+      .then(response => {
+        this.setState({firstname: response.data.firstname, lastname: response.data.lastname})
+      })
+      .catch(error => {
+        console.log("Unable to get user info provided credentials.");
+      });
   }
 
   render() {

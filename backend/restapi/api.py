@@ -4,11 +4,13 @@ import bcrypt
 import jwt
 import datetime
 from functools import wraps
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 app.config['TOKEN_SECRET_KEY'] = 'alecisgod'
-app.config['MONGO_DBNAME'] = 'users'
+app.config['MONGO_DBNAME'] = 'MLAI'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/users'
 
 mongodb = PyMongo(app)
@@ -35,9 +37,13 @@ def hello():
     return jsonify({"about": "hello world"})
 
 @app.route("/login", methods=['POST'])
-def login(): 
+def login():     
     username = request.get_json()['username']
     password = request.get_json()['password']
+
+    print("username:" + username)
+    print("password: " + password)
+    print("finding: " + str(request.get_json()))
 
     users = mongodb.db.users
     if users.find_one({'username': username, 'password': password}):
@@ -53,19 +59,38 @@ def login():
 def register():
     if request.method == 'POST':
         users = mongodb.db.users
-        existing_user = users.find_one({'username':  request.get_json()['username']})
+
+        username = request.get_json()['username']
+        password = request.get_json()['password']
+        firstname = request.get_json()['firstname']
+        lastname = request.get_json()['lastname']
+
+        
+        existing_user = users.find_one({'username':  username})
 
         if existing_user is None:
-            hashpass = request.get_json()['password']
             users.insert({
-                'username': request.get_json()['username'],
-                'password': hashpass
+                'username': username,
+                'password': password,
+                'firstname': firstname,
+                'lastname': lastname
             })
             return jsonify({'message':'sign up sucessfully'})
 
-        return jsonify({'error': 'username existed'})
+        return jsonify({'error': 'username existed'}), 422
     else:
         return''
+
+
+@app.route("/userinfo", methods=['GET'])
+def user():     
+    username = request.get_json()['username']
+
+    users = mongodb.db.users
+    user = users.find_one({'username': username})        
+    print(str(user))
+
+    return jsonify({'error':'Could not verify!', 'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
 @app.route('/protected', methods=['POST'])

@@ -14,7 +14,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import axios from "axios";
-import { Redirect, withRouter } from "react-router-dom";
+import { Redirect, withRouter, Link as RouterLink } from "react-router-dom";
 
 function Copyright() {
   return (
@@ -69,6 +69,7 @@ class SignIn extends Component {
       })
       .then(response => {
         sessionStorage.setItem("Token", response.data.token);
+        sessionStorage.setItem("Username", this.state.username);
         this.setState({ routeToHome: true });
       })
       .catch(error => {
@@ -137,9 +138,9 @@ class SignIn extends Component {
           </Button>
           <Grid container>
             <Grid item>
-              <Link href="#" onClick={this.routeToSignUp.bind(this)}>
-                {"Don't have an account? Sign Up"}
-              </Link>
+              <RouterLink to="/signup">
+              Don't have an account? Sign Up
+              </RouterLink>
             </Grid>
           </Grid>
         </div>

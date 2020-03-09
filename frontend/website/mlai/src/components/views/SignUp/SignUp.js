@@ -15,7 +15,8 @@ import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import axios from "axios";
 import { connect } from 'react-redux';
-import { Redirect, withRouter } from 'react-router-dom';
+import { Redirect, withRouter, Link as RouterLink  } from 'react-router-dom';
+
 
 import SignIn from "../SignIn/SignIn";
 
@@ -89,7 +90,7 @@ class SignUp extends Component {
     const { classes } = this.props;
 
     if (this.state.routeToSignIn) 
-        return <Redirect to='/' />;
+        return <Redirect to='/signIn' />;
 
     return (
       <React.Fragment>
@@ -193,13 +194,9 @@ class SignUp extends Component {
               </Button>
               <Grid container justify="flex-end">
                 <Grid item>
-                  <Link
-                    href="#"
-                    onClick={this.routeToSignIn.bind(this)}
-                    variant="body2"
-                  >
-                    Already have an account? Sign in
-                  </Link>
+                  <RouterLink to="/signin">
+                  Already have an account? Sign in
+                  </RouterLink>
                 </Grid>
               </Grid>
             </form>

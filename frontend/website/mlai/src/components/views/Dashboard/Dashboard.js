@@ -11,7 +11,7 @@ export default class componentName extends Component {
     }
 
     componentDidMount() {
-        console.log("token: " + this.state.token);
+        // console.log("token: " + this.state.token);
     }
 
     render() {
