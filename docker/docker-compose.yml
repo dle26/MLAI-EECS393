@@ -6,14 +6,14 @@ services:
     ports:
       - 27017-27019:27017-27019
     volumes:
-      - ./data:/data/db
-
-
-  mongo_seed:
-    image: mongo:4.2
-    links:
-      - mongodb
+      - ./mongo-volume:/data/db
+  
+  mongo-seed:
+    image: fvilers/mongo-seed
+    environment:
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
     volumes:
-      - ./mongo-seed:/mongo-seed
+      - ./data:/data
     command:
-      /mongo-seed/import.sh
+      "mongoimport -d MLAI -c 'users' --type json --file /data/users.json"

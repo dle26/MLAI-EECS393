@@ -11,7 +11,7 @@ CORS(app)
 
 app.config['TOKEN_SECRET_KEY'] = 'alecisgod'
 app.config['MONGO_DBNAME'] = 'MLAI'
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/users'
+app.config['MONGO_URI'] = 'mongodb://localhost:27017/MLAI'
 
 mongodb = PyMongo(app)
 
@@ -40,10 +40,6 @@ def hello():
 def login():     
     username = request.get_json()['username']
     password = request.get_json()['password']
-
-    print("username:" + username)
-    print("password: " + password)
-    print("finding: " + str(request.get_json()))
 
     users = mongodb.db.users
     if users.find_one({'username': username, 'password': password}):
@@ -89,8 +85,6 @@ def user():
     users = mongodb.db.users
     user = users.find_one({'username': username})        
     print(str(user))
-
-    return jsonify({'error':'Could not verify!', 'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
 @app.route('/protected', methods=['POST'])
