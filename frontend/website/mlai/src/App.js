@@ -19,7 +19,6 @@ export default class App extends Component {
             <RouteWithLayout key="home" path="/" exact layout={MainLayout} strict component={DashboardView} />
             <Route key="signUp" path="/signUp" exact component={SignUpView} />
             <Route key="signIn" path="/signIn" exact component={SignInView} />
-            {/* <RouteWithLayout component={DashboardView} exact layout={MainLayout} path="/"/> */}
           </Switch>
         </div>
       </Router>

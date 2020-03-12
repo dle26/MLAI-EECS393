@@ -31,11 +31,12 @@ class Profile extends Component {
     }
   }
 
-  componentDidMount() {
-    console.log("making call to get use information")
-    axios
-      .get("http://localhost:5000/userinfo", {
-        username: "phanlongboy",
+  componentDidMount() {    
+
+    if(this.state.username != null) {
+      axios
+      .post("http://localhost:5000/userinfo", {
+        "username": this.state.username
       })
       .then(response => {
         this.setState({firstname: response.data.firstname, lastname: response.data.lastname})
@@ -43,15 +44,16 @@ class Profile extends Component {
       .catch(error => {
         console.log("Unable to get user info provided credentials.");
       });
+    }
+
   }
 
   render() {
     const {classes, className, ...rest } = this.props;
 
     const user = {
-      name: 'Shen Zhi',
+      name: this.state.firstname + " " + this.state.lastname,
       avatar: '/images/avatars/avatar_11.png',
-      bio: 'Brain Director'
     };
 
     return (
@@ -59,20 +61,12 @@ class Profile extends Component {
         {...rest}
         className={clsx(classes.root, className)}
       >
-        <Avatar
-          alt="Person"
-          className={classes.avatar}
-          component={RouterLink}
-          src={user.avatar}
-          to="/settings"
-        />
         <Typography
           className={classes.name}
           variant="h4"
         >
           {user.name}
         </Typography>
-        <Typography variant="body2">{user.bio}</Typography>
       </div>
     );
 

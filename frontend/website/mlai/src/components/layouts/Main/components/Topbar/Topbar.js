@@ -8,6 +8,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import InputIcon from '@material-ui/icons/Input';
 import { withStyles } from "@material-ui/core/styles";
+import { Redirect } from "react-router-dom";
 
 
 
@@ -26,6 +27,11 @@ const styles = theme => ({
 class Topbar extends Component {
   constructor(props) {
     super(props)
+  }
+
+  signOut() {
+    // sessionStorage.clear();
+    console.log("clik signed out");
   }
 
   render() {
@@ -59,6 +65,7 @@ class Topbar extends Component {
           <IconButton
             className={classes.signOutButton}
             color="inherit"
+            onClick={this.signOut.bind(this)}
           >
             <InputIcon />
           </IconButton>

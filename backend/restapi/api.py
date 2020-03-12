@@ -38,8 +38,8 @@ def hello():
 
 @app.route("/login", methods=['POST'])
 def login():     
-    username = request.get_json()['username']
-    password = request.get_json()['password']
+    username = request.get_json(force = True)['username']
+    password = request.get_json(force = True)['password']
 
     users = mongodb.db.users
     if users.find_one({'username': username, 'password': password}):
@@ -56,10 +56,10 @@ def register():
     if request.method == 'POST':
         users = mongodb.db.users
 
-        username = request.get_json()['username']
-        password = request.get_json()['password']
-        firstname = request.get_json()['firstname']
-        lastname = request.get_json()['lastname']
+        username = request.get_json(force = True)['username']
+        password = request.get_json(force = True)['password']
+        firstname = request.get_json(force = True)['firstname']
+        lastname = request.get_json(force = True)['lastname']
 
         
         existing_user = users.find_one({'username':  username})
@@ -78,13 +78,25 @@ def register():
         return''
 
 
-@app.route("/userinfo", methods=['GET'])
+@app.route("/userinfo", methods=['POST'])
 def user():     
-    username = request.get_json()['username']
+    username = request.get_json(force = True)['username']
 
     users = mongodb.db.users
-    user = users.find_one({'username': username})        
-    print(str(user))
+    user = users.find_one({'username': username})   
+    return jsonify({
+        'firstname': user['firstname'],
+        'lastname': user['lastname'],
+    })     
+
+
+@app.route("/upload", methods=['POST'])
+def upload():
+    username = request.get_json(force = True)['username']
+
+    users = mongodb.db.users
+    user = users.find_one({'username': username})
+
 
 
 @app.route('/protected', methods=['POST'])

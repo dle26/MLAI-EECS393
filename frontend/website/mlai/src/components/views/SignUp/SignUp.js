@@ -84,8 +84,10 @@ class SignUp extends Component {
   }
 
   routeToSignIn() {
+    console.log("route to sign in");
     this.setState({ routeToSignIn: true });
   }
+
   render() {
     const { classes } = this.props;
 
@@ -171,14 +173,6 @@ class SignUp extends Component {
                     onChange={e => {
                       this.setState({ password: e.target.value });
                     }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox value="allowExtraEmails" color="primary" />
-                    }
-                    label="I want to receive inspiration, marketing promotions and updates via email."
                   />
                 </Grid>
               </Grid>
