@@ -23,11 +23,11 @@ def token_required(f):
         if not token:
             return jsonify({'message': 'Token is missing !'}), 403
 
-        try: 
+        try:
             data = jwt.decode(token, app.config['TOKEN_SECRET_KEY'])
         except:
             return jsonify({'message': 'Token is invalid'}), 403
-        
+
         return f(*args, **kwargs)
     return decorated
 
@@ -43,7 +43,7 @@ def login():
 
     users = mongodb.db.users
     if users.find_one({'username': username, 'password': password}):
-        
+
         # generate token
         token = jwt.encode({'user': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['TOKEN_SECRET_KEY'])
 
@@ -61,7 +61,7 @@ def register():
         firstname = request.get_json(force = True)['firstname']
         lastname = request.get_json(force = True)['lastname']
 
-        
+
         existing_user = users.find_one({'username':  username})
 
         if existing_user is None:
