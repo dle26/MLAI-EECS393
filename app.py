@@ -7,6 +7,11 @@ from functools import wraps
 from flask_cors import CORS
 import pandas as pd 
 from bson import Binary
+import csv
+from io import StringIO
+import codecs
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -94,23 +99,15 @@ def user():
 
 @app.route("/upload", methods=['POST'])
 def upload():
-    # username = request.get_json(force = True)['username']
-    # files = request.get_json(force = True)['file']
-    # list = []
-    # for f in files:
-    #     reader = csv.reader(open(f, 'r'))
-    #     d = {}
-    #     for row in reader:
-    #         print (row)
-    
-    # print (files)
     if len(request.files) != 0:
         f = request.files['file']
-        mongodb.save_file(f.filename, f, 'data')
-        f1 = mongodb.send_file(f.filename, 'data')
-        reader = pd.read_csv(f.stream, delim_whitespace=True)
-        for row in reader:
-            print (row)
+        fstring = f.read()
+        csv_dicts = [{k: v for k, v in row.items()} for row in csv.DictReader(fstring.decode().splitlines(), skipinitialspace=True)]
+
+        for d in csv_dicts:
+            for x, y in d.items():
+                print(x, y)
+            print("----------------------------")
 
     return jsonify({
         "message": "accepted file"
