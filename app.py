@@ -5,6 +5,8 @@ import jwt
 import datetime
 from functools import wraps
 from flask_cors import CORS
+import pandas as pd 
+from bson import Binary
 
 app = Flask(__name__)
 CORS(app)
@@ -92,12 +94,34 @@ def user():
 
 @app.route("/upload", methods=['POST'])
 def upload():
-    username = request.get_json(force = True)['username']
+    # username = request.get_json(force = True)['username']
+    # files = request.get_json(force = True)['file']
+    # list = []
+    # for f in files:
+    #     reader = csv.reader(open(f, 'r'))
+    #     d = {}
+    #     for row in reader:
+    #         print (row)
+    
+    # print (files)
+    if len(request.files) != 0:
+        f = request.files['file']
+        mongodb.save_file(f.filename, f, 'data')
+        f1 = mongodb.send_file(f.filename, 'data')
+        reader = pd.read_csv(f.stream, delim_whitespace=True)
+        for row in reader:
+            print (row)
 
-    users = mongodb.db.users
-    user = users.find_one({'username': username})
+    return jsonify({
+        "message": "accepted file"
+    })
 
+def save_upload(f):
+    mongodb.save_file(f.filename, f, 'data')
+    return get_upload(f.filename)
 
+def get_upload(filename):
+    return mongodb.send_file(filename)
 
 @app.route('/protected', methods=['POST'])
 @token_required

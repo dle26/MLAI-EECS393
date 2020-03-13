@@ -20,12 +20,9 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {/* {'Copyright © '} */}
-      <Link color="inherit" href="https://gitlab.com/TNThieding/cwrups">
-        EECS 341 Group 5
+      <Link color="inherit" href="https://github.com/justinphan3110/MLAI-EECS393">
+        EECS 393 Spring 2020
       </Link>
-      {" Fall "}
-      {new Date().getFullYear()}
-      {"."}
     </Typography>
   );
 }
