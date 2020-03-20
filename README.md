@@ -58,7 +58,7 @@ Machine Learning Accessibility Initiative (MLAI)
     
      password: 123
      
-  ### Main Dashboard after log in sucessfully
+  ### Main Dashboard after log in sucessfully (Updated 3/20/2020)
   
   ![image](https://user-images.githubusercontent.com/44376091/77140059-aebf7e00-6a4e-11ea-822c-76951a385a5d.png)
 
