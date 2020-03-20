@@ -102,12 +102,19 @@ def upload():
     if len(request.files) != 0:
         f = request.files['file']
         fstring = f.read()
+
+        # using csv reader
         csv_dicts = [{k: v for k, v in row.items()} for row in csv.DictReader(fstring.decode().splitlines(), skipinitialspace=True)]
 
-        for d in csv_dicts:
-            for x, y in d.items():
-                print(x, y)
-            print("----------------------------")
+        # for d in csv_dicts:
+        #     for x, y in d.items():
+        #         print(x, y)
+        #     print("----------------------------")
+
+        # using panda
+        
+        df = pd.read_csv(StringIO(fstring.decode()), delimiter='\n').T.to_dict()
+         
 
     return jsonify({
         "message": "accepted file"
