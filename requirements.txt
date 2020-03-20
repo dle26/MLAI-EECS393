@@ -2,7 +2,6 @@ flask
 flask_pymongo
 jwt
 datetime
-functools
 flask_cors
 pandas
-csv
+python-csv
