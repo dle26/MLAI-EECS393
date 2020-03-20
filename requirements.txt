@@ -1,6 +1,6 @@
 flask
 flask_pymongo
-jwt
+PyJWT
 datetime
 flask_cors
 pandas
