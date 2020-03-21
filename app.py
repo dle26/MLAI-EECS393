@@ -1,21 +1,18 @@
+from config import Config
 from flask import Flask, render_template, url_for, request, session, redirect, jsonify
-from flask_pymongo import PyMongo
-import jwt
-import datetime
-from functools import wraps
 from flask_cors import CORS
-import pandas as pd 
+from flask_pymongo import PyMongo
+from functools import wraps
 import csv
-
+import datetime
+import jwt
+import pandas as pd
 
 
 app = Flask(__name__)
 CORS(app)
 
-app.config['TOKEN_SECRET_KEY'] = 'alecisgod'
-app.config['MONGO_DBNAME'] = 'MLAI'
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/MLAI'
-
+app.config['MONGO_URI'] = Config.MONGO_URI
 mongodb = PyMongo(app)
 
 def token_required(f):
@@ -27,7 +24,7 @@ def token_required(f):
             return jsonify({'message': 'Token is missing !'}), 403
 
         try:
-            data = jwt.decode(token, app.config['TOKEN_SECRET_KEY'])
+            data = jwt.decode(token, Config.TOKEN_SECRET_KEY)
         except:
             return jsonify({'message': 'Token is invalid'}), 403
 
@@ -40,7 +37,7 @@ def hello():
     return jsonify({"about": "hello world"})
 
 @app.route("/login", methods=['POST'])
-def login():     
+def login():
     username = request.get_json(force = True)['username']
     password = request.get_json(force = True)['password']
 
@@ -48,7 +45,7 @@ def login():
     if users.find_one({'username': username, 'password': password}):
 
         # generate token
-        token = jwt.encode({'user': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['TOKEN_SECRET_KEY'])
+        token = jwt.encode({'user': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, Config.TOKEN_SECRET_KEY)
 
         return jsonify({'token': token.decode('UTF-8')})
 
@@ -82,15 +79,15 @@ def register():
 
 
 @app.route("/userinfo", methods=['POST'])
-def user():     
+def user():
     username = request.get_json(force = True)['username']
 
     users = mongodb.db.users
-    user = users.find_one({'username': username})   
+    user = users.find_one({'username': username})
     return jsonify({
         'firstname': user['firstname'],
         'lastname': user['lastname'],
-    })     
+    })
 
 
 @app.route("/upload", methods=['POST'])
@@ -108,9 +105,9 @@ def upload():
         #     print("----------------------------")
 
         # using panda
-        
+
         df = pd.read_csv(StringIO(fstring.decode()), delimiter='\n').T.to_dict()
-         
+
 
     return jsonify({
         "message": "accepted file"
