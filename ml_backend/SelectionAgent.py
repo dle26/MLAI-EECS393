@@ -11,14 +11,16 @@ import inspect
 import SMLTechniques
 import UMLTechniques
 import PreProcessing
+from TextMine import TEXTMINE
 
 
 class SelectionAgent:
     
-    def __init__(self,data,mining_threshold):
+    def __init__(self,data,threshold,techkey):
         
         self.data = copy.deepcopy(data)
-        self.mining_threshold
+        self.mining_threshold = threshold
+        self.technical_keywords = techkey
         
         
     def selectAnalysisApproach(self,time_constraint,no_labels=False):
@@ -32,30 +34,26 @@ class SelectionAgent:
         input_ml_scores = {}
         scores = {}
         
-        user_input = self.data.get_information()
-        
-        for key,keywords in mltechniques.items():  
-            if 'custom' not in list(keywords.keys()):
-               score = self.score_user(keywords,user_input)
-               input_ml_scores[key] = keywords
-               scores[key] = score
-               
-        if max(list(scores.values())) < self.threshold:
-            results = TextSelect(self.data).selectAnalysisApproach(time_constraint,no_labels)
+        user_input = self.data.get_info()
+        scores,input_ml_scores = self.get_initial_scores(mltechniques,user_input)
+        if max(list(scores.values())) < self.mining_threshold:
+            textmine = TEXTMINE(self.data,self.technical_keywords)
+            user_input = textmine.from_database()
+            scores,input_ml_scores = self.get_initial_scores(mltechniques,user_input)
+            
         else:
             results = self.weighted_select(input_ml_scores,scores,time_constraint)
         
         for tup in results:
-          if 'custom' not in tup[0]:
+          if 'custom' not in tup[1]:
             for key2,procscores in preprocessing.items():
-               preprocessing_ml_scores[(key2,key)] = self.score_ml_proc(tup[1],procscores)
-               
-        self.data.set_techniques(self.weighted_preproc_select(preprocessing_ml_scores,time_constraint))
+               preprocessing_ml_scores[(tup[0],key2)] = self.score_ml_proc(tup[0],procscores)
+            self.data.set_techniques(self.weighted_preproc_select(preprocessing_ml_scores,time_constraint))
 
         return self.data
         
         
-
+    
     def getMethods(self,unsupervised=False):
         
         all_classes = {}
@@ -83,10 +81,14 @@ class SelectionAgent:
         for word in usinput:
             if word in list(keywords.keys()):
                 score += keywords[word]
+                self.data.set_matching_keywords(word)
         return score
         
+    
     def apply_asg(self):
+        ## TODO WHEN ALEC IS DONE
         pass
+    
     
     def score_ml_proc(self,words,words2):
         
@@ -94,21 +96,16 @@ class SelectionAgent:
         for word in words.keys():
             if word in list(words2.keys()):
                 score += min([words[word],words2[word]])
+                self.data.set_matching_keywords(word)
+                self.data.set_matching_keywords(word,False)
                 
         return score
         
     
     def weghted_preproc_select(self,scores,time_constraint):
-              
-        if time_constraint == 0:
-            
             return np.asarray(list(scores.keys()))[np.choice(len(scores),1,scores/np.sum(list(scores).values()))]
-        else:
-            return np.asarray(list(scores.keys()))[np.choice(len(scores),3,scores/np.sum(list(scores).values()))]
         
 
-        
-    
     def weighted_ml_select(self,keywords,scores,time_constraint):
         
         scores = np.asarray(list(scores.values()))
@@ -117,28 +114,17 @@ class SelectionAgent:
             return np.asarray(list(keywords.items()))[np.choice(len(keywords),1,scores/np.sum(scores))]
         else:
             return np.asarray(list(keywords.items()))[np.choice(len(keywords),3,scores/np.sum(scores))]
+    
+    
+    def get_initial_scores(self,techniques,user_input):
         
-
-    
-class TextSelect:
-    pass
-    
-'''    
-    
-        score = 0
+        scores = {}
+        input_ml_scores = {}
         
-        if not user:
-            return len(list(set(words) & set(words2)))/len(words2)
-
-        for word in words2:
-           if word in words.keys():
-              score += words[word]
-                    
-        score /+ words['maxscore']
-        ### TODO: optimize experimentally
-        if score['numpapers'] > 1:
-            score += 0.05
-            
-        return score
-    
-'''
+        for key,keywords in techniques.items():  
+               score = self.score_user(keywords,user_input)
+               input_ml_scores[key] = keywords
+               scores[key] = score
+               
+        return input_ml_scores,scores
+        
