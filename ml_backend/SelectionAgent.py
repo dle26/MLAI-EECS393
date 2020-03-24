@@ -14,7 +14,7 @@ import PreProcessing
 from TextMine import TEXTMINE
 
 
-class SelectionAgent:
+class SELECT:
     
     def __init__(self,data,threshold,techkey):
         
@@ -28,7 +28,7 @@ class SelectionAgent:
         if no_labels:
            mltechniques,preprocessing = self.getMethods(unsupervised=True)
         else:
-             mltechniques,preprocessing = self.getMethods()
+            mltechniques,preprocessing = self.getMethods()
              
         preprocessing_ml_scores = {}
         input_ml_scores = {}

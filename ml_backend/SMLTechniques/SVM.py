@@ -15,12 +15,17 @@ from sklearn.model_selection import StratifiedKFold
 class SVM(Technique):
     
     ### static dict variable used in selection framework   
-    keywords = {'low-dim':(0,0),'images':(0,0),'numeric':(0,0),'binary':(0,0)}
+    keywords = {'low-dimensional': 0,'image': 0,'numeric': 0,'binary-class': 0}
+    num_uses = 0
     
     def __init__(self):
         self.model = None
  
     
+    def add_keyword(keyword,score):
+        SVM.keywords[keyword] = score
+        
+        
     def get_name():
         return 'SVM'
 

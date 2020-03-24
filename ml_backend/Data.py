@@ -56,6 +56,9 @@ class DATA:
     
     def set_techniques(self,tech):
         self.techniques.extend(tech)
+    
+    def set_preprocessing_techniques(self):
+        return self.techniques
         
     def set_matching_keywords(self,value,ml=True):
         if ml:
@@ -83,6 +86,9 @@ class DATA:
     def add_feat_importances(self,fi,name):
         self.feature_importances[name] = fi
         
+    def get_feat_importances(self):
+        return self.feature_importances
+        
     def add_pred_results(self,results):
         self.prediction_results.extend(results)
     
@@ -100,6 +106,9 @@ class DATA:
         self.bestmodel = best
         
     def get_techniques(self):
+        return self.techniques
+         
+    def get_preprocessing_techniques(self):
         return self.techniques
     
     def add_interpreted_results(self,res):

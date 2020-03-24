@@ -10,7 +10,7 @@ class Technique(abc.ABC):
        
     @abc.abstractmethod
     
-    def static_get_keywords():
+    def add_keywords():
         pass
     
     
