@@ -51,7 +51,7 @@ class TEXTMINE:
              for num,res in enumerate(doc_srch.results):
                  
                  DOI = res['prism:doi']
-                 URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI)
+                 URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + '?view=META_ABS'
                  r = requests.get(url = URL,headers=header)
                  
                  if 'INVALID_INPUT' not in str(r.content):
