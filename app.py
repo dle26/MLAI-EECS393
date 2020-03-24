@@ -3,6 +3,7 @@ from flask import Flask, render_template, url_for, request, session, redirect, j
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from functools import wraps
+from util import *
 import csv
 import datetime
 import jwt
@@ -112,6 +113,15 @@ def upload():
     return jsonify({
         "message": "accepted file"
     })
+
+@app.route("/developerfeedback", methods=['POST'])
+def developer_feedback():
+    email_address = request.get_json(force = True)['email_address']
+    name = request.get_json(force = True)['name']
+    feedback = request.get_json(force = True)['feedback']
+    subject = request.get_json(force = True)['subject']
+
+    return send_feedback_email(email_address, name, feedback, subject)
 
 def save_upload(f):
     mongodb.save_file(f.filename, f, 'data')
