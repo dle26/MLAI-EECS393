@@ -34,14 +34,6 @@ if (NR%50==0)
 
 
 END {
-    print "<pre>"
-    print "<h1> --- Your Topic --- </h1>"
-    print "\n"
-    print topic
-    print "\n"
-    print "\n"
-    print "<h1> ---- Keywords (Scores typically between 0.5-5, higher score = hotter topic!) ---- </h1>"
-    print "\n" 
     j=0
     for (i  in wordcounts)
        {
