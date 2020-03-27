@@ -1,10 +1,12 @@
 #!/bin/bash
 
-read -p "Enter your topic here (i.e. virus, hay+fever): " word
-read -p "Search papers published in or after (i.e. 2016): " year1
-read -p "Search papers published in or before (i.e. 2020): " year2
-read -p "How many papers per search year (5,10,20,50,100,200): " paper
-read -p "How many related papers in search (None,5,10,20,50,100,200): " related
+args=("$@")
+word=${args[0]} 
+year1=${args[1]}  
+year2=${args[2]}  
+paper=${args[3]}  
+related=${args[4]}  
+user_id=${args[5]}  
 
 none="None"
 numyears=$((year2-year1))
@@ -15,15 +17,15 @@ do
   lynx --dump --nolist "https://www.ncbi.nlm.nih.gov/pubmed/?term=$word+AND+$((year1+i))[pdat]&dispmax=$papers&report=abstract"> "output$i.txt"
   if [ $related != $none ]
   then
-     lynx -dump "https://www.ncbi.nlm.nih.gov/pubmed/?term=$word+AND+$((year1+i))[pdat]&dispmax=$papers&report=abstract" | awk '/http/{print $2}' > "links$i"
+     lynx -dump "https://www.ncbi.nlm.nih.gov/pubmed/?term=$word+AND+$((year1+i))[pdat]&dispmax=$papers&report=abstract" | awk '/http/{print $2}' > "links$i$user_id"
      sed -i '/linkname=pubmed_pubmed&from_uid/!d' "links$i.txt"
-     mapfile -t arr < "links$i.txt"
+     mapfile -t arr < "links$i$user_id.txt"
      len=${#arr[@]}
-     rm "links$i"
+     rm "links$i$user_id"
      for j in ${arr[*]}
      do 
        k=$((k+1))
-       lynx --dump --nolist "$j&dispmax=$related&report=abstract" > "related$k.txt"
+       lynx --dump --nolist "$j&dispmax=$related&report=abstract" > "related$k$user_id.txt"
      done
   fi
 done
@@ -32,7 +34,7 @@ cat *txt > testfile
 
 for ((i=0;i<=$numyears;i++))
 do
-   rm "output$i.txt"
+   rm "output$i$user_id.txt"
 done
 
 
@@ -40,7 +42,7 @@ if [ $related != $none ]
 then
   for ((i=0;i<=$k;i++))
   do
-   rm "related$i.txt"
+   rm "related$i$user_id.txt"
   done
 fi
 
@@ -48,6 +50,7 @@ fi
 sed -i 's/[ \t]*//' testfile
 sed -i '/^[[:space:]]*$/d' testfile
 awk 'length($0)>50' testfile > out
+rm testfile 
 sed -i 's/[0-9]\w\+//g' out
 sed -i 's/[]/.:;<>!=+?,"&@%()[^*]//g' out
 sed -i 's/\\//g' out
@@ -56,7 +59,6 @@ sed -i '/^$/d' stop
 sed -i 's/[[:space:]]*$//' stop
 sed -i '/^$/d' spanishwords
 sed -i 's/[[:space:]]*$//' spanishwords
-awk -v topic=$word -f p2.awk out > results.html
-rm testfile
+awk -v topic=$word -f p2.awk out > "results$user_id.txt"
 rm out
-
+sed -i 's/ //g' "results$user_id.txt"
