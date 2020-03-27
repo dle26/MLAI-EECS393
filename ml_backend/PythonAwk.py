@@ -42,7 +42,7 @@ class AbstractAwk:
                 for ln in lines:
                     bigrams.append(ln[0:ln.index(":")])
                     bigram_scores.append(float(ln[ln.index(":")+1:len(ln)]))
-            shutil.rmtree("results" + str(self.user_id) + ".txt")
+            shutil.rmtree("results" + str(self.user_id))
         
         return self.two_list_sort(bigrams,bigram_scores)[int(len(bigrams)*0.9):len(bigrams)]
             
