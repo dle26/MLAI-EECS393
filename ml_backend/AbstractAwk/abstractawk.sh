@@ -59,6 +59,6 @@ sed -i '/^$/d' stop
 sed -i 's/[[:space:]]*$//' stop
 sed -i '/^$/d' spanishwords
 sed -i 's/[[:space:]]*$//' spanishwords
-awk -v topic=$word -f p2.awk out > "results$user_id.txt"
+awk -v topic=$word -f p2.awk out > "results$user_id"
 rm out
-sed -i 's/ //g' "results$user_id.txt"
+sed -i 's/ //g' "results$user_id"
