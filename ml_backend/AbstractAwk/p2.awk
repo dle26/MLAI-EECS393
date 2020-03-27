@@ -15,6 +15,7 @@ if ($i in stopwords || $i in spanish ||$i in topic_arr || $i in seenwords || len
    continue 
 
 seenwords[$i] = $i
+
 if ($i in allwords)
 { 
    wordcounts[$i] = wordcounts[$i] + 1
