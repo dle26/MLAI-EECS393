@@ -25,7 +25,8 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token: sessionStorage.getItem("Token")
+      token: sessionStorage.getItem("Token"),
+      files: []
     };
   }
 
@@ -33,15 +34,16 @@ class Dashboard extends Component {
     console.log("token: " + this.state.token);
   }
 
-  addFiles(file) {
+  addFile(files) {
+    this.setState({
+      files: files[0]
+    });
+  }
+
+  upload() {
     const url = "http://localhost:5000/upload";
-
     const formData = new FormData();
-    
-    console.warn("data: ", file[0]);
-
-    formData.append("file", file[0]);
-        
+    formData.append("file", this.state.files);
     const config = {
       headers: {
         "content-type": "multipart/form-data"
@@ -49,21 +51,15 @@ class Dashboard extends Component {
     };
 
     axios
-      .post(url, formData, config)
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    .post(url, formData, config)
+    .then(response => {
+      console.log(response.data);
+    })
+    .catch(error => {
+      console.log(error);
+    });
   }
 
-  upload() {
-    axios.post("http://localhost:5000/upload", {
-      username: sessionStorage.getItem("Username"),
-      files: this.state.files
-    }).then;
-  }
   render() {
     const { classes } = this.props;
 
@@ -96,7 +92,7 @@ class Dashboard extends Component {
             dropzoneText={"Drop file here, or click to select file"}
             cancelButtonText={true}
             showPreviewsInDropzone={true}
-            onChange={this.addFiles.bind(this)}
+            onChange={this.addFile.bind(this)}
             showFileNames={true}
             showPreviewsInDropzone={true}
             maxFileSize={10000000}

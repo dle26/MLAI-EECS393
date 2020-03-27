@@ -74,18 +74,12 @@ class SignIn extends Component {
       });
   }
 
-  routeToSignUp() {
-    this.setState({
-      routeToSignUp: true
-    });
-  }
+
 
   render() {
     const { classes } = this.props;
 
     if (this.state.routeToHome) return <Redirect to="/" />;
-
-    if (this.state.routeToSignUp) return <Redirect to="/signUp" />;
 
     return (
       <Container component="main" maxWidth="xs">
