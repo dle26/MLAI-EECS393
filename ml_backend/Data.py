@@ -11,11 +11,11 @@ import copy
 
 class DATA:
     
-    def __init__(self,data,user,labels =None):
+    def __init__(self):
         
-        self.data = data
-        self.labels = labels
-        self.user=user
+        self.data = None
+        self.labels = None
+        self.user= None
         self.info = None
         self.bestmodel = None
         self.techniques = []
