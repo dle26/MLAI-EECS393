@@ -1,6 +1,6 @@
 #Automated Machine Learning Analysis Framework for MLAI
 
-Currently accepted formats:
+Accepted formats (single file or dir):
 
   .csv,
   .xlsx,
@@ -10,5 +10,11 @@ Currently accepted formats:
   .txt
   
  How each format is structured:
- - c
+ - csv/xlsx - as is 
+ - directory of images - combined into a single array w/original dimensions stored
+ - .txt - converted to nd.array
+ - .fcs - converted into pandas.dataframe
+ 
+ 
+ 
   
