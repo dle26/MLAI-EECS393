@@ -1,6 +1,6 @@
 # AbstractAwk
 
-Developed by James Anibal james.anibal@case.edu)
+Developed by James Anibal (james.anibal@case.edu)
 
 # Introduction and Purpose
 We aim to provide a more efficient approach to jounral article searches searches by developing AbstractAwk, a straightforward command line tool that will run on any Ubuntu or Mac OS. 
