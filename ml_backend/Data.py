@@ -27,10 +27,8 @@ class DATA:
         self.feature_importances = None
         self.prediction_results = None
         self.prior_preprocessing = []
-        self.matching_keywords = {"Preprocessing": [], "ML":[]}
+
         
-    
-    
     
     ####  GENERAL USE
     def get_data(self):

@@ -27,16 +27,26 @@ import datetime
 class TEXTMINE:
     
     
-    TECHNICAL_KEYWORDS = ["machine learning","deep learning","clustering",
-                          "supervised learning","computer vision"]
+    SUP_TECHNICAL_KEYWORDS = ["machine learning","deep learning",
+                          "supervised learning","classification"]
     
-    def __init__(self,user_keywords,technical_keywords):
+    UNS_TECHNICAL_KEYWORDS = ["machine learning","deep learning",
+                          "unsupervised learning","clustering"]
+    
+    
+    def __init__(self,user_keywords,technical_keywords,supervised = True):
         
         self.user_keywords = user_keywords
         self.technical_keywords = technical_keywords
         self.run_id = run_id
+        self.supervised = supervised
     
     def from_database(self):
+        
+        if self.supervised:
+            tech_words = TEXTMINE.SUP_TECHNICAL_KEYWORDS
+        else:
+             tech_words = TEXTMINE.UNS_TECHNICAL_KEYWORDS
         
         con_file = open("config.json")
         config = json.load(con_file)
@@ -53,18 +63,19 @@ class TEXTMINE:
         bigram_scores = []
         
         for year in years:
-          for combo in self.generate_combinations(self.user_keywords,TEXTMINE.TECHNICAL_KEYWORDS):
+          for combo in self.generate_combinations(self.user_keywords,tech_words):
               
              file = open("TextMineResults" + str(self.run_id) + ".txt","w")
-            
+
              string = combo[0] + " " + combo[1]
              doc_srch = ElsSearch(string + ' ' + str(year),'sciencedirect')
+             
              doc_srch.execute_modified(doc_srch.uri,client,get_all=True,set_limit=75,get_all = True)
 
              for num,res in enumerate(doc_srch.results):
                  
                  DOI = res['prism:doi']
-                 URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + '?view=FULL"
+                 URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?view=FULL"
                  r = requests.get(url = URL,headers=header)
                  
                  if 'INVALID_INPUT' not in str(r.content):
@@ -96,7 +107,7 @@ class TEXTMINE:
     ### TODO: CITE ELSAPY - I MODIFIED THE SRC FOR MLAI 
     def execute_modified(uri,els_client = None, get_all = False,set_limit=25):
 
-        api_response = els_client.exec_request(uri
+        api_response = els_client.exec_request(uri)
         results = api_response['search-results']['entry']
         
         if get_all is True:

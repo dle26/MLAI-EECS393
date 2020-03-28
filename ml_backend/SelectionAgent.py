@@ -13,11 +13,11 @@ from UniversalScores import UniversalScores
 
 class SELECT:
     
-    def __init__(self,data,threshold,techkey):
+    def __init__(self,data,threshold=0.5):
         
         self.data = copy.deepcopy(data)
         self.mining_threshold = threshold
-        self.technical_keywords = techkey
+
         
         
     def selectAnalysisApproach(self,time_constraint,no_labels=False):
@@ -41,7 +41,7 @@ class SELECT:
             
 
         if pscore < self.mining_threshold:
-            self.data = TEXTMINE(self.data,self.technical_keywords).from_database()
+            self.data = TEXTMINE(self.data).from_database()
             user_input = self.data.get_info()
             preprocessing,pscore = UniversalScores.reference(user_input,"preprocessing",top3_approaches)
             
@@ -50,3 +50,5 @@ class SELECT:
 
         return self.data
         
+    
+    
