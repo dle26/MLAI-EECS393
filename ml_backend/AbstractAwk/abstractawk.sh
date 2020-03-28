@@ -2,6 +2,7 @@
 
 args=("$@")
 file = ${args[0]} 
+user_id = ${args[1]}
 
 sed -i 's/[ \t]*//' file
 sed -i '/^[[:space:]]*$/d' file
