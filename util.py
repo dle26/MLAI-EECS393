@@ -2,6 +2,7 @@ from config import Config
 from flask import jsonify
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+import pymongo
 
 def send_feedback_email(email_address, name, feedback, subject):
     message = Mail(
@@ -16,3 +17,16 @@ def send_feedback_email(email_address, name, feedback, subject):
     except Exception as e:
         print(e)
         return jsonify({'feedback': 'error'})
+
+#json contents need to be in dictionary format
+# ex send_json_to_database(isaacwithrow, {"a": 2}) will add
+# {"file": {"a": 2}} to the user isaacwithrow's entry in the database
+def send_json_to_database(username, json_contents):
+    myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+    mydb = myclient["MLAI"]
+    users = mydb["users"]
+
+    myquery = { "username": username }
+
+    newvalues = { "$set": { "file": json_contents } }
+    users.update_one(myquery, newvalues)
