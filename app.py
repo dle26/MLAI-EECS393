@@ -8,6 +8,7 @@ import csv
 import datetime
 import jwt
 import pandas as pd
+import pymongo
 
 
 app = Flask(__name__)
@@ -135,6 +136,12 @@ def get_upload(filename):
 def protected():
     return jsonify({'message': 'with token'})
 
+#was only used to test send_json_to_database, will be deleted in a future commit
+# @app.route("/pythonobject", methods=['POST'])
+# def python_object():
+#     username = request.get_json(force = True)['username']
+#
+#     return send_json_to_database(username, {"a": 3})
 
 if __name__ == '__main__':
     app.run(debug=True)
