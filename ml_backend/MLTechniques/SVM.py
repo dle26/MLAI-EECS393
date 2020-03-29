@@ -18,7 +18,8 @@ from sklearn.model_selection import StratifiedKFold
 class SVM(Technique):
     
   
-    custom = False
+    CUSTOM = False
+    TECHNIQUE_TYPE = "supervised"
     
     def __init__(self):
         self.model = None

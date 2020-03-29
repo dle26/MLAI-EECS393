@@ -6,3 +6,6 @@
 
 import Technique
 import Linear_SVC
+import VGG-CNN
+import SIFT
+import Arcsinh

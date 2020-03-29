@@ -18,8 +18,11 @@ class DATA:
     
     def __init__(self):
         
+        
+        ''' the data that is to be analyzed ''' 
         self.data = None
         
+        ''' the class labels for the data that is to be analyzed ''' 
         self.labels = None
         
         self.user= None
@@ -30,7 +33,7 @@ class DATA:
         
         self.techniques = []
         
-        self.prior_models = []
+        self.prior_model = None
         
         self.preprocessed_data = None
         
@@ -45,6 +48,15 @@ class DATA:
         self.prior_preprocessing = []
         
         self.current_models = []
+        
+        self.data_for_update = None
+        
+        self.ppr_data_for_update = None
+        
+        ### for images only 
+        self.dimensions = None
+        
+        
 
 
 class DATAPREP:
@@ -55,6 +67,8 @@ class DATAPREP:
         
 
     def process_data(self):
+
+        ####HANDLE PRIOR MODELS HERE
         return self.data
     
     
@@ -67,9 +81,9 @@ class DATAPREP:
         
         score = 1
         data_features = []
-        
+
         if self.data.user_input == None: 
-            score -= 0.05
+            score -= 0.25
 
         if self.multifile == False:
             sparsity = np.count_nonzero(np.isnan(self.data.data))/len(self.data)
@@ -84,7 +98,7 @@ class DATAPREP:
         if sparsity > 0.1:
             data_features.append("sparse")
             if sparsity > 0.25:
-                score -= 0.1
+                score -= 0.15
              
         if (oratio/num) > 0.05:
              data_features.append("outliers")

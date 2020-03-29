@@ -70,7 +70,7 @@ class UniversalScores:
                 matched_words[technique] = matched_words
                 
             for scoreset in technique_matches.values():
-                technique_matches[technique] = data_score * (np.average([sum(list(scoreset)),match_percentage[technique]],weights=[0.75,0.25]))
+                technique_matches[technique] = np.average([sum(list(scoreset)),match_percentage[technique]],weights=[0.75,0.25])
     
         results,values = UniversalScores.key_sort(list(technique_matches.keys()),list(technique_matches.values()))
         
@@ -87,7 +87,6 @@ class UniversalScores:
     
     
     def apply_skipgram(self):
-        ## TODO WHEN ALEC IS DONE
         pass
     
     
@@ -117,7 +116,7 @@ class UniversalScores:
 
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
-                if obj.technique_type == type_identifier:
+                if obj.TECHNIQUE_TYPE == type_identifier:
                      UniversalScores.TECHNIQUE_SCORES[type_identifier][obj.get_name()] = {}
 
 
