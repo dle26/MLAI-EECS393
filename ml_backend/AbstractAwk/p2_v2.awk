@@ -57,7 +57,7 @@ if (!(bigram in allbigrams) && stopword == 1)
     seenbigrams[bigram] = bigram
   }
 }
-if (NR%50==0)
+if (NR%20==0)
    {
      if (found_keyword == 1)
      {
@@ -109,7 +109,7 @@ END {
         j+=1
        }
     n =  dual_insertion_sort(numwordcounts,words) 
-    for (i=int(length(wordcounts)*0.95); i >= int(length(wordcounts)*0.9);i--)
+    for (i=int(length(wordcounts)); i >= int(length(wordcounts)*0.5);i--)
         {
            print numallwords[i]":"(numwordcounts[i]/normalize)
            print "\n"
@@ -124,7 +124,7 @@ END {
        }
        
     n =  dual_insertion_sort(numbigramcounts,bigrams)
-    for (i=int(length(bigramcounts)*0.95); i >= int(length(bigramcounts)*0.9);i--)
+    for (i=int(length(bigramcounts)); i >= int(length(bigramcounts)*0.5);i--)
         {
            print numallbigrams[i]";"(numbigramcounts[i]/normalize)
            print "\n"
@@ -139,9 +139,9 @@ END {
        }
      
      n =  dual_insertion_sort(numbigramcounts,bigrams)
-    for (i=int(length(allwords)*0.95); i >= int(length(allwords)*0.9);i--)
+    for (i=int(length(allwords)); i >= int(length(allwords)*0.5);i--)
         {
-           print numallwords[i]";"(total_words[i]/normalize)
+           print numallwords[i]"#"(total_words[i]/normalize)
            print "\n"
         }
      
