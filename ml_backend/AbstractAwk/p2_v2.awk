@@ -65,7 +65,7 @@ if (NR%50==0)
      {
        for (x in keywords)
        {
-         if (!(j in keywords))
+         if (!(j == x))
          {
           if (x"-"j in wordcounts)
              wordcounts[x"-"j] += 1
