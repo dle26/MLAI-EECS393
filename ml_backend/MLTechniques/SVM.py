@@ -26,7 +26,7 @@ class SVM(Technique):
  
 
     def get_name():
-        return 'SVM'
+        return 'svm'
 
     def train(self,data,time_constraint):
  
@@ -73,7 +73,7 @@ class SVM(Technique):
             results = gcv.predict(X[test])
             model = gcv.estimator
             
-        data.prediction_results = (results,SVM.get_name())
+        data.prediction_results.extend((results,SVM.get_name()))
         data.current_models.extend((self,SVM.get_name()))
         data.feat_importances.extend((None,SVM.get_name()))
   

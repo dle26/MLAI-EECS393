@@ -45,7 +45,7 @@ class VGG_CNN:
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2))
         
-        
+         
         self.classifier = nn.Sequential(
           nn.Linear(2048,4096),
           nn.Dropout(),
@@ -85,7 +85,7 @@ class VGG_CNN:
  
 
     def get_name():
-        return 'VGG-16 CNN'
+        return 'vgg-16 cnn'
     
     def train(self,data,time_constraint):
     

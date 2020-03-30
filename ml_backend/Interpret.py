@@ -11,11 +11,7 @@ Standardization class for Results collection/model eval
 from sklearn import metrics
 import copy 
 import numpy as np
-import inspect
-import UMLTechniques
-import SMLTechniques
-import PreProcessing
- 
+
 
 class INTERPRET:
     
@@ -101,15 +97,21 @@ class INTERPRET:
         highest_AUC = 0
         
         for technique in class_results.keys():
+            
+          self.update_result_tup(technique,class_results[technique]["AUC"])
+          
           if class_results[technique]["AUC"] > highest_AUC:
                 highest_AUC = class_results[technique]["AUC"]
                 best_technique = technique
+                
           if class_results[technique]["AUC"] == highest_AUC:
               if class_results[technique]["F1 Score"] < class_results[best_technique]["F1 Score"]:
                     best_technique = technique
+                    
               if class_results[technique]["Accuracy"] == class_results[best_technique]["Accuracy"]:
                    if class_results[technique]["Accuracy"] < class_results[best_technique]["Accuracy"]:
                         best_technique = technique
+                        
                    if class_results[technique]["Accuracy"] == class_results[best_technique]["Accuracy"]:
                         if np.random.randint(0,2) > 0:
                             best_technique = technique
@@ -118,36 +120,14 @@ class INTERPRET:
         return self.data
         
     
-    def update_model_heuristics(self,unsupervised=False):
-    
-        all_classes = {}
-        if unsupervised:
-             for name, obj in inspect.getmembers(UMLTechniques):
-                 if inspect.isclass(obj):
-                     all_classes[str(name)] = obj
-        
-        for name, obj in inspect.getmembers(SMLTechniques):
-            if inspect.isclass(obj):
-                all_classes[str(name)] = obj
-        
-                
-        all_preprocessing = {}
-        for name, obj in inspect.getmembers(PreProcessing):
-            if inspect.isclass(obj):
-                all_preprocessing[str(name)] = obj
-        
-        matches = self.data.get_match_keywords()
-        
-        
-        for ppr in self.data.get_preproessing_techniques():
-            for word in matches:
-                obj = all_preprocessing[ppr]
-                curr_score = obj.keywords[word]*obj.num_uses
-
-        return -1
-  
-
     
     
-    
-    
+    def update_result_tup(self,technique,score):
+        
+         for n,tup in enumerate(self.data.data_for_update):
+             
+             if technique in tup:
+                ml_update,ppr_update = list(self.data.data_for_update[n]),list(self.data.ppr_data_for_update[n])
+                ml_update.append(score)
+                ppr_update.append(score)
+                self.data.data_for_update[n],self.data.ppr_data_for_update[n] = tuple(ml_update),tuple(ppr_update)   

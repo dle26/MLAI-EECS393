@@ -9,45 +9,46 @@ Created on Fri Mar 20 18:19:49 2020
 from elsapy.elsclient import ElsClient
 from elsapy.elssearch import ElsSearch
 import json
-import nltk
 import itertools
+import inspect
 import requests
 import numpy as np
-from nltk.corpus import stopwords
 import string
-from nltk.corpus import wordnet as wn
 import pickle
 import os
-nltk.download('wordnet')
 import datetime
-
-
-
+from sklearn.preprocessing import MinMaxScaler
+import MLTechniques
 
 class TEXTMINE:
     
     
     SUP_TECHNICAL_KEYWORDS = ["machine learning","deep learning",
-                          "supervised learning","classification"]
+                          "supervised learning","classification","preprocessing","scaling"]
     
     UNS_TECHNICAL_KEYWORDS = ["machine learning","deep learning",
-                          "unsupervised learning","clustering"]
+                          "unsupervised learning","clustering","preprocessing","scaling"]
     
     
-    def __init__(self,user_keywords,technical_keywords,supervised = True):
+    def __init__(self,user_keywords,technical_keywords,approach=None,analysis_type='supervised'):
         
         self.user_keywords = user_keywords
         self.technical_keywords = technical_keywords
         self.run_id = run_id
-        self.supervised = supervised
+        self.analysis_type = analysis_type
+        self.approach = approach
+        self.preprocessing = preprocessing
+        
     
     def from_database(self):
         
-        if self.supervised:
+        if self.analysis_type == 'supervised':
             tech_words = TEXTMINE.SUP_TECHNICAL_KEYWORDS
-        else:
+            
+        elif self.analysis_type == 'unsupervised': 
              tech_words = TEXTMINE.UNS_TECHNICAL_KEYWORDS
-        
+
+
         con_file = open("config.json")
         config = json.load(con_file)
         con_file.close()
@@ -62,6 +63,15 @@ class TEXTMINE:
         bigrams = []
         bigram_scores = []
         
+        search_words = open("searchwords","w")
+        
+        for name, obj in inspect.getmembers(MLTechniques):
+            if inspect.isclass(obj):
+                if obj.TECHNIQUE_TYPE == self.analysis_type:
+                    search_words.write(obj.get_name() + '\n')
+                if obj.TECHNIQUE_TYPE == 'preprocessing':
+                    search_words.write(obj.get_name() + '\n')
+                    
         for year in years:
           for combo in self.generate_combinations(self.user_keywords,tech_words):
               
@@ -82,16 +92,12 @@ class TEXTMINE:
                      file.write(str(r.content))
                      
              file.close()
-             subprocess.check_call(["abstractawk.sh",str(file),str(self.user_id)])
-        
-             with open("results" + str(self.user_id)) as f:
-                lines = f.readlines()
-                for ln in lines:
-                    bigrams.append(ln[0:ln.index(":")])
-                    bigram_scores.append(float(ln[ln.index(":")+1:len(ln)]))
-                    shutil.rmtree("results" + str(self.user_id))
-        
-        return self.two_list_sort(bigrams,bigram_scores)
+             subprocess.check_call(["abstractawk.sh",str(file),str(search_words),str(self.user_id)])
+             os.remove(file)
+             filename = "results" + self.user_id
+             keywords,keyword_scores = self.adjust_awk_output(filename)
+            
+        return self.two_list_sort(keywords,keyword_scores)
         
         
     
@@ -124,7 +130,8 @@ class TEXTMINE:
     
         return results
     
-                                               
+               
+                                
     def two_list_sort(self,tosort,basis):
       for i in range(1, len(basis)):
         key = basis[i]
@@ -140,6 +147,30 @@ class TEXTMINE:
         
       return tosort
     
+    
      
-    def format_keywords(self):
-       pass
+    def adjust_awk_output(self,file):
+
+      keywords = []
+      keyword_scores = []
+      
+      #### SKIPGRAM HERE -- generate synonyms/related words
+      
+      with file as f:
+         tracker = 0
+         lines = f.readlines()
+         for ln in lines:
+             if ln.find(':') > -1:
+                 keywords.append(ln[0:ln.index(":")])
+                 keyword_scores.append(float(ln[ln.index(":")+1:len(ln)]))
+             if ln.find(';') > -1:
+                 keywords.append(ln[0:ln.index(";")])
+                 keyword_scores.append(max(1,float(ln[ln.index(";")+1:len(ln)])+(0.1*float(ln[ln.index(";")+1:len(ln)]))))
+             if ln.find("#") == -1:
+                tracker += 1
+             else:
+                 keyword_scores[keywords.index(ln[0:ln.index("#")])] = (keyword_scores[keywords.index(ln[0:ln.index("#")])]/float(ln[ln.index("#")+1:len(ln)]))
+                                                             
+      os.remove(file)
+      
+      return list(MinMaxScaler().fit_transform(keywords)),keyword_scores

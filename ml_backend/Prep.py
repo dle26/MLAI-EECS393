@@ -43,7 +43,7 @@ class DATA:
         
         self.feature_importances = None
         
-        self.prediction_results = None
+        self.prediction_results = []
         
         self.prior_preprocessing = []
         
@@ -69,7 +69,9 @@ class DATAPREP:
     def process_data(self):
 
         ####HANDLE PRIOR MODELS HERE
+        ### TODO: FOR IMAGES - DO NOT FORGET MULTIPLE CHANNELS 
         return self.data
+    
     
     
     ### TODO: add in text data handling + unsupervised learning  

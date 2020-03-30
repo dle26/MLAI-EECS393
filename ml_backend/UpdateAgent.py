@@ -8,11 +8,13 @@ Created on Thu Mar 26 23:20:06 2020
 
 from UniversalScores import UniversalScores
 
+''' THIS WILL BE CALLED AT THE END OF PIPELINE '''
 
+### TODO: ENSURE NO DUPLICATE KEYWORD WITH ADASKIPGRAM - DO NOT WANT AN EXCESS OF KEYWORDS
 
 class UpdateAgent:
 
-     
+ 
     def update(technique_score_tups):
         
         UpdateAgent.update_boost(technique_score_tups)
