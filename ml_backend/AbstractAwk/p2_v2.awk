@@ -2,12 +2,15 @@ BEGIN {
       ORS=" "
       n = make_array("stop",stopwords)
       n = make_array("spanishwords",spanish)
+      n = make_array("searchwords",searchwords)
       normalize = 0
       skipword = 1
+      found_keyword = 0
       split(topic,topic_arr,"+") 
       for (i in topic_arr)
         topic_words[topic_arr[i]] = topic_arr[i]
       }
+      
 {
 for (i=1; i <= NF;i++)
 {
@@ -16,94 +19,132 @@ if ($i in stopwords || $i in spanish ||$i in topic_arr || length($i) < 4 || i==N
    continue
 if ($(i+1) in stopwords || $(i+1) in spanish || $(i+1) in topic_arr || length($(i+1)) < 4)
    stopword = 0
- 
+
+if ($i in searchwords)
+{
+   found_keyword = 1
+   keywords[$i] = 1
+}
+
 bigram = $i" "$(i+1)
 if ($i in allwords)
 { 
-  if (!($i in seenwords))
-  {
-   wordcounts[$i] = wordcounts[$i] + 1
-   }
+  allwords[$i] = allwords[$i] + 1
 }
 else
 {
- if (!($i in seenwords))
+allwords[$i] = 1
+}
+
+if (!($i in seenwords))
   {
-   allwords[$i] = $i
-   wordcounts[$i] = 1
+   seenwords[$i] = $i
    }
  }
-
+ 
 if (bigram in allbigrams && stopword == 1)
 { 
+ allbigrams[bigram] = allbigrams[bigram]+1
+ }
+ 
+if (!(bigram in allbigrams) && stopword == 1)
+{ 
+ allbigrams[bigram] = 1
+} 
+
  if (!(bigram in seenbigrams))
   {
-   bigramcounts[bigram] = bigramcounts[bigram] + 1
-   }
-}
-else
-{
- if (stopword == 1)
-  {
-    if (!(bigram in seenbigrams))
-    {
-   bigramcounts[bigram] =  1
-   allbigrams[bigram] = bigram
-   }
-   }
+    seenbigrams[bigram] = bigram
+  }
 }
 if (NR%50==0)
    {
+     if (found_keyword == 1)
+     {
+     for (j in seenwords)
+     {
+       for (x in keywords)
+       {
+         if (!(j in keywords))
+         {
+          if (x"-"j in wordcounts)
+             wordcounts[x"-"j] += 1
+          else
+            wordcounts[x"-"j] = 1   
+         }
+        }
+     }
+
+     for (k in seenbigrams)
+     {
+       for (x in keywords)
+         {
+            if (x"-"k in bigramcounts)
+             bigramcounts[x"-"k] += 1
+          else
+            bigramcounts[x"-"k] = 1   
+         }
+     }
+     
+      found_word = 0
+     }
+     
      delete seenwords
      delete seenbigrams
+     delete keywords
      normalize = normalize + 1
     }
-seenbigrams[bigram] = bigram
-seenwords[$i] = $istopword = 1
+    
 stopword = 1
    }
 }
 
 
 END {
-    print "<pre>"
-    print "<h1> --- Your Topic --- </h1>"
-    print "\n"
-    print topic
-    print "\n"
-    print "\n"
-    print "<h1> ---- Keywords (Scores typically between 0.5-5, higher score = hotter topic!) ---- </h1>"
-    print "\n" 
     j=0
     for (i  in wordcounts)
        {
         numwordcounts[j] = wordcounts[i]
-        numallwords[j] = allwords[i]
+        words[j] = i
         j+=1
        }
-    n =  dual_insertion_sort(numwordcounts,numallwords) 
+    n =  dual_insertion_sort(numwordcounts,words) 
     for (i=int(length(wordcounts)*0.95); i >= int(length(wordcounts)*0.9);i--)
         {
-           print numallwords[i]": "(numwordcounts[i]/normalize)*100
+           print numallwords[i]":"(numwordcounts[i]/normalize)
            print "\n"
         }
 
-    print "\n"
-    print "\n"
-    print "<h1> ---- Key Bigrams (Scores typically between 0.5-5, higher score = hotter topic!) ---- </h1>"
     j=0
     for (i  in bigramcounts)
        {
         numbigramcounts[j] = bigramcounts[i]
-        numallbigrams[j] = allbigrams[i]
+        bigrams[j] = i
         j+=1
        }
-    n =  dual_insertion_sort(numbigramcounts,numallbigrams)
+       
+    n =  dual_insertion_sort(numbigramcounts,bigrams)
     for (i=int(length(bigramcounts)*0.95); i >= int(length(bigramcounts)*0.9);i--)
         {
-           print numallbigrams[i]": "(numbigramcounts[i]/normalize)*100
+           print numallbigrams[i]";"(numbigramcounts[i]/normalize)
            print "\n"
         }
+     
+    j=0
+    for (i  in allwords)
+       {
+        numallwords[j] = allwords[i]
+        total_words[j] = i
+        j+=1
+       }
+     
+     n =  dual_insertion_sort(numbigramcounts,bigrams)
+    for (i=int(length(allwords)*0.95); i >= int(length(allwords)*0.9);i--)
+        {
+           print numallwords[i]";"(total_words[i]/normalize)
+           print "\n"
+        }
+     
 }
 
 
@@ -137,5 +178,3 @@ function dual_insertion_sort(arr1,arr2)
   }
   return 0
   }
-
-
