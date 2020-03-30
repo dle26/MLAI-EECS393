@@ -16,6 +16,8 @@ sed -i '/^$/d' stop
 sed -i 's/[[:space:]]*$//' stop
 sed -i '/^$/d' spanishwords
 sed -i 's/[[:space:]]*$//' spanishwords
+sed -i '/^$/d' searchwords
+sed -i 's/[[:space:]]*$//' searchwords
 awk -v topic=$word -f p2.awk out > "results$user_id"
 rm out
 sed -i 's/ //g' "results$user_id"
