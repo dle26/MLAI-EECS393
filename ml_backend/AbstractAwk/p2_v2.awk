@@ -68,9 +68,9 @@ if (NR%20==0)
          if (!(j == x))
          {
           if (x"-"j in wordcounts)
-             wordcounts[x"-"j] += 1
+             wordcounts[x"+"j] += 1
           else
-            wordcounts[x"-"j] = 1   
+            wordcounts[x"+"j] = 1   
          }
         }
      }
@@ -80,9 +80,9 @@ if (NR%20==0)
        for (x in keywords)
          {
             if (x"-"k in bigramcounts)
-             bigramcounts[x"-"k] += 1
+             bigramcounts[x"+"k] += 1
           else
-            bigramcounts[x"-"k] = 1   
+            bigramcounts[x"+"k] = 1   
          }
      }
      
