@@ -15,7 +15,13 @@ class SIFT:
     
     def __init__(self):
       self.model = None
-        
+    
+    def get_name():
+        return 'sift'
+    
+    def get_category_name():
+        return 'sift'
+    
     def train(self,data):
         
         train_data = data.data

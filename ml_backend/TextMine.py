@@ -6,6 +6,7 @@ Created on Fri Mar 20 18:19:49 2020
 @author: anibaljt
 """
 
+import elsapy
 from elsapy.elsclient import ElsClient
 from elsapy.elssearch import ElsSearch
 import json
@@ -13,12 +14,13 @@ import itertools
 import inspect
 import requests
 import numpy as np
-import string
 import pickle
 import os
 import datetime
 from sklearn.preprocessing import MinMaxScaler
 import MLTechniques
+import subprocess
+
 
 class TEXTMINE:
     
@@ -30,16 +32,13 @@ class TEXTMINE:
                           "unsupervised learning","clustering","preprocessing","scaling"]
     
     
-    def __init__(self,user_keywords,technical_keywords,approach=None,analysis_type='supervised'):
+    def __init__(self,user_keywords,user_id,analysis_type='supervised'):
         
         self.user_keywords = user_keywords
-        self.technical_keywords = technical_keywords
-        self.run_id = run_id
+        self.user_id = user_id
         self.analysis_type = analysis_type
-        self.approach = approach
-        self.preprocessing = preprocessing
+
         
-    
     def from_database(self):
         
         if self.analysis_type == 'supervised':
@@ -55,34 +54,36 @@ class TEXTMINE:
         client = ElsClient(config['apikey'])
         header = {'X-ELS-APIKey': config['apikey'],
           'Accept':'text/plain'}
-        
-        now = datetime.datetime.now()
-        
-        years = list(range(now.year-1,now.year+1))
-        
-        bigrams = []
-        bigram_scores = []
+
+        ###TODO: add year back in??
         
         search_words = open("searchwords","w")
-        
+        techniques = []
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
-                if obj.TECHNIQUE_TYPE == self.analysis_type:
-                    search_words.write(obj.get_name() + '\n')
-                if obj.TECHNIQUE_TYPE == 'preprocessing':
-                    search_words.write(obj.get_name() + '\n')
-                    
-        for year in years:
-          for combo in self.generate_combinations(self.user_keywords,tech_words):
+                if obj.TECHNIQUE_TYPE == self.analysis_type or obj.TECHNIQUE_TYPE == 'preprocessing':
+                    if obj.get_category_name() not in techniques:
+                        search_words.write(obj.get_category_name() + '\n')
+                        techniques.append(obj.get_category_name())
+   
+        
+        search_words.close()
+        
+        for combo in self.generate_combinations(self.user_keywords,tech_words):
               
-             file = open("TextMineResults" + str(self.run_id) + ".txt","w")
-
-             string = combo[0] + " " + combo[1]
-             doc_srch = ElsSearch(string + ' ' + str(year),'sciencedirect')
+             file = open("TextMineResults" + str(self.user_id) + ".txt","w")
              
-             doc_srch.execute_modified(doc_srch.uri,client,get_all=True,set_limit=75,get_all = True)
 
-             for num,res in enumerate(doc_srch.results):
+             if len(combo[0][0]) == 2:
+
+                 string = combo[0][0][0] + " " + combo[0][0][1] + " " + combo[0][1]
+             else:
+                 string = combo[0][0][0] + " " + combo[0][1]
+                 
+             doc_srch = ElsSearch(string,'sciencedirect')
+             results = TEXTMINE.execute_modified(doc_srch.uri,client,get_all=True,set_limit=25)
+
+             for num,res in enumerate(results):
                  
                  DOI = res['prism:doi']
                  URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?view=FULL"
@@ -92,11 +93,13 @@ class TEXTMINE:
                      file.write(str(r.content))
                      
              file.close()
-             subprocess.check_call(["abstractawk.sh",str(file),str(search_words),str(self.user_id)])
+             subprocess.check_call(["AbstractAwk/abstractawk.sh",str(file),str(search_words),str(self.user_id)])
              os.remove(file)
              filename = "results" + self.user_id
              keywords,keyword_scores = self.adjust_awk_output(filename)
-            
+        
+        os.remove(search_words)
+        
         return self.two_list_sort(keywords,keyword_scores)
         
         

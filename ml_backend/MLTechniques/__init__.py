@@ -4,8 +4,10 @@
 @author: anibaljt
 """
 
-import Technique
-import Linear_SVC
-import VGG-CNN
-import SIFT
-import Arcsinh
+
+from .Technique import Technique
+from .SVM import SVM
+from .VGG_CNN import VGG_CNN
+from .SIFT import SIFT
+from .Arcsinh import ARCSINH
+

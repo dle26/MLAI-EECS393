@@ -56,14 +56,17 @@ class DATA:
         ### for images only 
         self.dimensions = None
         
+        self.evalscore = 1
+        
         
 
 
 class DATAPREP:
     
-    def __init__(self,multifile=False):
-        self.data = DATA()
+    def __init__(self,data,multifile=False):
+    
         self.multifile = False
+        self.data = data
         
 
     def process_data(self):
@@ -84,27 +87,33 @@ class DATAPREP:
         score = 1
         data_features = []
 
-        if self.data.user_input == None: 
+        if self.data.descriptive_info == None: 
             score -= 0.25
 
+        ### TODO: zero + nan, not just nan
         if self.multifile == False:
-            sparsity = np.count_nonzero(np.isnan(self.data.data))/len(self.data)
-            oratio = self.outlier_ratio(self.data.data)
+            nan_count = 0
+            for arr in self.data.data:
+                nan_count += list(np.isnan(arr)).count('True')
+            
+            sparsity = nan_count/len(self.data.data)
+            oratio = self.outlier_ratio(self.data.data)/len(self.data.data)
             
         else:
             sparsity  = self.get_sparsity() 
             oratio = 0
             for num,i in enumerate(self.data.data):
-                oratio += self.outlier_ratio(self.data.data[i])
+                    oratio += self.outlier_ratio(self.data.data[i])
+            oratio = oratio/num
                 
         if sparsity > 0.1:
             data_features.append("sparse")
             if sparsity > 0.25:
                 score -= 0.15
              
-        if (oratio/num) > 0.05:
+        if oratio > 0.05:
              data_features.append("outliers")
-             if (oratio/num) > 0.1:
+             if oratio > 0.1:
                 score -= 0.1
                        
         if len(self.data.labels) < 100:
@@ -115,7 +124,7 @@ class DATAPREP:
         if len(list(set(self.data.labels))) > 2:
             data_features.append("multiclass")
             
-        elif len(list(set(self.data.labels))) == 1:
+        elif len(list(set(self.data.labels))) == 2:
             data_features.append("binary")
             
         else:
@@ -128,7 +137,8 @@ class DATAPREP:
                 score -= 0.1
         
 
-        info = self.data.descriptive_info.extend(data_features)
+        self.data.descriptive_info.extend(data_features)
+        info = self.data.descriptive_info
         self.data.descriptive_info = []
         self.data.descriptive_info = list(itertools.combinations(info,2))
         self.data.eval_score = score
@@ -187,9 +197,16 @@ class DATAPREP:
         outlier_ratio = 0
         
         for i in data.columns:
-            mean = np.mean(data[i])
-            std = np.std(data[i])
-            vals = (data[i].values-mean)/std
-            outlier_ratio /= len(np.where(np.abs(vals) > 3)[0])/len(data[i])
+            mean = np.mean(data[i].values)
+            std = np.std(data[i].values)
+            
+            if std > 0:
+                vals = (data[i].values-mean)/std
+            else:
+                vals = data[i].values-mean
+                
+            outliers = np.where(np.abs(vals) > 3)[0]
+            if len(outliers) > 0:
+                outlier_ratio  += (len(outliers)/len(data[i]))
         
         return outlier_ratio

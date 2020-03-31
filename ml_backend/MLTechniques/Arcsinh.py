@@ -12,4 +12,9 @@ class ARCSINH:
     
     TECHNIQUE_TYPE = "preprocessing"
     
-    pass
+    def get_name():
+        return 'arcsinh'
+    
+    def get_category_name():
+        return 'arcsinh'
+    

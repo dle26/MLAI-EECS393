@@ -7,7 +7,9 @@
 import abc
 
 class Technique(abc.ABC):
-       
+    
+    TECHNIQUE_TYPE = None
+    
     @abc.abstractmethod
     
     def add_keywords():

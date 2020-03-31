@@ -12,7 +12,7 @@ import torch.nn.functional as F
 
 class VGG_CNN:
     
-    CUSTOM = False
+    CUSTOM = True #smoothing via max pooling
     TECHNIQUE_TYPE = "supervised"
     
     class ConvNet(nn.Module):
@@ -86,6 +86,9 @@ class VGG_CNN:
 
     def get_name():
         return 'vgg-16 cnn'
+    
+    def get_category_name():
+        return 'cnn'
     
     def train(self,data,time_constraint):
     

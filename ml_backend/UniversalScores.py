@@ -7,50 +7,24 @@ Created on Thu Mar 26 16:25:59 2020
 """ 
 
 import inspect
-import copy
 import numpy as np
 import MLTechniques
+import pickle
+import os
 
 class UniversalScores:
     
     
-    TECHNIQUE_SCORES = {"supervised":{},"unsupervised":{},"preprocessing":{}}
-    BOOST = {"supervised":{},"unsupervised":{},"preprocessing":{}}
-    
-    
-    
-    SML_FIRST_USE = True
-    UML_FIRST_USE = True
-    PRP_FIRST_USE = True
-
-
     def reference(keywords,type_indentifier='supervised',top_approaches=None):
 
-        if (type_indentifier == 'supervised' and UniversalScores.SML_FIRST_USE): 
-            UniversalScores.initialize('supervised')
+        if (type_indentifier == 'supervised'): 
+           boost,scores = UniversalScores.initialize('supervised')
             
-        if (type_indentifier=='unsupervised' and UniversalScores.UML_FIRST_USE): 
-            UniversalScores.initialize('unsupervised')
+        if (type_indentifier=='unsupervised'): 
+            boost,scores = UniversalScores.initialize('unsupervised')
         
-        if (type_indentifier == 'preprocessing' and UniversalScores.PRP_FIRST_USE): 
-            UniversalScores.initialize('preprocessing')
-   
-    
-        #### values, flatten the technique-bigram tups
-        boost = copy.deepcopy(UniversalScores.BOOST) 
-        tech_scores = copy.deepcopy(UniversalScores.TECHNIQUE_SCORES)
-            
-        if type_indentifier == 'supervised':
-            scores = tech_scores["supervised"]
-            boost = boost["supervised"]
-        
-        elif type_indentifier == "unsupervised":
-            scores = tech_scores["unsupervised"]
-            boost =  boost["unsupervised"]
-            
-        scores_ppr = tech_scores["preprocessing"]
-        boost_ppr =  boost["preprocessing"]
-          
+        boost_ppr,scores_ppr = UniversalScores.initialize('preprocessing')
+
         results,values,matched_words = UniversalScores.compare_keywords(scores,boost,keywords)
         
         results = UniversalScores.weighted_select(results)
@@ -80,24 +54,27 @@ class UniversalScores:
         return np.asarray(keywords)[indicies],scores[indicies]
         
     
+    ### REDOTHIS FOR PICKLE FILES!!
+    
     def initialize(type_identifier):
         
-        ### class inspection
-        if type_identifier == 'supervised':
-            UniversalScores.SML_FIRST_USE = False
-            
-        if type_identifier == 'unsupervised':
-            UniversalScores.UML_FIRST_USE = False
+        if os.path.exists('BOOST.pkl'):
+            boost = pickle.load(open('BOOST.pkl','rb'))
+        else:
+            boost = {"supervised":{},"unsupervised":{},"preprocessing":{}}
         
-        if type_identifier == 'preprocessing':
-            UniversalScores.PRP_FIRST_USE = False
-
+        
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
-                if obj.TECHNIQUE_TYPE == type_identifier:
-                     UniversalScores.BOOST[type_identifier][obj.get_name()] = {}
-
-
+                if obj.TECHNIQUE_TYPE == type_identifier and obj.TECHNIQUE_TYPE not in boost:
+                     boost[type_identifier][obj.get_name()] = {}
+        
+        pickle.dump(boost,open("BOOST.pkl","wb"))
+        
+        return boost[type_identifier],pickle.load(open('TECHNIQUE_SCORES.pkl','rb'))[type_identifier]
+        
+        
+    
 
     def key_sort(keys,values): 
   

@@ -17,9 +17,13 @@ import nltk
 import string
 from nltk.tokenize import word_tokenize
 from Data import DATA
-from Prep.DATAPREP import eval_data
+from Prep import DATAPREP
+from TextMine import TEXTMINE
+from datetime import datetime
+from SelectionAgent import SELECT
 
 
+time = datetime.now()
 
 raw_data = pd.read_csv('training.csv')
 train_data = raw_data[[col for col in raw_data if col != 'label']].values
@@ -35,30 +39,44 @@ words = [word.lower() for word in words if word not in string.punctuation or wor
 tagged_words = nltk.pos_tag(words)
 
 search_words = []
-for n,word in enumerate(tagged_words):
-    if word[1][0] == 'N':
+for n,word in enumerate(tagged_words[0:len(tagged_words)-1]):
+    
+    if (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'J') or (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'N'):
+        search_words.append(word[0] + " " + tagged_words[n+1][1][0])
+
+    elif (word[1][0] == 'N'):
         search_words.append(word[0])
+        
 
 data = DATA()
 data.data = train_data
 data.labels = labels
 data.time_constraint = 1
-data.add_descriptive_info = search_words
+data.descriptive_info = search_words
 
 
-newdata = eval_data(data)
-           
+newdata = DATAPREP(data).eval_data()
+
+userid = 'JTA001'
+
+print(newdata.descriptive_info)
+
+words,scores = TEXTMINE(newdata.descriptive_info,userid).from_database()
+
+print('Prep Time: ' + str(datetime.now()-time))
+
+
 def test_eval():
 
-    assert (True == ("multiclass images" in newdata.descriptive_info)),"Structural Eval. Failed"
-    assert (True == (newdata.eval_score is not None and newdata.evalscore > 0.25 and newdata.evalscore < 1.1)),"Data Scoring Failed"
+    assert (True == (('multiclass', 'images') in newdata.descriptive_info) or ('images', 'multiclass') in newdata.descriptive_info),"Structural Eval. Failed"
+    assert (True == (newdata.eval_score is not None and newdata.eval_score > 0.25 and newdata.eval_score < 1.1)),"Data Scoring Failed"
+
+def test_mining():
+    
+    assert (True == ('cnn+image' in words or 'cnn+images' in words)) ,"Textmining Failed"
     
 
-def test_textmining():
-    pass
-    
-def test_selection():
-    pass
+
 
 def test_analysis():
     pass

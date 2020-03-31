@@ -7,7 +7,7 @@ Implementation for SkLearn's SVC class
 
 """
 
-from Technique import Technique 
+from .Technique import Technique
 from sklearn.svm import SVC
 import numpy as np
 from sklearn.model_selection import GridSearchCV
@@ -28,6 +28,9 @@ class SVM(Technique):
     def get_name():
         return 'svm'
 
+    def get_category_name():
+        return 'svm'
+    
     def train(self,data,time_constraint):
  
         X = np.asarray(data.preprocessed_data) 

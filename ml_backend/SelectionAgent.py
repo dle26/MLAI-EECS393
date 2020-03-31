@@ -36,17 +36,19 @@ class SELECT:
         ##### NOTHING HERE TO HANDLE EMPTY ONES - NOVEL APPROACHES
        
         all_approaches,all_ppr = "",""
+        custom_approaches = {}
 
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
                 if obj.TECHNIQUE_TYPE == analysis_type:
                     all_approaches += obj.get_name()
+                    custom_approaches[obj.get_name()] = obj.CUSTOM
                 if obj.TECHNIQUE_TYPE == 'preprocessing':
                     all_ppr += obj.get_name()
 
         if (len(matches)/len(self.data.descriptive_info)) < self.mining_threshold:
         
-            keywords,keyword_scores = TEXTMINE(self.data).from_database()
+            keywords,keyword_scores = TEXTMINE(self.data,self.run_id).from_database()
             top3_approaches,top3ppr,matches,ppr_matches = self.select_from_textmine(keywords,keyword_scores,all_approaches,all_ppr)
 
         else:
@@ -59,11 +61,13 @@ class SELECT:
         return self.data
     
     
-
-    def select_from_textmine(self,keywords,keywordscores,allapproaches,all_pr_approaches):
+    
+    
+    def select_from_textmine(self,keywords,keywordscores,allapproaches,all_pr_approaches,custom):
         
         approach_scores = {}
         ppr_approach_scores = {}
+     
         
         #### need adagram for this as well!!!!
         for num,key in enumerate(keywords):
@@ -74,10 +78,19 @@ class SELECT:
                    approach_scores[key[0:key.index('+')]] = 1
                if key[key.index('+'):len(key)] in all_pr_approaches:
                    if key[key.index('+'):len(key)] in ppr_approach_scores:
-                       ppr_approach_scores[key] += 1
+                       ppr_approach_scores[key[key.index('+'):len(key)]] += 2
                    else:
-                       ppr_approach_scores[key] = 1
-          
+                       ppr_approach_scores[key[key.index('+'):len(key)]] = 2
+                       
+           if key[0:key.index('+')] in all_pr_approaches:
+               for app in allapproaches:
+                   if app + key[key.index('+'):len(key)] in keywords:
+                     if app+"+"+key[0:key.index('+')] in ppr_approach_scores:
+                       ppr_approach_scores[app+"+"+key[0:key.index('+')]] += 1
+                     else:
+                         ppr_approach_scores[key[key.index('+'):len(key)]] += 1
+            
+            
         ranked_approaches,approach_scores = UniversalScores.sort_dict_values(approach_scores.keys(),approach_scores.values())
         ranked_ppr_approaches,ppr_scores = UniversalScores.sort_dict_values(ppr_approach_scores.keys(),ppr_approach_scores.values())
         
@@ -88,21 +101,28 @@ class SELECT:
         
         top3ppr = []
         for a in top3approaches:
-           for key in range(len(ranked_ppr_approaches)-1,0,-1):
-               ppr_key = list(ranked_ppr_approaches.keys())
-               if a in ranked_ppr_approaches[ppr_key]:
-                   top3ppr.append(ranked_ppr_approaches)
-                   break
+           if custom[a]:
+               top3ppr.append(None)
+           else:
+               for key in range(len(ranked_ppr_approaches)-1,0,-1):
+                   ppr_key = list(ranked_ppr_approaches.keys())
+                   if a in ranked_ppr_approaches[ppr_key]:
+                       top3ppr.append(ranked_ppr_approaches[ppr_key])
+                       break
         
         ml_match,ppr_match = [],[]
         
         for group in zip(top3approaches,top3ppr):
             matches,p_matches = [],[]
+            
             for word in keywords:
                 if word in group[0] and word not in group[1]:
                    matches.append(word[word.index('+'):len(word)])
-                if word not in group[0] and word in group[1]:
-                    p_matches.append(word[word.index('+'):len(word)])
+                   
+                if group[1] is not None:
+                    if word not in group[0] and word in group[1]:
+                        p_matches.append(word[word.index('+'):len(word)])
+                
                     
             ml_match.append(matches)
             ppr_match.append(p_matches)
