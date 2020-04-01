@@ -2,7 +2,7 @@ BEGIN {
       ORS=" "
       n = make_array("stop",stopwords)
       n = make_array("spanishwords",spanish)
-      n = make_array("search",searchwords)
+      n = make_array("searchwords",searchwords)
       normalize = 0
       skipword = 1
       found_keyword = 0
@@ -12,24 +12,21 @@ BEGIN {
       }
       
 {
-print NR
 for (i=1; i <= NF;i++)
 {
-
 ### eliminate stopwords 
-if ($i in stopwords || $i in spanish ||$i in topic_arr || length($i) < 4)
+if ($i in stopwords || $i in spanish ||$i in topic_arr || length($i) < 4 || length($i) > 50 || i==NF)
    continue
-if ($(i+1) in stopwords || $(i+1) in spanish || $(i+1) in topic_arr || (i+1) > NF || length($(i+1)) < 4)
+if ($(i+1) in stopwords || $(i+1) in spanish || $(i+1) in topic_arr || length($(i+1)) < 4 || length($(i+1)) > 50)
    stopword = 0
 
 if ($i in searchwords)
 {
-   print "here"
    found_keyword = 1
    keywords[$i] = 1
 }
-if (stopword==1)
-  bigram = $i" "$(i+1)
+
+bigram = $i" "$(i+1)
 if ($i in allwords)
 { 
   allwords[$i] = allwords[$i] + 1
@@ -43,6 +40,7 @@ if (!($i in seenwords))
   {
    seenwords[$i] = $i
    }
+ }
  
 if (bigram in allbigrams && stopword == 1)
 { 
@@ -58,15 +56,15 @@ if (!(bigram in allbigrams) && stopword == 1)
   {
     seenbigrams[bigram] = bigram
   }
-
-if (NR%20==0 && i==NF)
-   { 
+}
+if (NR%20==0)
+   {
      if (found_keyword == 1)
      {
      for (j in seenwords)
      {
        for (x in keywords)
-       {  
+       {
          if (!(j == x))
          {
           if (x"-"j in wordcounts)
@@ -95,21 +93,18 @@ if (NR%20==0 && i==NF)
      delete seenbigrams
      delete keywords
      normalize = normalize + 1
-    }    
+    }
+    
 stopword = 1
-}
- print "here"
    }
-
+}
 
 
 END {
-    print NR
     j=0
     for (i  in wordcounts)
        {
         numwordcounts[j] = wordcounts[i]
-        print i
         words[j] = i
         j+=1
        }

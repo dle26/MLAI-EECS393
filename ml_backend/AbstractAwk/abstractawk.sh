@@ -1,23 +1,25 @@
-#!/bin/bash
+#!usr/local/bin/bash
 
 args=("$@")
 file = ${args[0]} 
-user_id = ${args[1]}
+searchwords = ${args[1]}
+user_id = ${args[2]}
 
-sed -i 's/[ \t]*//' file
-sed -i '/^[[:space:]]*$/d' file
-awk 'length($0)>50' testfile > out
+sed -E -i "" 's/[ \t]*//' file
+sed -E -i "" '/^[[:space:]]*$/d' file
+awk 'length($0)>50' testfile > "out$user_id"
 rm file 
-sed -i 's/[0-9]\w\+//g' out
-sed -i 's/[]/.:;<>!=+?,"&@%()[^*]//g' out
-sed -i 's/\\//g' out
-sed -i 's/[A-Z]/\L&/g' out
-sed -i '/^$/d' stop
-sed -i 's/[[:space:]]*$//' stop
-sed -i '/^$/d' spanishwords
-sed -i 's/[[:space:]]*$//' spanishwords
-sed -i '/^$/d' searchwords
-sed -i 's/[[:space:]]*$//' searchwords
-awk -v topic=$word -f p2.awk out > "results$user_id"
-rm out
-sed -i 's/ //g' "results$user_id"
+sed -E -i "" 's/[0-9]\w\+//g' "out$user_id"
+sed -E -i "" 's/[]/.:;<>!=+?,"&@%()[^*]//g' "out$user_id"
+sed -E -i "" 's/\\//g' "out$user_id"
+awk '{print tolower($0)}' "out$user_id" > "out_2_$user_id"
+sed -E -i "" '/^$/d' stop
+sed -E -i "" 's/[[:space:]]*$//' stop
+sed -E -i "" '/^$/d' spanishwords
+sed -E -i "" 's/[[:space:]]*$//' spanishwords
+sed -E -i "" '/^$/d' searchwords
+sed -E -i "" 's/[[:space:]]*$//' searchwords
+awk -v topic=$word -f p2.awk "out_2_$user_id" > "results$user_id"
+rm "out$user_id"
+rm "out_2_$user_id"
+sed -E -i "" 's/ //g' "results$user_id"

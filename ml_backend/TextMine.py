@@ -20,6 +20,7 @@ import datetime
 from sklearn.preprocessing import MinMaxScaler
 import MLTechniques
 import subprocess
+import time
 
 
 class TEXTMINE:
@@ -52,11 +53,7 @@ class TEXTMINE:
         config = json.load(con_file)
         con_file.close()
         client = ElsClient(config['apikey'])
-        header = {'X-ELS-APIKey': config['apikey'],
-          'Accept':'text/plain'}
-
         ###TODO: add year back in??
-        
         search_words = open("searchwords","w")
         techniques = []
         for name, obj in inspect.getmembers(MLTechniques):
@@ -66,38 +63,46 @@ class TEXTMINE:
                         search_words.write(obj.get_category_name() + '\n')
                         techniques.append(obj.get_category_name())
    
-        
         search_words.close()
         
-        for combo in self.generate_combinations(self.user_keywords,tech_words):
+        file = "TextMineResults" + str(self.user_id) + ".txt"
+        
+        for n,combo in enumerate(self.generate_combinations(self.user_keywords,tech_words)):
               
-             file = open("TextMineResults" + str(self.user_id) + ".txt","w")
-             
-
              if len(combo[0][0]) == 2:
 
                  string = combo[0][0][0] + " " + combo[0][0][1] + " " + combo[0][1]
              else:
                  string = combo[0][0][0] + " " + combo[0][1]
                  
-             doc_srch = ElsSearch(string,'sciencedirect')
+             doc_srch = ElsSearch(string, 'sciencedirect')
              results = TEXTMINE.execute_modified(doc_srch.uri,client,get_all=True,set_limit=25)
 
              for num,res in enumerate(results):
                  
                  DOI = res['prism:doi']
-                 URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?view=FULL"
-                 r = requests.get(url = URL,headers=header)
+                 URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?APIKey=" + str(config['apikey'])
+                 subprocess.Popen(["bash",str(os.getcwd()) + "/AbstractAwk/collect.sh",str(URL), str(self.user_id)])         
+                 time.sleep(0.1)
                  
-                 if 'INVALID_INPUT' not in str(r.content):
-                     file.write(str(r.content))
-                     
-             file.close()
-             subprocess.check_call(["AbstractAwk/abstractawk.sh",str(file),str(search_words),str(self.user_id)])
-             os.remove(file)
-             filename = "results" + self.user_id
-             keywords,keyword_scores = self.adjust_awk_output(filename)
-        
+                 if num == 0 and n==0:
+                     file_op = 'w'
+                 else:
+                     file_op = 'a'
+                      
+                 with open(file,file_op) as f:
+                     with open(str(os.getcwd()) + "/html_text" + self.user_id,'rb') as f1:
+                         for line in f1:
+                             f.write(str(line))
+                     f1.close()
+                 f.close()  
+                 os.remove(str(os.getcwd()) + "/html_text" + str(self.user_id))
+
+                 
+        subprocess.Popen(["bash",str(os.getcwd()) + "/AbstractAwk/abstractawk.sh",str(file),"searchwords", str(self.user_id)])        
+        filename = "results" + self.user_id
+        time.sleep(0.1)
+        keywords,keyword_scores = self.adjust_awk_output(filename)
         os.remove(search_words)
         
         return self.two_list_sort(keywords,keyword_scores)
@@ -159,7 +164,7 @@ class TEXTMINE:
       
       #### SKIPGRAM HERE -- generate synonyms/related words
       
-      with file as f:
+      with open(file,'r') as f:
          tracker = 0
          lines = f.readlines()
          for ln in lines:
