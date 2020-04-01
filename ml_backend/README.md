@@ -16,5 +16,7 @@ Accepted formats (single file or dir):
  - .fcs - converted into pandas.dataframe
  
  
+ TODO: remove code for handling unsupervised data
+ (or merge preprocessing to be assigned based on data type?)
  
   
