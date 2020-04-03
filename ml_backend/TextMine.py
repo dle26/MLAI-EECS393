@@ -6,31 +6,28 @@ Created on Fri Mar 20 18:19:49 2020
 @author: anibaljt
 """
 
-import elsapy
 from elsapy.elsclient import ElsClient
 from elsapy.elssearch import ElsSearch
 import json
 import itertools
 import inspect
-import requests
 import numpy as np
-import pickle
 import os
-import datetime
 from sklearn.preprocessing import MinMaxScaler
 import MLTechniques
 import subprocess
 import time
+from TextProcess import TEXTPROCESS
 
 
 class TEXTMINE:
     
     
     SUP_TECHNICAL_KEYWORDS = ["machine learning","deep learning",
-                          "supervised learning","classification","preprocessing","scaling"]
+                          "supervised learning","classification","preprocessing"]
     
     UNS_TECHNICAL_KEYWORDS = ["machine learning","deep learning",
-                          "unsupervised learning","clustering","preprocessing","scaling"]
+                          "unsupervised learning","clustering"]
     
     
     def __init__(self,user_keywords,user_id,analysis_type='supervised'):
@@ -54,18 +51,18 @@ class TEXTMINE:
         con_file.close()
         client = ElsClient(config['apikey'])
         ###TODO: add year back in??
-        search_words = open("searchwords","w")
-        techniques = []
+        searchwords = []
+
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
-                if obj.TECHNIQUE_TYPE == self.analysis_type or obj.TECHNIQUE_TYPE == 'preprocessing':
-                    if obj.get_category_name() not in techniques:
-                        search_words.write(obj.get_category_name() + '\n')
-                        techniques.append(obj.get_category_name())
-   
-        search_words.close()
-        
-        file = "TextMineResults" + str(self.user_id) + ".txt"
+                if obj.TECHNIQUE_TYPE == self.analysis_type:
+                    if obj.get_category_name():
+                        searchwords.append(obj.get_category_name())
+
+
+        textmine_results_words = {'words':[],'scores':[]}
+        textmine_results_bg = {'bigrams':[],'scores':[]}
+        textmine_results_allwords = {'words':[],'scores':[]}
         
         for n,combo in enumerate(self.generate_combinations(self.user_keywords,tech_words)):
               
@@ -79,32 +76,26 @@ class TEXTMINE:
              results = TEXTMINE.execute_modified(doc_srch.uri,client,get_all=True,set_limit=25)
 
              for num,res in enumerate(results):
-                 
+                 print("STARTING NEW ONE")
                  DOI = res['prism:doi']
                  URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?APIKey=" + str(config['apikey'])
-                 subprocess.Popen(["bash",str(os.getcwd()) + "/AbstractAwk/collect.sh",str(URL), str(self.user_id)])         
-                 time.sleep(0.1)
                  
-                 if num == 0 and n==0:
-                     file_op = 'w'
-                 else:
-                     file_op = 'a'
-                      
-                 with open(file,file_op) as f:
-                     with open(str(os.getcwd()) + "/html_text" + self.user_id,'rb') as f1:
-                         for line in f1:
-                             f.write(str(line))
-                     f1.close()
-                 f.close()  
-                 os.remove(str(os.getcwd()) + "/html_text" + str(self.user_id))
+                 subprocess.Popen(["bash",str(os.getcwd()) + "/collect.sh",str(URL), str(self.user_id)])
+                 time.sleep(1)
 
                  
-        subprocess.Popen(["bash",str(os.getcwd()) + "/AbstractAwk/abstractawk.sh",str(file),"searchwords", str(self.user_id)])        
-        filename = "results" + self.user_id
-        time.sleep(0.1)
-        keywords,keyword_scores = self.adjust_awk_output(filename)
-        os.remove(search_words)
-        
+                 foundwords = TEXTPROCESS.findkeywords(str(self.user_id),searchwords)
+                 results = TEXTPROCESS.process_score(str(self.user_id),foundwords)
+                 os.remove(str(self.user_id))
+                 textmine_results_words['words'].extend(results[0])
+                 textmine_results_words['scores'].extend(results[1])
+                 textmine_results_bg['bigrams'].extend(results[2])
+                 textmine_results_bg['scores'].extend(results[3])
+                 textmine_results_allwords['words'].extend(results[4])
+                 textmine_results_allwords['scores'].extend(results[5])
+                
+        keywords,keyword_scores = self.adjust_output(textmine_results_words,textmine_results_bg,textmine_results_allwords)
+
         return self.two_list_sort(keywords,keyword_scores)
         
         
@@ -157,28 +148,25 @@ class TEXTMINE:
     
     
      
-    def adjust_awk_output(self,file):
+    def adjust_output(self,words,bigrams,allwords):
 
-      keywords = []
-      keyword_scores = []
+      scores = []
+      wscores = []
+            
+      allwordkeys = np.asarray(list(set(list(allwords.keys()))))
+      for word in allwordkeys:
+          wscores.append(np.median(np.asarray(list(allwords.values()))[np.where(np.asarray(list(allwords.keys())) == word)]))
+          
+      wordkeys = np.asarray(list(set(list(words.keys()))))
+      for word in wordkeys:
+          scores.append(np.median(np.asarray(list(words.values()))[np.where(np.asarray(np.asarray(list(words.keys())) == word))])/wscores[list(wordkeys).index(word)])
+          
+      bgkeys = np.asarray(list(set(list(bigrams.keys())))) 
       
-      #### SKIPGRAM HERE -- generate synonyms/related words
+      for bg in bgkeys:
+          scores.append(np.median(np.asarray(list(bigrams.values()))[np.where(np.asarray(list(bigrams.keys()) == word))])/wscores[list(bgkeys).index(bg)])
       
-      with open(file,'r') as f:
-         tracker = 0
-         lines = f.readlines()
-         for ln in lines:
-             if ln.find(':') > -1:
-                 keywords.append(ln[0:ln.index(":")])
-                 keyword_scores.append(float(ln[ln.index(":")+1:len(ln)]))
-             if ln.find(';') > -1:
-                 keywords.append(ln[0:ln.index(";")])
-                 keyword_scores.append(max(1,float(ln[ln.index(";")+1:len(ln)])+(0.1*float(ln[ln.index(";")+1:len(ln)]))))
-             if ln.find("#") == -1:
-                tracker += 1
-             else:
-                 keyword_scores[keywords.index(ln[0:ln.index("#")])] = (keyword_scores[keywords.index(ln[0:ln.index("#")])]/float(ln[ln.index("#")+1:len(ln)]))
-                                                             
-      os.remove(file)
+      wordkeys = list(wordkeys)
+      wordkeys.extend(list(bgkeys))
       
-      return list(MinMaxScaler().fit_transform(keywords)),keyword_scores
+      return wordkeys,MinMaxScaler().fit_transform(scores)

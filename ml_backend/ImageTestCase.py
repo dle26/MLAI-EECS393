@@ -16,8 +16,7 @@ import pandas as pd
 import nltk
 import string
 from nltk.tokenize import word_tokenize
-from Data import DATA
-from Prep import DATAPREP
+from Prep import DATAPREP,DATA
 from TextMine import TEXTMINE
 from datetime import datetime
 from SelectionAgent import SELECT
