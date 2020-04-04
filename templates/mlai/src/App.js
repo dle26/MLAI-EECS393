@@ -9,6 +9,7 @@ import {
 } from './components/views';
 
 import RouteWithLayout from './components/RouteWithLayout/RouteWithLayout'
+import Test from './Test'
 
 export default class App extends Component {
   render() {
@@ -22,6 +23,7 @@ export default class App extends Component {
           </Switch>
         </div>
       </Router>
+      // <Test />
     );
   }
 }
