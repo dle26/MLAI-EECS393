@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 """
 @author: anibaljt
+
+Implementation for SkLearn's SVC class
+
 """
 
-from Technique import Technique 
+from .Technique import Technique
 from sklearn.svm import SVC
 import numpy as np
 from sklearn.model_selection import GridSearchCV
@@ -15,20 +18,23 @@ from sklearn.model_selection import StratifiedKFold
 class SVM(Technique):
     
   
-    custom = False
+    CUSTOM = False
+    TECHNIQUE_TYPE = "supervised"
     
     def __init__(self):
         self.model = None
  
 
     def get_name():
-        return 'SVM'
+        return 'svm'
 
+    def get_category_name():
+        return 'svm'
+    
     def train(self,data,time_constraint):
-        
-       
-        X = np.asarray(data.get_preprocessed_data()) 
-        y = np.asarray(data.get_labels)
+ 
+        X = np.asarray(data.preprocessed_data) 
+        y = np.asarray(data.labels)
         model = SVC()
         
         if time_constraint == 1:
@@ -70,9 +76,9 @@ class SVM(Technique):
             results = gcv.predict(X[test])
             model = gcv.estimator
             
-        data.add_results(results,SVM.get_name())
-        data.add_model(self,SVM.get_name())
-        data.add_feat_importances(None,SVM.get_name())
+        data.prediction_results.extend((results,SVM.get_name()))
+        data.current_models.extend((self,SVM.get_name()))
+        data.feat_importances.extend((None,SVM.get_name()))
   
         return data
     
@@ -80,7 +86,7 @@ class SVM(Technique):
     
     def predict(self,data,labels,model):
         
-        results = model.predict(data.get_preprocessed_data())
+        results = model.predict(data.preprocessed_data)
         data.set_results(results)
         
         return data

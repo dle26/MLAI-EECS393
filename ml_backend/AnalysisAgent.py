@@ -37,11 +37,11 @@ class AnalysisAgent:
         else:
             ml_package = list(np.asarray(inspect.getmembers(SMLTechniques)).flatten())
             
-        for technique in self.data.techniques():
+        for technique in self.data.techniques:
     
             obj = preprocessing_package[preprocessing_package.index(technique+1)]
-            self.data = obj().apply_technique(self.data)
+            self.data = obj().train(self.data)
             mlmodel = ml_package[ml_package.index(technique+1)]
-            self.data = mlmodel().apply_technique(self.data)
+            self.data = mlmodel().train(self.data)
         
         return self.data

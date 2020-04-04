@@ -7,119 +7,74 @@ Created on Thu Mar 26 16:25:59 2020
 """ 
 
 import inspect
-import copy
 import numpy as np
 import MLTechniques
+import pickle
+import os
 
 class UniversalScores:
     
     
-    TECHNIQUE_SCORES = {"supervised":{},"unsupervised":{},"preprocessing":{}}
-    BOOST = {"supervised":{},"unsupervised":{},"preprocessing":{}}
-    SML_FIRST_USE = True
-    UML_FIRST_USE = True
-    PRP_FIRST_USE = True
+    def reference(keywords,type_indentifier='supervised',top_approaches=None):
 
-
-
-    def reference(keywords,data_score,type_indentifier='supervised'):
-
-        if (type_indentifier == 'supervised' and UniversalScores.SML_FIRST_USE): 
-            UniversalScores.initialize('supervised')
+        if (type_indentifier == 'supervised'): 
+           boost,scores = UniversalScores.initialize('supervised')
             
-        if (type_indentifier=='unsupervised' and UniversalScores.UML_FIRST_USE): 
-            UniversalScores.initialize('unsupervised')
+        if (type_indentifier=='unsupervised'): 
+            boost,scores = UniversalScores.initialize('unsupervised')
         
-        if (type_indentifier == 'preprocessing' and UniversalScores.PRP_FIRST_USE): 
-            UniversalScores.initialize('preprocessing')
-   
-    
-        #### values, flatten the technique-bigram tups
-        boost = copy.deepcopy(UniversalScores.BOOST) 
-        tech_scores = copy.deepcopy(UniversalScores.TECHNIQUE_SCORES)
-            
-        if type_indentifier == 'supervised':
-            scores = tech_scores["supervised"]
-            boost = boost["supervised"]
-        
-        elif type_indentifier == "unsupervised":
-            scores = tech_scores["unsupervised"]
-            boost =  boost["unsupervised"]
-            
-        else:
-            scores = tech_scores["preprocessing"]
-            boost =  boost["preprocessing"]
-          
-        #### which techniques correspond to which words?
-        technique_matches = {}
-        match_percentage = {}
+        boost_ppr,scores_ppr = UniversalScores.initialize('preprocessing')
 
-        for dic in (scores,boost):
-            for technique in dic:
-                num_matches = 0
-                technique_matches[technique] = {}
-                matched_words = []
-                
-                for bigram in dic[technique].keys():
-                    if bigram in keywords:
-                        technique_matches[technique][bigram] = dic[technique][bigram][1]
-                        num_matches += 1
-                        matched_words.append(bigram)
-                        
-                match_percentage[technique] = num_matches/len(keywords)
-                matched_words[technique] = matched_words
-                
-            for scoreset in technique_matches.values():
-                technique_matches[technique] = data_score * (np.average([sum(list(scoreset)),match_percentage[technique]],weights=[0.75,0.25]))
-    
-        results,values = UniversalScores.key_sort(list(technique_matches.keys()),list(technique_matches.values()))
+        results,values,matched_words = UniversalScores.compare_keywords(scores,boost,keywords)
         
+        results = UniversalScores.weighted_select(results)
         
-        if  type_indentifier != 'preprocessing':
-            results,values = UniversalScores.weighted_select(results,values)
-            words = list(matched_words.values())[len(values)-3:len(values)]
-            return results[len(results)-3:len(results)],values[len(values)-3:len(values)],words
+        ppr_results = []
+        ppr_matches = []
         
-        results,values = UniversalScores.weighted_select(results,values,True)
-        
-        return results[-1],values[-1],list(matched_words.values())[-1]
+        for approach in results:
+            results,values,matches = UniversalScores.compare_keywords(scores_ppr,boost_ppr,keywords,approach)
+            ppr_results.append(results.index(values.index(max(values))))
+            ppr_matches.append(matches)
     
     
+        return results,ppr_results,matches,ppr_matches
+    
+    
+    ### TODO!!!!!!!
     
     def apply_skipgram(self):
-        ## TODO WHEN ALEC IS DONE
         pass
     
     
-    def weighted_select(self,keywords,scores,preprocessing=False):
+    def weighted_select(self,keywords,scores):
         
         scores = np.asarray(list(scores.values()))
+        indicies = np.choice(len(keywords),3,scores/np.sum(scores))
+        return np.asarray(keywords)[indicies],scores[indicies]
         
-        if preprocessing:
-            indicies = np.choice(len(keywords),1,scores/np.sum(scores))
-            return np.asarray(keywords)[indicies],scores[indicies]
-        else:
-            indicies = np.choice(len(keywords),3,scores/np.sum(scores))
-            return np.asarray(keywords)[indicies],scores[indicies]
-        
+    
+    ### REDOTHIS FOR PICKLE FILES!!
     
     def initialize(type_identifier):
         
-        ### class inspection
-        if type_identifier == 'supervised':
-            UniversalScores.SML_FIRST_USE = False
-            
-        if type_identifier == 'unsupervised':
-            UniversalScores.UML_FIRST_USE = False
+        if os.path.exists('BOOST.pkl'):
+            boost = pickle.load(open('BOOST.pkl','rb'))
+        else:
+            boost = {"supervised":{},"unsupervised":{},"preprocessing":{}}
         
-        if type_identifier == 'preprocessing':
-            UniversalScores.PRP_FIRST_USE = False
-
+        
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
-                if obj.technique_type == type_identifier:
-                     UniversalScores.TECHNIQUE_SCORES[type_identifier][obj.get_name()] = {}
-
+                if obj.TECHNIQUE_TYPE == type_identifier and obj.TECHNIQUE_TYPE not in boost:
+                     boost[type_identifier][obj.get_name()] = {}
+        
+        pickle.dump(boost,open("BOOST.pkl","wb"))
+        
+        return boost[type_identifier],pickle.load(open('TECHNIQUE_SCORES.pkl','rb'))[type_identifier]
+        
+        
+    
 
     def key_sort(keys,values): 
   
@@ -137,3 +92,36 @@ class UniversalScores:
             keys[j+1] = key2
             
         return keys,values
+    
+    
+
+    def compare_keywords(scores,boost,keywords,approach):
+        
+        #### which techniques correspond to which words? - need adagram here!!!!
+        technique_matches = {}
+        match_percentage = {}
+
+        for dic in (scores,boost):
+            for technique in dic:
+                num_matches = 0
+                technique_matches[technique] = {}
+                matched_words = []
+                
+                for keyword in dic[technique].keys():
+                    if keyword in keywords:
+                        technique_matches[technique][keyword] = dic[technique][keyword][1]
+                        if approach != None:
+                          if keyword in approach:
+                            technique_matches[technique][keyword] = (dic[technique][keyword][1]+dic[technique][keyword][1]*0.1)
+                        num_matches += 1
+                        matched_words.append(keyword)
+                        
+                match_percentage[technique] = num_matches/len(keywords)
+                matched_words[technique] = matched_words
+                
+            for scoreset in technique_matches.values():
+                technique_matches[technique] = np.average([sum(list(scoreset)),match_percentage[technique]],weights=[0.75,0.25])
+    
+        results,values = UniversalScores.key_sort(list(technique_matches.keys()),list(technique_matches.values()))
+        
+        return results,values,matched_words    

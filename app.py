@@ -8,6 +8,8 @@ import csv
 import datetime
 import jwt
 import pandas as pd
+import pymongo
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
@@ -15,6 +17,10 @@ CORS(app)
 
 app.config['MONGO_URI'] = Config.MONGO_URI
 mongodb = PyMongo(app)
+
+UPLOAD_FOLDER = ''
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 def token_required(f):
     @wraps(f)
@@ -90,29 +96,27 @@ def user():
         'lastname': user['lastname'],
     })
 
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
-@app.route("/upload", methods=['POST'])
-def upload():
-    if len(request.files) != 0:
-        f = request.files['file']
-        fstring = f.read()
+def allowed_file(filename):
+	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-        # using csv reader
-        csv_dicts = [{k: v for k, v in row.items()} for row in csv.DictReader(fstring.decode().splitlines(), skipinitialspace=True)]
-
-        # for d in csv_dicts:
-        #     for x, y in d.items():
-        #         print(x, y)
-        #     print("----------------------------")
-
-        # using panda
-
-        df = pd.read_csv(StringIO(fstring.decode()), delimiter='\n').T.to_dict()
-
-
-    return jsonify({
-        "message": "accepted file"
-    })
+@app.route('/upload', methods=['POST'])
+def upload_file():
+	# check if the post request has the file part
+	if 'file[]' not in request.files:
+		resp = jsonify({'message' : 'No file part in the request'})
+		resp.status_code = 400
+		print(request.files)
+		return resp
+	files = request.files.getlist('file[]')
+	for file in files:
+		if file and allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+	resp = jsonify({'message' : 'File successfully uploaded'})
+	resp.status_code = 201
+	return resp
 
 @app.route("/developerfeedback", methods=['POST'])
 def developer_feedback():
@@ -135,6 +139,12 @@ def get_upload(filename):
 def protected():
     return jsonify({'message': 'with token'})
 
+#was only used to test send_json_to_database, will be deleted in a future commit
+# @app.route("/pythonobject", methods=['POST'])
+# def python_object():
+#     username = request.get_json(force = True)['username']
+#
+#     return send_json_to_database(username, {"a": 3})
 
 if __name__ == '__main__':
     app.run(debug=True)
