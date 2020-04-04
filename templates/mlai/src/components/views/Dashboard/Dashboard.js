@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { DropzoneArea } from "material-ui-dropzone";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import axios, { post } from "axios";
 import { Upload, message, Button } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
+import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
 
 // import { Button } from "@material-ui/core";
 
@@ -43,7 +43,7 @@ class Dashboard extends Component {
       files: [...this.state.files, file]
     });
 
-    console.log("in addFile: " + file)
+    console.log("in addFile: " + file);
   }
 
   onChange(info) {
@@ -56,9 +56,8 @@ class Dashboard extends Component {
       message.success(`${info.file.name} file uploaded successfully.`);
 
       this.setState({
-      files: [...this.state.files, info.file.originFileObj]
+        files: [...this.state.files, info.file.originFileObj]
       });
-
     } else if (status === "error") {
       message.error(`${info.file.name} file upload failed.`);
     }
@@ -67,30 +66,28 @@ class Dashboard extends Component {
   upload() {
     this.setState({ uploading: true });
 
-
     const url = "http://localhost:5000/upload";
     const formData = new FormData();
-    this.state.files.forEach(file => formData.append('file[]', file))
-    
-    const headers = {
-      headers: {'Content-Type': 'multipart/form-data' }
-    }
+    this.state.files.forEach(file => formData.append("file[]", file));
 
-    axios.post(url, formData, headers
-      )
+    const headers = {
+      headers: { "Content-Type": "multipart/form-data" }
+    };
+
+    axios
+      .post(url, formData, headers)
       .then(response => {
-          //handle success
-          console.log(response);
-          this.setState( { files: [] });
+        //handle success
+        console.log(response);
+        this.setState({ files: [] });
       })
       .catch(response => {
-          //handle error
-          console.log(response);
+        //handle error
+        console.log(response);
       });
 
     this.setState({ uploading: false });
   }
-
 
   render() {
     const { Dragger } = Upload;
@@ -120,6 +117,24 @@ class Dashboard extends Component {
         </Grid>
 
         <Grid item lg={8} md={12} xl={9} xs={12}>
+          <Typography variant="h4" gutterBottom>
+            Or
+          </Typography>
+        </Grid>
+        
+        <Grid item lg={8} md={12} xl={9} xs={12}>
+          <Upload
+            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            directory
+            onChange={this.onChange.bind(this)}
+          >
+            <Button>
+              <UploadOutlined /> Upload Directory
+            </Button>
+          </Upload>
+        </Grid>
+
+        <Grid item lg={8} md={12} xl={9} xs={12}>
           <Button
             type="primary"
             onClick={this.upload.bind(this)}
@@ -130,11 +145,11 @@ class Dashboard extends Component {
             {this.state.uploading ? "Uploading" : "Start Upload"}
           </Button>
         </Grid>
+
       </Grid>
     );
   }
 }
-
 
 Dashboard.propTypes = {
   classes: PropTypes.object.isRequired
