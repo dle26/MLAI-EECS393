@@ -12,6 +12,7 @@ import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
 
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
+import MoreDetails from "../../modals/MoreDetails";
 
 const styles = theme => ({
   root: {},
@@ -30,8 +31,21 @@ class Dashboard extends Component {
     this.state = {
       token: sessionStorage.getItem("Token"),
       files: [],
-      uploading: false
+      uploading: false,
+      moreDetailsVisible: false
     };
+  }
+
+  moreDetailsVisible() {
+    this.setState({
+      moreDetailsVisible: ! this.state.moreDetailsVisible
+    });
+  }
+
+  uploadingToggle() {
+    this.setState({
+      uploading: ! this.state.uploading
+    });
   }
 
   componentDidMount() {
@@ -40,10 +54,8 @@ class Dashboard extends Component {
 
   addFile(file) {
     this.setState({
-      files: [...this.state.files, file]
+      files: file
     });
-
-    console.log("in addFile: " + file);
   }
 
   onChange(info) {
@@ -55,38 +67,19 @@ class Dashboard extends Component {
     if (status === "done") {
       message.success(`${info.file.name} file uploaded successfully.`);
 
-      this.setState({
-        files: [...this.state.files, info.file.originFileObj]
-      });
+      this.addFile([...this.state.files, info.file.originFileObj]);
+
     } else if (status === "error") {
       message.error(`${info.file.name} file upload failed.`);
     }
   }
 
   upload() {
-    this.setState({ uploading: true });
+    this.uploadingToggle();
 
-    const url = "http://localhost:5000/upload";
-    const formData = new FormData();
-    this.state.files.forEach(file => formData.append("file[]", file));
+    this.moreDetailsVisible();
 
-    const headers = {
-      headers: { "Content-Type": "multipart/form-data" }
-    };
-
-    axios
-      .post(url, formData, headers)
-      .then(response => {
-        //handle success
-        console.log(response);
-        this.setState({ files: [] });
-      })
-      .catch(response => {
-        //handle error
-        console.log(response);
-      });
-
-    this.setState({ uploading: false });
+    this.uploadingToggle();
   }
 
   render() {
@@ -121,7 +114,7 @@ class Dashboard extends Component {
             Or
           </Typography>
         </Grid>
-        
+
         <Grid item lg={8} md={12} xl={9} xs={12}>
           <Upload
             action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
@@ -144,8 +137,16 @@ class Dashboard extends Component {
           >
             {this.state.uploading ? "Uploading" : "Start Upload"}
           </Button>
-        </Grid>
 
+          <MoreDetails
+            modalVisible={this.state.moreDetailsVisible}
+            moreDetailsVisible={this.moreDetailsVisible.bind(this)}
+            uploadingToggle={this.uploadingToggle.bind(this)}
+            addFile={this.addFile.bind(this)}
+            files={this.state.files}
+            step={1}
+          />
+        </Grid>
       </Grid>
     );
   }
