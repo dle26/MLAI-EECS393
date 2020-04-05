@@ -15,3 +15,4 @@ Accepted formats (single file or dir):
 
  
   TODO: Add more approaches!!!
+  TODO: Add protections against highly specific approaches
