@@ -1,4 +1,4 @@
-#Automated Machine Learning Analysis Framework for MLAI
+# Automated Machine Learning Analysis Framework for MLAI
 
 Accepted formats (single file or dir):
 
@@ -16,3 +16,14 @@ Accepted formats (single file or dir):
  
   TODO: Add more approaches!!!
   TODO: Add protections against highly specific approaches
+  
+  Current Requirements:
+    - numpy
+    - pandas
+    - sklearn
+    - skimage
+    - pytorch 
+    - OpenCV
+    - nltk
+    - elsapy
+    - requests
