@@ -101,7 +101,7 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/upload', methods=['POST'])
+@app.route("/upload", methods=['POST'])
 def upload_file():
 	# check if the post request has the file part
 	if 'file[]' not in request.files:
@@ -110,6 +110,8 @@ def upload_file():
 		print(request.files)
 		return resp
 	files = request.files.getlist('file[]')
+    details = request.files['details']
+    time = request.files['time']
 	for file in files:
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
@@ -126,6 +128,50 @@ def developer_feedback():
     subject = request.get_json(force = True)['subject']
 
     return send_feedback_email(email_address, name, feedback, subject)
+
+
+@app.route("/dev/register", methods=['POST'])
+def developer_register():
+    if request.method == 'POST':
+        devs = mongodb.db.devs
+
+        devname = request.get_json(force=True)['devname']
+        password = request.get_json(force = True)['password']
+        firstname = request.get_json(force = True)['firstname']
+        lastname = request.get_json(force = True)['lastname']
+
+
+        existing_dev = devs.find_one({'devname':  devname})
+
+        if existing_dev is None:
+            devs.insert({
+                'devname': username,
+                'password': password,
+                'firstname': firstname,
+                'lastname': lastname
+            })
+            return jsonify({'message':'sign up sucessfully'})
+
+        return jsonify({'error': 'developer existed'}), 422
+    else:
+        return ''
+
+@app.route("/dev/login", methods=['POST'])
+def dev_login:
+    devname = request.get_json(force = True)['devname']
+    password = request.get_json(force = True)['password']
+
+    devs = mongodb.db.devs
+    if devs.find_one({'devname': devname, 'password': password}):
+
+        # generate token
+        token = jwt.encode({'dev': devname, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, Config.TOKEN_SECRET_KEY)
+
+        return jsonify({'token': token.decode('UTF-8')})
+
+    return jsonify({'error':'Could not verify!', 'WWW-Authenticate': 'Basic realm="Login Required"'}), 401
+
+
 
 def save_upload(f):
     mongodb.save_file(f.filename, f, 'data')
