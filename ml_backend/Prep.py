@@ -33,8 +33,6 @@ class DATA:
         
         self.techniques = []
         
-        self.prior_model = None
-        
         self.preprocessed_data = None
         
         self.results = None
@@ -45,13 +43,9 @@ class DATA:
         
         self.prediction_results = []
         
-        self.prior_preprocessing = []
-        
         self.current_models = []
         
         self.data_for_update = None
-        
-        self.ppr_data_for_update = None
         
         ### for images only 
         self.dimensions = None

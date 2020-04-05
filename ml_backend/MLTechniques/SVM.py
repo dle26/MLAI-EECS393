@@ -28,8 +28,11 @@ class SVM(Technique):
     def get_name():
         return 'svm'
 
-    def get_category_name():
+    def get_category():
         return 'svm'
+    
+    def get_general_category():
+        return 'machine learning'
     
     def train(self,data,time_constraint):
  

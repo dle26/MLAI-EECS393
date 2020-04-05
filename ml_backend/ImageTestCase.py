@@ -17,10 +17,10 @@ import nltk
 import string
 from nltk.tokenize import word_tokenize
 from Prep import DATAPREP,DATA
-from TextMine import TEXTMINE
 from datetime import datetime
 from SelectionAgent import SELECT
 
+import pickle
 
 time = datetime.now()
 
@@ -60,8 +60,10 @@ userid = 'JTA001'
 
 print(newdata.descriptive_info)
 
-words,scores = TEXTMINE(newdata.descriptive_info,userid).from_database()
 
+newdata = pickle.load(open('nd.pkl','rb'))
+newdata2 = SELECT(newdata,"JTA001").selectAnalysisApproach(1)
+print(newdata2.techniques)
 print('Prep Time: ' + str(datetime.now()-time))
 
 
@@ -70,17 +72,18 @@ def test_eval():
     assert (True == (('multiclass', 'images') in newdata.descriptive_info) or ('images', 'multiclass') in newdata.descriptive_info),"Structural Eval. Failed"
     assert (True == (newdata.eval_score is not None and newdata.eval_score > 0.25 and newdata.eval_score < 1.1)),"Data Scoring Failed"
 
-def test_mining():
-    
-    assert (True == ('cnn+image' in words or 'cnn+images' in words)) ,"Textmining Failed"
-    
-
-
+def test_select():
+    pass
 
 def test_analysis():
+    pass
+
+def test_predictions():
     pass
 
 def test_interpretation():
     pass
 
-    
+def test_results():
+    pass
+ 

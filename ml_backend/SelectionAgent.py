@@ -10,14 +10,17 @@ import copy
 from TextMine import TEXTMINE
 from UniversalScores import UniversalScores
 import inspect
+import numpy as np
+#from UniversalScores import UNIVERSALSCORES
 
 
 class SELECT:
     
-    def __init__(self,data,threshold=0.25):
+    def __init__(self,data,run_id,threshold=0.25):
         
         self.data = copy.deepcopy(data)
         self.mining_threshold = threshold
+        self.run_id = run_id
 
         
         
@@ -28,104 +31,114 @@ class SELECT:
             analysis_type = "unsupervised"
             
         user_input = self.data.descriptive_info
-        top3_approaches,top3scores,matches = UniversalScores.reference(user_input,analysis_type)
+        top2_approaches,matches = UniversalScores.reference(user_input,analysis_type)
         
-        #### HOW TO HANDLE CUSTOM HERE - find a way to remove custom
-        ##### PUT CURRENT APPROACHES IN A LIST HERE
-        top3preprocessing,top3pscore,top3pmatches = UniversalScores.reference(user_input,"preprocessing",top3_approaches)
-        ##### NOTHING HERE TO HANDLE EMPTY ONES - NOVEL APPROACHES
-       
-        all_approaches,all_ppr = "",""
-        custom_approaches = {}
-
-        for name, obj in inspect.getmembers(MLTechniques):
-            if inspect.isclass(obj):
-                if obj.TECHNIQUE_TYPE == analysis_type:
-                    all_approaches += obj.get_name()
-                    custom_approaches[obj.get_name()] = obj.CUSTOM
-                if obj.TECHNIQUE_TYPE == 'preprocessing':
-                    all_ppr += obj.get_name()
 
         if (len(matches)/len(self.data.descriptive_info)) < self.mining_threshold:
         
-            keywords,keyword_scores = TEXTMINE(self.data,self.run_id).from_database()
-            top3_approaches,top3ppr,matches,ppr_matches = self.select_from_textmine(keywords,keyword_scores,all_approaches,all_ppr)
-
-        else:
-            top3_approaches,top3ppr,matches,ppr_matches = UniversalScores.reference(user_input,analysis_type)
+            keywords,keyword_scores,searchwords = TEXTMINE(self.data.descriptive_info,self.run_id).from_database()
+            top2_approaches = self.select_from_textmine(keywords,keyword_scores,searchwords,analysis_type)
             
-            
-        self.data.data_for_update = zip(top3_approaches,matches)
-        self.data.ppr_data_for_update = zip(top3ppr,matches)
-
+        self.data.data_for_update = zip(top2_approaches,[user_input,user_input])
+        self.data.techniques.extend(top2_approaches)
         return self.data
     
     
     
     
-    def select_from_textmine(self,keywords,keywordscores,allapproaches,all_pr_approaches,custom):
+    def select_from_textmine(self,keywords,keywordscores,searchwords,analysis_type):
         
-        approach_scores = {}
-        ppr_approach_scores = {}
-     
+        #### 3 tiered approach here - need adaskipgram here
+        names = []
+        scores = []
+        approaches = []
         
-        #### need adagram for this as well!!!!
-        for num,key in enumerate(keywords):
-           if key[0:key.index('+')] in allapproaches:
-               if key[0:key.index('+')] in approach_scores:
-                   approach_scores[key[0:key.index('+')]] += 1
-               else:
-                   approach_scores[key[0:key.index('+')]] = 1
-               if key[key.index('+'):len(key)] in all_pr_approaches:
-                   if key[key.index('+'):len(key)] in ppr_approach_scores:
-                       ppr_approach_scores[key[key.index('+'):len(key)]] += 2
-                   else:
-                       ppr_approach_scores[key[key.index('+'):len(key)]] = 2
-                       
-           if key[0:key.index('+')] in all_pr_approaches:
-               for app in allapproaches:
-                   if app + key[key.index('+'):len(key)] in keywords:
-                     if app+"+"+key[0:key.index('+')] in ppr_approach_scores:
-                       ppr_approach_scores[app+"+"+key[0:key.index('+')]] += 1
-                     else:
-                         ppr_approach_scores[key[key.index('+'):len(key)]] += 1
-            
-            
-        ranked_approaches,approach_scores = UniversalScores.sort_dict_values(approach_scores.keys(),approach_scores.values())
-        ranked_ppr_approaches,ppr_scores = UniversalScores.sort_dict_values(ppr_approach_scores.keys(),ppr_approach_scores.values())
-        
-        ### TODO: weighted select here
-        top3approaches = UniversalScores.weighted_selected(ranked_approaches,approach_scores)
-        
-        ###TODO: handle custom, built-in PPR - may have to switch to this anyway
-        
-        top3ppr = []
-        for a in top3approaches:
-           if custom[a]:
-               top3ppr.append(None)
-           else:
-               for key in range(len(ranked_ppr_approaches)-1,0,-1):
-                   ppr_key = list(ranked_ppr_approaches.keys())
-                   if a in ranked_ppr_approaches[ppr_key]:
-                       top3ppr.append(ranked_ppr_approaches[ppr_key])
-                       break
-        
-        ml_match,ppr_match = [],[]
-        
-        for group in zip(top3approaches,top3ppr):
-            matches,p_matches = [],[]
-            
-            for word in keywords:
-                if word in group[0] and word not in group[1]:
-                   matches.append(word[word.index('+'):len(word)])
-                   
-                if group[1] is not None:
-                    if word not in group[0] and word in group[1]:
-                        p_matches.append(word[word.index('+'):len(word)])
+        for word in searchwords['names']:
+            if word in keywords:
+                names.append(word)
+                scores.append(keywordscores[keywords.index(word)])
                 
+        final_approaches = []
+        if len(names) > 1:
+            return two_list_sort(names,scores)[[-2,-1]]
+        
+        elif len(names) == 1:
+            final_approaches.append(names[0])
+            
+            
+            
+        else:
+           names = []
+           scores = []
+           technique_names = []
+           for word in searchwords['specific']:
+              if word in keywords:
+                  names.append(word)
+                  scores.append(keywordscores[keywords.index(word)])
+            
+           if len(approaches) == 0 and len(names) > 1:
+                approaches = list(two_list_sort(names,scores)[[-2,-1]])
+                for a in approaches:
+                    technique_names = select_approach(a,"specific",analysis_type)
                     
-            ml_match.append(matches)
-            ppr_match.append(p_matches)
+                ### TODO: add selection method and add to approaches
+                return approaches
+            
+           elif len(final_approaches) == 1 and len(names) > 0:
+                technique_names = select_approach(two_list_sort(names,scores)[-1],'specific',analysis_type)
+                
+                final_approaches.append(UniversalScores.select_from_usage(technique_names,1))
+                
+                return final_approaches
+            
+           elif len(names) == 0:
+               names = []
+               scores = []
+               for word in searchwords['general']:
+                  if word in keywords:
+                     names.append(word)
+                     scores.append(keywordscores[keywords.index(word)])
+               technique_names = select_approach(two_list_sort(names,scores)[-1])
+               if len(final_approaches) == 0:
+                   final_approaches.append(UniversalScores.select_from_usage(technique_names,2))
+               else:
+                  final_approaches.append(UniversalScores.select_from_usage(technique_names,1))
+               
+        return final_approaches
         
+            
+                
+def two_list_sort(tosort,basis):
+    
+      for i in range(1, len(basis)):
+        key = basis[i]
+        key2 = tosort[i]
+        j = i-1
+        while j >=0 and key <basis[j] : 
+                basis[j+1] = basis[j] 
+                tosort[j+1] = tosort[j]
+                j -= 1
+                
+        basis[j+1] = key 
+        tosort[j+1] = key2
         
-        return top3approaches,top3ppr,ml_match,ppr_match
+      return np.array(tosort)
+              
+            
+  
+#### TODO: UPDATE w/more elegant code          
+def select_approach(name,select,analysis_type):
+
+    
+        approaches_to_select = []
+        for name, obj in inspect.getmembers(MLTechniques):
+            if inspect.isclass(obj):
+                if obj.TECHNIQUE_TYPE == analysis_type:
+                    if select =='specific':
+                        if obj.get_category() == name:
+                            approaches_to_select.append(obj.get_name())
+                    else:
+                         if obj.get_general_category() == name:
+                            approaches_to_select.append(obj.get_name())
+        
+        return approaches_to_select

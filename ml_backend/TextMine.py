@@ -9,22 +9,21 @@ Created on Fri Mar 20 18:19:49 2020
 from elsapy.elsclient import ElsClient
 from elsapy.elssearch import ElsSearch
 import json
-import itertools
 import inspect
 import numpy as np
 import os
 from sklearn.preprocessing import MinMaxScaler
 import MLTechniques
-import subprocess
-import time
 from TextProcess import TEXTPROCESS
+import requests
+import copy
 
 
 class TEXTMINE:
     
     
     SUP_TECHNICAL_KEYWORDS = ["machine learning","deep learning",
-                          "supervised learning","classification","preprocessing"]
+                          "supervised learning","classification" ]
     
     UNS_TECHNICAL_KEYWORDS = ["machine learning","deep learning",
                           "unsupervised learning","clustering"]
@@ -51,64 +50,64 @@ class TEXTMINE:
         con_file.close()
         client = ElsClient(config['apikey'])
         ###TODO: add year back in??
-        searchwords = []
+        searchwords = {'general':[],'specific':[],'names':[]}
 
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
                 if obj.TECHNIQUE_TYPE == self.analysis_type:
-                    if obj.get_category_name():
-                        searchwords.append(obj.get_category_name())
+                        searchwords['general'].append(obj.get_name())
+                        searchwords['specific'].append(obj.get_category())
+                        searchwords['names'].append(obj.get_general_category())
 
 
-        textmine_results_words = {'words':[],'scores':[]}
-        textmine_results_bg = {'bigrams':[],'scores':[]}
-        textmine_results_allwords = {'words':[],'scores':[]}
-        
-        for n,combo in enumerate(self.generate_combinations(self.user_keywords,tech_words)):
-              
-             if len(combo[0][0]) == 2:
+        textmine_results = {'words':[],'scores':[],'numlines':0,'allwords':[]}
 
-                 string = combo[0][0][0] + " " + combo[0][0][1] + " " + combo[0][1]
-             else:
-                 string = combo[0][0][0] + " " + combo[0][1]
-                 
+
+        combos = self.generate_combinations(self.user_keywords,tech_words)
+
+        for n,combo in enumerate(combos[0:3]):
+             print(combo)
+            
+             string = ""
+             for word in combo:
+                 string += (word + " ") 
+
              doc_srch = ElsSearch(string, 'sciencedirect')
              results = TEXTMINE.execute_modified(doc_srch.uri,client,get_all=True,set_limit=25)
-
+             
              for num,res in enumerate(results):
-                 print("STARTING NEW ONE")
+                 
                  DOI = res['prism:doi']
-                 URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?APIKey=" + str(config['apikey'])
-                 
-                 subprocess.Popen(["bash",str(os.getcwd()) + "/collect.sh",str(URL), str(self.user_id)])
-                 time.sleep(1)
+                 URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?APIkey=" + str(config['apikey']) #+ "&view=META_ABS"
+                 r = requests.get(URL)
 
+
+                 with open(str(self.user_id),'w') as f:
+                     f.write(r.text)
+                 f.close()
                  
-                 foundwords = TEXTPROCESS.findkeywords(str(self.user_id),searchwords)
-                 results = TEXTPROCESS.process_score(str(self.user_id),foundwords)
+                 foundwords,allwords,numlines = TEXTPROCESS.findkeywords(str(self.user_id),searchwords,str(self.user_keywords))
+                 textmine_results['words'].extend(list(foundwords.keys()))
+                 textmine_results['scores'].extend(list(foundwords.values()))
+                 textmine_results['numlines'] += numlines
+                 textmine_results['allwords'].extend(allwords)
+
                  os.remove(str(self.user_id))
-                 textmine_results_words['words'].extend(results[0])
-                 textmine_results_words['scores'].extend(results[1])
-                 textmine_results_bg['bigrams'].extend(results[2])
-                 textmine_results_bg['scores'].extend(results[3])
-                 textmine_results_allwords['words'].extend(results[4])
-                 textmine_results_allwords['scores'].extend(results[5])
-                
-        keywords,keyword_scores = self.adjust_output(textmine_results_words,textmine_results_bg,textmine_results_allwords)
 
-        return self.two_list_sort(keywords,keyword_scores)
+        keywords,keyword_scores = self.adjust_output(textmine_results)
         
+        return self.two_list_sort(keywords,keyword_scores),keyword_scores,searchwords
         
-    
+
     def generate_combinations(self,l1,l2):
         
-        combinations = []
-        permutations = itertools.permutations(l1, 2)
-        for perm in permutations:
-            zipped = zip(perm, l2)
-            combinations.append(list(zipped))
-        return combinations
-    
+        l3 = []
+        for tup in l1:
+           for word in l2:
+               t = copy.deepcopy(tup)
+               t += (word,)
+               l3.append(t)
+        return l3
     
     
     ### TODO: CITE ELSAPY - I MODIFIED THE SRC FOR MLAI 
@@ -148,25 +147,15 @@ class TEXTMINE:
     
     
      
-    def adjust_output(self,words,bigrams,allwords):
+    def adjust_output(self,words):
 
       scores = []
-      wscores = []
-            
-      allwordkeys = np.asarray(list(set(list(allwords.keys()))))
-      for word in allwordkeys:
-          wscores.append(np.median(np.asarray(list(allwords.values()))[np.where(np.asarray(list(allwords.keys())) == word)]))
-          
-      wordkeys = np.asarray(list(set(list(words.keys()))))
+      print("STARTING")
+      
+      wordkeys = list(set(words['words']))
       for word in wordkeys:
-          scores.append(np.median(np.asarray(list(words.values()))[np.where(np.asarray(np.asarray(list(words.keys())) == word))])/wscores[list(wordkeys).index(word)])
+          score = np.median(np.asarray(words['scores'])[np.where(np.asarray(words['words']) == word)])
+          score /= words['numlines']
+          scores.append(score * (words['allwords'].count(word)/len(words['allwords'])))
           
-      bgkeys = np.asarray(list(set(list(bigrams.keys())))) 
-      
-      for bg in bgkeys:
-          scores.append(np.median(np.asarray(list(bigrams.values()))[np.where(np.asarray(list(bigrams.keys()) == word))])/wscores[list(bgkeys).index(bg)])
-      
-      wordkeys = list(wordkeys)
-      wordkeys.extend(list(bgkeys))
-      
-      return wordkeys,MinMaxScaler().fit_transform(scores)
+      return wordkeys,list(np.asarray(scores)/np.sum(scores))

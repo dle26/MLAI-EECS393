@@ -87,8 +87,11 @@ class VGG_CNN:
     def get_name():
         return 'vgg-16 cnn'
     
-    def get_category_name():
+    def get_category():
         return 'cnn'
+    
+    def get_general_category():
+        return 'deep learning'
     
     def train(self,data,time_constraint):
     

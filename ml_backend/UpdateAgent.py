@@ -45,7 +45,7 @@ class UpdateAgent:
                                  (boost[tup[0]][w][1]+1))+adj_score)/(boost[tup[0]][w][1]+1)
                       
                       tech_scores[tup[0]][w] = (newscore,20)
-                      
+                      ## TODO: fix dict iteration error
                       del boost[tup[0]][w]
                       
                   else:
