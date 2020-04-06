@@ -9,15 +9,22 @@ import abc
 class Technique(abc.ABC):
     
     TECHNIQUE_TYPE = None
+
+    @abc.abstractmethod
+    def preprocess(data):
+        pass 
+        
+
+    @abc.abstractmethod
+    def get_category():
+        pass
     
     @abc.abstractmethod
-    
-    def add_keywords():
+    def get_general_category():
         pass
     
     
     @abc.abstractmethod
-    
     def get_name():
         pass
     

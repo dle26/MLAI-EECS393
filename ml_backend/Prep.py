@@ -27,6 +27,10 @@ class DATA:
         
         self.user= None
         
+        self.type = None
+        
+        self.test_labels = []
+        
         self.descriptive_info = []
         
         self.bestmodel = None
@@ -39,7 +43,9 @@ class DATA:
         
         self.time_constraint = None
         
-        self.feature_importances = None
+        self.feature_importances = []
+        
+        self.interpreted_results = None
         
         self.prediction_results = []
         
