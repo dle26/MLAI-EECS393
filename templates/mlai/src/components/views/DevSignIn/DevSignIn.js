@@ -4,12 +4,12 @@ import Avatar from "@material-ui/core/Avatar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import { Form, Input, Button, Checkbox } from "antd";
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
-import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
+import DeveloperModeIcon from "@material-ui/icons/DeveloperMode";
 import Typography from "@material-ui/core/Typography";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
@@ -143,12 +143,8 @@ class DevSignIn extends Component {
               Sign In
             </Button> */}
           </Form>
-          <Grid container>
-            <Grid item xs>
-              <RouterLink to="/signin">
-                Sign in as an user
-              </RouterLink>
-            </Grid>
+          <Grid item xs>
+            <RouterLink to="/signin">Sign in as an user</RouterLink>
           </Grid>
         </div>
         <Box mt={8}>
