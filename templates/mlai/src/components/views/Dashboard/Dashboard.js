@@ -89,7 +89,7 @@ class Dashboard extends Component {
 
     return (
       <Grid container spacing={6}>
-        <Grid item lg={8} md={12} xl={9} xs={12}>
+        <Grid item lg={12} md={12} xl={9} xs={12} alignItems={'stretch'}>
           <Dragger
             action={"https://www.mocky.io/v2/5cc8019d300000980a055e76"}
             multiple={true}
@@ -103,15 +103,15 @@ class Dashboard extends Component {
               Click or drag file to this area to upload
             </p>
             <p className="ant-upload-hint">
-              Support for a single or bulk upload. Strictly prohibit from
-              uploading company data or other band files
+              Support for a single or bulk upload. Strictly prohibited from
+              uploading company data or other banned files
             </p>
           </Dragger>
         </Grid>
 
-        <Grid item lg={8} md={12} xl={9} xs={12}>
+        <Grid item lg={8} md={12} xl={9} xs={12} alignItems={'stretch'}>
           <Typography variant="h4" gutterBottom>
-            Or
+              Or, if you prefer old school: click below.
           </Typography>
         </Grid>
 
