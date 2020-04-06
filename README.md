@@ -56,7 +56,7 @@ Machine Learning Accessibility Initiative (MLAI)
 
      username: testing
 
-     password: 123
+     password: 123 
 
   ### Main Dashboard after log in sucessfully (Updated 3/20/2020)
 
