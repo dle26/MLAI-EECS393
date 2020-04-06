@@ -104,17 +104,18 @@ def allowed_file(filename):
 @app.route("/upload", methods=['POST'])
 def upload_file():
     # check if the post request has the file part
-    if 'file[]' not in request.files:
+    if 'files[]' not in request.files:
         resp = jsonify({'message' : 'No file part in the request'})
         resp.status_code = 400
         print(request.files)
         return resp
-    files = request.files.getlist('file[]')
-    details = request.files['details']
-    time = request.files['time']
+    files = request.files.getlist('files[]')
+    details = request.form.get('details')
+    time = request.form.get('time')
     for file in files:
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
+            print(filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     resp = jsonify({'message' : 'File successfully uploaded'})
     resp.status_code = 201

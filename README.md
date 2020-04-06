@@ -1,6 +1,6 @@
 Machine Learning Accessibility Initiative (MLAI)
 
-
+Instructions for running MLAI on a personal device 
 
 ## :gear:	 Install
 #### :whale:	Docker
@@ -54,9 +54,9 @@ Machine Learning Accessibility Initiative (MLAI)
 
   ### Some sample username and password is :
 
-     username: testing
+     username: sadsad
 
-     password: 123
+     password: password 
 
   ### Main Dashboard after log in sucessfully (Updated 3/20/2020)
 
