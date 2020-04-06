@@ -48,33 +48,13 @@ class Sidebar extends Component {
 
     const pages = [
       {
-        title: 'Dashboard',
-        href: '/dashboard',
+        title: 'Upload New Data',
+        href: '',
         icon: <DashboardIcon />
       },
       {
-        title: 'Users',
-        href: '/users',
-        icon: <PeopleIcon />
-      },
-      {
-        title: 'Products',
-        href: '/products',
-        icon: <ShoppingBasketIcon />
-      },
-      {
-        title: 'Authentication',
-        href: '/sign-in',
-        icon: <LockOpenIcon />
-      },
-      {
-        title: 'Typography',
-        href: '/typography',
-        icon: <TextFieldsIcon />
-      },
-      {
-        title: 'Icons',
-        href: '/icons',
+        title: 'Previous Models',
+        href: '/prevmodels',
         icon: <ImageIcon />
       },
       {
@@ -84,7 +64,7 @@ class Sidebar extends Component {
       },
       {
         title: 'Settings',
-        href: '/settings',
+        href: '/setting',
         icon: <SettingsIcon />
       }
     ];
@@ -107,7 +87,6 @@ class Sidebar extends Component {
           className={classes.nav}
           pages={pages}
         />
-        <UpgradePlan />
       </div>
     </Drawer>
     )
