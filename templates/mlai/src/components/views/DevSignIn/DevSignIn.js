@@ -1,14 +1,16 @@
 import React, { Component } from "react";
 import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
+// import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
+import { Form, Input, Button, Checkbox } from "antd";
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
-import WebAssetIcon from '@material-ui/icons/WebAsset';import Typography from "@material-ui/core/Typography";
+import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
+import Typography from "@material-ui/core/Typography";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -49,7 +51,7 @@ const styles = (theme) => ({
   },
 });
 
-class SignIn extends Component {
+class DevSignIn extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -79,6 +81,14 @@ class SignIn extends Component {
   render() {
     const { classes } = this.props;
 
+    const layout = {
+      labelCol: { span: 8 },
+      wrapperCol: { span: 16 },
+    };
+    const tailLayout = {
+      wrapperCol: { offset: 8, span: 16 },
+    };
+
     if (this.state.routeToHome) return <Redirect to="/" />;
 
     return (
@@ -86,56 +96,57 @@ class SignIn extends Component {
         <CssBaseline />
         <div className={classes.paper}>
           <Avatar className={classes.avatar}>
-            <WebAssetIcon />
+            <DeveloperModeIcon />
           </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="username"
-            label="username"
-            defaultValue={this.state.username}
-            autoFocus
-            onChange={(e) => {
-              this.setState({ username: e.target.value });
-            }}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            label="Password"
-            type="password"
-            id="password"
-            defaultValue={this.state.password}
-            onChange={(e) => {
-              this.setState({ password: e.target.value });
-            }}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-            onClick={this.login.bind(this)}
+
+          <Form
+            {...layout}
+            name="basic"
+            // initialValues={{ remember: true }}
+            // onFinish={onFinish}
+            // onFinishFailed={onFinishFailed}
           >
-            Sign In
-          </Button>
+            <Form.Item
+              label="Username"
+              name="username"
+              rules={[
+                { required: true, message: "Please input your username!" },
+              ]}
+            >
+              <Input
+                prefix={<UserOutlined className="site-form-item-icon" />}
+                placeholder="Username"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[
+                { required: true, message: "Please input your password!" },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                type="password"
+                placeholder="Password"
+              />
+            </Form.Item>
+            {/* <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={this.login.bind(this)}
+            >
+              Sign In
+            </Button> */}
+          </Form>
           <Grid container>
             <Grid item xs>
-              <RouterLink to="/signup">
-                Don't have an account? Sign Up
-              </RouterLink>
-            </Grid>
-            <Grid item>
-              <RouterLink to="/devSignIn">
-                {"Sign in as a developer"}
+              <RouterLink to="/signin">
+                Sign in as an user
               </RouterLink>
             </Grid>
           </Grid>
@@ -147,8 +158,8 @@ class SignIn extends Component {
     );
   }
 }
-SignIn.propTypes = {
+DevSignIn.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withRouter(withStyles(styles)(SignIn));
+export default withRouter(withStyles(styles)(DevSignIn));

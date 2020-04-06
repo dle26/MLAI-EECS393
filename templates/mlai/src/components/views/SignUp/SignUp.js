@@ -8,7 +8,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import FiberNewIcon from '@material-ui/icons/FiberNew';
 import Typography from "@material-ui/core/Typography";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
@@ -90,7 +90,7 @@ class SignUp extends Component {
         <CssBaseline />
         <div className={classes.paper}>
           <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
+            <FiberNewIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Sign Up
