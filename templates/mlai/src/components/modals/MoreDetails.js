@@ -30,7 +30,7 @@ export default class MoreDetails extends Component {
   upload() {
     const url = "http://localhost:5000/upload";
     const formData = new FormData();
-    this.props.files.forEach(file => formData.append("file[]", file));
+    this.props.files.forEach(file => formData.append('files[]', file, file.name));
     formData.set("details", this.state.details);
     formData.set("time", this.state.timeContraint);
 
