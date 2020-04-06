@@ -10,19 +10,23 @@ import inspect
 import numpy as np
 
 
-class AnalysisAgent:
+class ANALYZE:
     
     def __init__(self,data):
         
         self.data = copy.deepcopy(data)
         
-    def fitApproaches(self,unsupervised=False):
+        
+        
+    def train_approaches(self,unsupervised=False):
 
         ml_package = list(np.asarray(inspect.getmembers(MLTechniques)).flatten())
+
+        for technique in [self.data.techniques[-1]]:
+            mlmodel = ml_package[ml_package.index(technique.upper())+1]
+            self.data = mlmodel().train(self.data,1)
             
-        for technique in self.data.techniques:
-            
-            mlmodel = ml_package[ml_package.index(technique+1)]
-            self.data = mlmodel().train(self.data)
-        
+        print("-----ANALYSIS COMPLETE: INTERPRETING RESULTS NOW-----")
+        print()
+
         return self.data

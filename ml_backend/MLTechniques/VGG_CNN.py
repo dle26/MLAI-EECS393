@@ -85,7 +85,7 @@ class VGG_CNN:
  
 
     def get_name():
-        return 'vgg-16 cnn'
+        return 'vgg_16 cnn'
     
     def get_category():
         return 'cnn'

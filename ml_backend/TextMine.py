@@ -22,11 +22,9 @@ import copy
 class TEXTMINE:
     
     
-    SUP_TECHNICAL_KEYWORDS = ["machine learning","deep learning",
-                          "supervised learning","classification" ]
+    SUP_TECHNICAL_KEYWORDS = ["supervised","learning","classification" ]
     
-    UNS_TECHNICAL_KEYWORDS = ["machine learning","deep learning",
-                          "unsupervised learning","clustering"]
+    UNS_TECHNICAL_KEYWORDS = ["unsupervised","learning","clustering"]
     
     
     def __init__(self,user_keywords,user_id,analysis_type='supervised'):
@@ -64,9 +62,12 @@ class TEXTMINE:
 
 
         combos = self.generate_combinations(self.user_keywords,tech_words)
-
-        for n,combo in enumerate(combos[0:3]):
+        print("-----UNKNOWN DATA DETECTED: INITIATING TEXT MINING-----")
+        print()
+        for n,combo in enumerate(combos[0:6]):
+             print("SEARCH QUERY " + str(n+1) + ":")
              print(combo)
+             print()
             
              string = ""
              for word in combo:
@@ -93,7 +94,8 @@ class TEXTMINE:
                  textmine_results['allwords'].extend(allwords)
 
                  os.remove(str(self.user_id))
-
+                 
+        print("------MINING COMPLETE: SEARCHING FOR KEYWORDS-----")
         keywords,keyword_scores = self.adjust_output(textmine_results)
         
         return self.two_list_sort(keywords,keyword_scores),keyword_scores,searchwords
@@ -150,8 +152,7 @@ class TEXTMINE:
     def adjust_output(self,words):
 
       scores = []
-      print("STARTING")
-      
+
       wordkeys = list(set(words['words']))
       for word in wordkeys:
           score = np.median(np.asarray(words['scores'])[np.where(np.asarray(words['words']) == word)])
