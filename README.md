@@ -16,7 +16,7 @@ Instructions for running MLAI on a personal device
 
       pip3 install -r requirements.txt
 
-### Please note that the server and website need to be run on two seperate terminals (labeled inside this readme): 
+Please note that the server and website need to be run on two seperate terminals (labeled inside this readme): 
 
 ## :arrow_forward: Run
 
