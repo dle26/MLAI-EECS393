@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Apr  6 00:49:50 2020
 
+"""
 @author: anibaljt
+
 """
 
 
@@ -19,14 +19,14 @@ class KMeans(Technique):
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'KMeans'
+    
     def get_name():
         return 'k-Means'
 
     def get_category():
         return 'k-Means'
-    
-    def get_general_category():
-        return 'machine learning'
     
     def preprocess(self,data):
         pass

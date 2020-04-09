@@ -11,27 +11,29 @@ Standardization class for Results collection/model eval
 from sklearn import metrics
 import copy 
 import numpy as np
+from sklearn.metrics import plot_confusion_matrix
+import matplotlib.pyplot as plt
 
 
 class INTERPRET:
     
-    #### TODO: Score the quality data based on heuristics 
     
-    def __init(self,data,performance_threshold,data_score):
+    def __init__(self,data,performance_threshold):
+        
         self.data = copy.deepcopy(data)
-        self.data_score = data_score
+        self.performance_threshold = performance_threshold
 
         
     def interpret_supervised(self):
         
         self.data = self.supervised_accuracy_metrics()
         
-        if self.data.get_feat_importances() is not None:
-            self.data = self.fi_interpret()
+       # if self.data.feature_importances is not None:
+        #    self.data = self.fi_interpret()
         
-        self.data = self.assign_top_model()
-        self.data = self.NLResults()
-        self.data = self.assign_top_model()
+       # self.data = self.assign_top_model()
+       # self.data = self.NLResults()
+       # self.data = self.assign_top_model()
         
         return self.data
     
@@ -40,29 +42,38 @@ class INTERPRET:
     
     def supervised_accuracy_metrics(self):
         
-        techniques = self.data.get_techniques()
-        true_labels = self.data.get_labels()
-        
+        techniques = self.data.techniques
+
         all_results = {}
         
-        for n,tech in enumerate(techniques):
+        for n,tech in enumerate([techniques[-1]]):
             
             int_results = {}
-            preds = self.data.get_prediction_results[n]
-            fpr, tpr, _ = metrics.roc_curve(true_labels,preds)
             
+            preds = np.asarray(self.data.prediction_results[n][0])
+            true_labels = np.asarray(self.data.test_labels)
+
+            # Compute ROC curve and ROC area for each class + cite sklearn
+            
+            fpr = {}
+            tpr = {}
+            roc_auc = []
+            
+            for i in range(len(list(set(true_labels)))):
+                fpr[i], tpr[i], _ = metrics.roc_curve(true_labels, preds,pos_label=list(set(true_labels))[i])
+                roc_auc.append(metrics.auc(fpr[i], tpr[i]))
+
             int_results["Accuracy"] = metrics.accuracy_score(true_labels,preds)
-            int_results["AUC"] = metrics.auc(fpr, tpr)
-            int_results['F1 Score'] = metrics.f1_score(true_labels,preds)
+            int_results["AUC"] = np.median(roc_auc)
+            int_results['F1 Score'] = metrics.f1_score(true_labels,preds,average='macro')
+
+            int_results["Confusion Matrix"] = metrics.confusion_matrix(true_labels, preds)
             
-            cm = metrics.confusion_matrix(true_labels, preds)
-            
-            int_results["Class Predictions"] = self.analyze_confusion_metrics(cm,true_labels,int_results)
-        
+
             all_results[tech] = int_results
         
-        self.data.add_interpreted_results(all_results)
-        
+        self.data.interpreted_results = all_results
+
         return self.data
             
  
@@ -72,20 +83,7 @@ class INTERPRET:
     def fi_interpret(self):
         pass 
     
-    def analyze_confusion_metrics(self,cm):
-        
 
-       preds_by_labels = {}
-       j = 0
-       
-       for num,i in enumerate(list(cm)):
-          preds_by_labels[str(num)+"correct"] = i
-          if (j/2)%0:
-              preds_by_labels[str(num)+"false prediction"] = i/len(cm)
-              j = 0
-              
-       return preds_by_labels
-             
 
     def NL_results(self,name):
         pass
@@ -127,7 +125,10 @@ class INTERPRET:
          for n,tup in enumerate(self.data.data_for_update):
              
              if technique in tup:
-                ml_update,ppr_update = list(self.data.data_for_update[n]),list(self.data.ppr_data_for_update[n])
+                ml_update = list(self.data.data_for_update[n])
                 ml_update.append(score)
-                ppr_update.append(score)
-                self.data.data_for_update[n],self.data.ppr_data_for_update[n] = tuple(ml_update),tuple(ppr_update)   
+                self.data.data_for_update[n] = tuple(ml_update)
+                
+         #### TBC 
+         pass
+     

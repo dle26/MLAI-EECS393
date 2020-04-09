@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Apr  5 23:45:21 2020
 
 @author: anibaljt
+
 """
 
 from .Technique import Technique
@@ -24,8 +24,9 @@ class RandomForest(Technique):
     def get_category():
         return 'random forest'
     
-    def get_general_category():
-        return 'machine learning'
+    def get_class_name():
+        return 'RandomForest'
+    
     
     def preprocess(self,data):
         pass

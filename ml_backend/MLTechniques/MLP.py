@@ -19,14 +19,14 @@ class MLP(Technique):
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'MLP'
+    
     def get_name():
         return 'multilayer perceptron'
 
     def get_category():
-        return 'ann'
-    
-    def get_general_category():
-        return 'deep learning'
+        return 'multilayer perceptron'
     
     def preprocess(self,data):
         pass

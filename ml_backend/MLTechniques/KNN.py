@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Apr  6 00:32:21 2020
 
+"""
 @author: anibaljt
+
 """
 
 
@@ -21,14 +21,14 @@ class KNN(Technique):
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'KNN'
+    
     def get_name():
         return 'k-nearest neighbor'
 
     def get_category():
-        return 'neighbor'
-    
-    def get_general_category():
-        return 'machine learning'
+        return 'nearest neighbor'
     
     def preprocess(self,data):
         pass

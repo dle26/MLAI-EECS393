@@ -12,7 +12,6 @@ import json
 import inspect
 import numpy as np
 import os
-from sklearn.preprocessing import MinMaxScaler
 import MLTechniques
 from TextProcess import TEXTPROCESS
 import requests
@@ -53,18 +52,17 @@ class TEXTMINE:
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
                 if obj.TECHNIQUE_TYPE == self.analysis_type:
-                        searchwords['general'].append(obj.get_name())
+                        searchwords['names'].append(obj.get_name())
                         searchwords['specific'].append(obj.get_category())
-                        searchwords['names'].append(obj.get_general_category())
 
-
-        textmine_results = {'words':[],'scores':[],'numlines':0,'allwords':[]}
+        print(searchwords['specific'])
+        textmine_results = {'words':[],'scores':[],'allwords':[]}
 
 
         combos = self.generate_combinations(self.user_keywords,tech_words)
         print("-----UNKNOWN DATA DETECTED: INITIATING TEXT MINING-----")
         print()
-        for n,combo in enumerate(combos[0:6]):
+        for n,combo in enumerate(combos[0:5]):
              print("SEARCH QUERY " + str(n+1) + ":")
              print(combo)
              print()
@@ -76,13 +74,15 @@ class TEXTMINE:
              doc_srch = ElsSearch(string, 'sciencedirect')
              results = TEXTMINE.execute_modified(doc_srch.uri,client,get_all=True,set_limit=25)
              
-             for num,res in enumerate(results):
+             if results != 0:
+               print("SUCCESSFUL QUERY")
+               for num,res in enumerate(results):
                  
                  DOI = res['prism:doi']
-                 URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?APIkey=" + str(config['apikey']) #+ "&view=META_ABS"
+                 URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?APIkey=" + str(config['apikey'])
+                
                  r = requests.get(URL)
-
-
+                 
                  with open(str(self.user_id),'w') as f:
                      f.write(r.text)
                  f.close()
@@ -90,7 +90,6 @@ class TEXTMINE:
                  foundwords,allwords,numlines = TEXTPROCESS.findkeywords(str(self.user_id),searchwords,str(self.user_keywords))
                  textmine_results['words'].extend(list(foundwords.keys()))
                  textmine_results['scores'].extend(list(foundwords.values()))
-                 textmine_results['numlines'] += numlines
                  textmine_results['allwords'].extend(allwords)
 
                  os.remove(str(self.user_id))
@@ -116,6 +115,10 @@ class TEXTMINE:
     def execute_modified(uri,els_client = None, get_all = False,set_limit=25):
 
         api_response = els_client.exec_request(uri)
+        
+        if api_response['search-results']['opensearch:totalResults'] is None:
+                return 0
+        
         results = api_response['search-results']['entry']
         
         if get_all is True:
@@ -154,9 +157,9 @@ class TEXTMINE:
       scores = []
 
       wordkeys = list(set(words['words']))
+      
       for word in wordkeys:
           score = np.median(np.asarray(words['scores'])[np.where(np.asarray(words['words']) == word)])
-          score /= words['numlines']
           scores.append(score * (words['allwords'].count(word)/len(words['allwords'])))
-          
+
       return wordkeys,list(np.asarray(scores)/np.sum(scores))

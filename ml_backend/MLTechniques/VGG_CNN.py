@@ -88,11 +88,12 @@ class VGG_CNN:
         return 'vgg_16 cnn'
     
     def get_category():
-        return 'cnn'
+        return 'convolutional neural network'
     
-    def get_general_category():
-        return 'deep learning'
+    def get_class_name():
+        return 'VGG_CNN'
     
+
     def train(self,data,time_constraint):
     
         ###TODO: IMPLMEMENT THESE  + ADD TIME CONSTRAINTS

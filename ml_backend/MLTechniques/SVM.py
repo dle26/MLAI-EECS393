@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 
+
 class SVM(Technique):
      
   
@@ -25,25 +26,19 @@ class SVM(Technique):
         self.model = None
  
     
-
+    def get_class_name():
+        return 'SVM'
+    
     def get_name():
-        return 'svm'
+        return 'support vector machine'
 
     def get_category():
-        return 'svm'
-    
-    def get_general_category():
-        return 'machine learning'
-    
-    
-    
-    
+        return 'support vector machine'
+        
     def preprocess(self,data):
         
         if data.type == 'image':
             features = StandardScaler().fit_transform(data.data)
-            
-               
             return features
         
         if data.type == 'numeric':
@@ -71,7 +66,7 @@ class SVM(Technique):
             for n,ii in enumerate(y_test):
                 if ii == results[n]:
                     k += 1
-            
+
 
         if time_constraint == 2:
             
@@ -114,19 +109,12 @@ class SVM(Technique):
             data.test_labels.extend(y[test])
             model = gcv.estimator
         
-
+        self.model = model
         data.prediction_results.append((results,SVM.get_name()))
-        data.current_models.extend((self,SVM.get_name()))
-        data.feature_importances.extend((None,SVM.get_name()))
+        data.current_models.append((self,SVM.get_name()))
+        data.feature_importances.append((None,SVM.get_name()))
+        print()
   
-        return data
-    
-
-    def predict(self,data,labels,model):
-        
-        results = model.predict(data.preprocessed_data)
-        data.set_results(results)
-        
         return data
     
     
@@ -138,4 +126,4 @@ class SVM(Technique):
         return self.model
     
 
-    
+

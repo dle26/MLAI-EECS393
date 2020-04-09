@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 @author: anibaljt
+
+Abstract class for ensuring ML techniques in package are properly structured
 """
 
 import abc
@@ -18,16 +20,14 @@ class Technique(abc.ABC):
     @abc.abstractmethod
     def get_category():
         pass
-    
-    @abc.abstractmethod
-    def get_general_category():
-        pass
-    
-    
+        
     @abc.abstractmethod
     def get_name():
         pass
     
+    @abc.abstractmethod
+    def get_class_name():
+        pass
     
     @abc.abstractmethod
     

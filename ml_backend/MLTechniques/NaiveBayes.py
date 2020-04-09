@@ -19,15 +19,15 @@ class NaiveBayes(Technique):
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'NaiveBayes'
+    
     
     def get_name():
         return 'naive bayes'
 
     def get_category():
         return 'bayesian'
-    
-    def get_general_category():
-        return 'machine learning'
     
     def preprocess(self,data):
         pass

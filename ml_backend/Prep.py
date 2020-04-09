@@ -12,7 +12,7 @@ import nltk
 import cv2
 import pandas as pd
 import itertools
-
+import json
 
 class DATA:
     
@@ -69,13 +69,54 @@ class DATAPREP:
         self.data = data
         
 
+    def from_json(self):
+        
+        file=open(self.filename, 'r')
+        decoded = json.load(file)
+        file.close()
+        
+        for item in decoded:
+            datatype = item.get('type')
+            userid = item.get('userid')
+            userinput = str(item.get('input'))
+            time_const = int(item.get('time constraint'))
+            
+        return -1
+    
     def process_data(self):
-
+        
+        if self.data.type == 'image':
+            pass
+        if self.data.type == 'numeric':
+            pass
+        if self.data.type == 'text':
+            pass
+        
         ####HANDLE PRIOR MODELS HERE
-        ### TODO: FOR IMAGES - DO NOT FORGET MULTIPLE CHANNELS 
         return self.data
     
     
+    def process_images(self):
+        
+        final_data = []
+        ### TODO: MULTIPLE CHANNELS??
+        if self.multifile:
+            for data in self.data.data:
+                img = cv2.imread(data,cv2.IMREAD_GRAYSCALE)
+                final_data.append(np.ravel(img))
+                
+        else:
+            return np.asarray(self.data.data)
+        
+        return final_data
+                
+        
+    def process_excel(self):
+        return np.asarray(self.data.data)
+    
+    def process_txt(self):
+        pass
+        
     
     ### TODO: add in text data handling + unsupervised learning  
     def eval_text_data(self):
@@ -174,23 +215,11 @@ class DATAPREP:
         
         return sparsity/len(data)
     
-    
 
     def extract_labels(self):
         pass
     
-    
-    
-    def text_eval(self):
-        pass
-    
-    
-    
-    def format_images(self):
-        pass
-    
 
-    
     def outlier_ratio(self,data):
         
         data = pd.DataFrame(data)

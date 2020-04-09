@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  6 00:43:56 2020
 
 @author: anibaljt
+
 """
 
 
@@ -19,14 +19,15 @@ class LSTM(Technique):
     def __init__(self):
         self.model = None
  
+    
+    def get_class_name():
+        return 'LSTM'
+    
     def get_name():
         return 'lstm'
 
     def get_category():
         return 'rnn'
-    
-    def get_general_category():
-        return 'deep learning'
     
     def preprocess(self,data):
         pass

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
-Created on Mon Apr  6 00:55:55 2020
 
 @author: anibaljt
+
+
 """
 
 
@@ -19,15 +21,15 @@ class Autoencoder(Technique):
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'Autoencoder'
+    
     def get_name():
         return 'autoencoder'
 
     def get_category():
-        return 'encoder'
-    
-    def get_general_category():
-        return 'deep learning'
-    
+        return 'autoencoder'
+        
     def preprocess(self,data):
         pass
         

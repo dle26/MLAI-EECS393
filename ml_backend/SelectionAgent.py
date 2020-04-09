@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 @author: anibaljt
 
@@ -11,7 +12,6 @@ from TextMine import TEXTMINE
 from UniversalScores import UniversalScores
 import inspect
 import numpy as np
-#from UniversalScores import UNIVERSALSCORES
 
 
 class SELECT:
@@ -24,19 +24,15 @@ class SELECT:
 
         
         
-    def selectAnalysisApproach(self,time_constraint,no_labels=False):
+    def selectAnalysisApproach(self,time_constraint,analysis_type = 'supervised'):
         print()
-        print("----SELECTING APPROACH FOR SUPERVISED DATA-----")
+        print("----SELECTING APPROACH-----")
         print()
-        analysis_type = "supervised"
-        if no_labels:
-            analysis_type = "unsupervised"
-            
+
         user_input = self.data.descriptive_info
         top2_approaches,matches = UniversalScores.reference(user_input,analysis_type)
         
-        print(matches)
-        
+
         if (len(np.ravel(matches))/len(self.data.descriptive_info)) < self.mining_threshold:
         
             keywords,keyword_scores,searchwords = TEXTMINE(self.data.descriptive_info,self.run_id).from_database()
@@ -56,69 +52,37 @@ class SELECT:
     
     
     
-    
     def select_from_textmine(self,keywords,keywordscores,searchwords,analysis_type):
         
-        #### 3 tiered approach here - need adaskipgram here
+        #### 2 tiered approach here - need adaskipgram here
         names = []
         scores = []
-        approaches = []
-        
-        for word in searchwords['names']:
+
+        for n,word in enumerate(list(set(searchwords['specific']))):
             if word in keywords:
                 names.append(word)
                 scores.append(keywordscores[keywords.index(word)])
                 
-        final_approaches = []
-        if len(names) > 1:
-            return two_list_sort(names,scores)[[-2,-1]]
+        approaches,scores = two_list_sort(names,scores)
         
-        elif len(names) == 1:
-            final_approaches.append(names[0])
-            
-        else:
-           names = []
-           scores = []
-           technique_names = []
-           for word in searchwords['specific']:
-
-              if word in keywords:
-                  names.append(word)
-                  scores.append(keywordscores[keywords.index(word)])
-            
-           if len(approaches) == 0 and len(names) > 1:
-                approaches = list(two_list_sort(names,scores)[[-2,-1]])
-
-                for a in approaches:
-                    technique_names.append(select_approach(a,"specific",analysis_type))
-                final_approaches.append(UniversalScores.select_from_usage(technique_names,1,analysis_type))
-
-                return final_approaches
-            
-           elif len(final_approaches) == 1 and len(names) > 0:
-                technique_names = select_approach(two_list_sort(names,scores)[-1],'specific',analysis_type)
-                
-                final_approaches.append(UniversalScores.select_from_usage(technique_names,1,analysis_type))
-                
-                return final_approaches
-            
-           elif len(names) == 0:
-               names = []
-               scores = []
-               for word in searchwords['general']:
-                  if word in keywords:
-                     names.append(word)
-                     scores.append(keywordscores[keywords.index(word)])
-               technique_names = select_approach(two_list_sort(names,scores)[-1])
-               if len(final_approaches) == 0:
-                   final_approaches.append(UniversalScores.select_from_usage(technique_names,2,analysis_type))
-               else:
-                  final_approaches.append(UniversalScores.select_from_usage(technique_names,1,analysis_type))
-               
-        return final_approaches
+        approaches = approaches[[-2,-1]]
+        scores = scores[[-2,-1]]
         
-            
-                
+        technique_names = np.random.choice(approaches,2,replace=False,p=np.asarray(scores)/np.sum(scores))
+        
+        specific_names = []
+        classes = []
+
+        for app in technique_names:
+             specific_names,class_names = select_approach(app,"specific",analysis_type)
+             tech = UniversalScores.select_from_usage(specific_names,1,analysis_type)
+             classes.append(class_names[specific_names.index(tech[0])])
+
+
+        return classes
+
+
+                      
 def two_list_sort(tosort,basis):
     
       for i in range(1, len(basis)):
@@ -133,7 +97,7 @@ def two_list_sort(tosort,basis):
         basis[j+1] = key 
         tosort[j+1] = key2
         
-      return np.array(tosort)
+      return np.array(tosort),np.asarray(basis)
               
             
   
@@ -141,14 +105,18 @@ def two_list_sort(tosort,basis):
 def select_approach(app_name,select,analysis_type):
 
         approaches_to_select = []
+        class_names = []
+    
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
                 if obj.TECHNIQUE_TYPE == analysis_type:
                     if select =='specific':
                         if obj.get_category() == app_name:
                             approaches_to_select.append(obj.get_name())
+                            class_names.append(obj.get_class_name())
                     else:
                          if obj.get_general_category() == name:
                             approaches_to_select.append(obj.get_name())
-        
-        return approaches_to_select
+                            class_names.append(obj.get_class_name())
+
+        return approaches_to_select,class_names
