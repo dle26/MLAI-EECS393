@@ -16,27 +16,26 @@ import numpy as np
 
 class SELECT:
     
-    def __init__(self,data,run_id,threshold=0.25):
+    def __init__(self,data,threshold=0.25):
         
         self.data = copy.deepcopy(data)
         self.mining_threshold = threshold
-        self.run_id = run_id
 
         
         
-    def selectAnalysisApproach(self,time_constraint,analysis_type = 'supervised'):
+    def selectAnalysisApproach(self):
         print()
         print("----SELECTING APPROACH-----")
         print()
 
         user_input = self.data.descriptive_info
-        top2_approaches,matches = UniversalScores.reference(user_input,analysis_type)
+        top2_approaches,matches = UniversalScores.reference(user_input,self.data.analysis_type)
         
 
         if (len(np.ravel(matches))/len(self.data.descriptive_info)) < self.mining_threshold:
         
             keywords,keyword_scores,searchwords = TEXTMINE(self.data.descriptive_info,self.run_id).from_database()
-            top2_approaches = self.select_from_textmine(keywords,keyword_scores,searchwords,analysis_type)
+            top2_approaches = self.select_from_textmine(keywords,keyword_scores,searchwords,self.data.analysis_type)
             
         self.data.data_for_update = zip(top2_approaches,[user_input,user_input])
         

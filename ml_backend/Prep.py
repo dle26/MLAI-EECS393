@@ -24,22 +24,16 @@ class DATA:
         ''' the class labels for the data that is to be analyzed ''' 
         self.labels = None
         
-        self.user= None
+        self.userid = None
         
-        self.type = None
-        
-        self.test_labels = []
+        self.data_type = None
         
         self.descriptive_info = []
         
         self.bestmodel = None
         
         self.techniques = []
-        
-        self.preprocessed_data = None
-        
-        self.results = None
-        
+
         self.time_constraint = None
         
         self.feature_importances = []
@@ -47,9 +41,7 @@ class DATA:
         self.interpreted_results = None
         
         self.prediction_results = []
-        
-        self.current_models = []
-        
+                
         self.data_for_update = None
         
         ### for images only 
@@ -61,6 +53,10 @@ class DATA:
         
         self.original_features = None
         
+        self.test_data = []
+        
+        self.test_labels = []
+        
         
 
 
@@ -69,6 +65,7 @@ class DATAPREP:
     def __init__(self,datafiles,datafilenames,datafilesize,labelfile,labelfilename,labelfilesize,info_dict):
     
         self.data = DATA()
+        self.data.userid = info_dict["userid"]
         self.datafiles = datafiles
         self.info_dict = info_dict
         self.labelfile = labelfile
@@ -118,7 +115,7 @@ class DATAPREP:
         
         
         if str(filename).find('.jpg') > -1 or str(filename).find('.jpg') > -1:
-            self.data.type = "image"
+            self.data.data_type = "image"
             file.save(str(self.info_dict['userid']) + filename,filesize)
             output = np.asarray(cv2.imread(file,cv2.IMREAD_GRAYSCALE))
             self.data.dimension = output.shape
@@ -127,7 +124,7 @@ class DATAPREP:
 
 
         if str(filename).find('.txt') > -1 or str(filename).find('.text') > -1:
-            self.data.type = "text"
+            self.data.data_type = "text"
             file.save(str(self.info_dict['userid']) + filename,filesize)
             string = ""
             with open(str(self.info_dict['userid']) + filename, 'r') as f:
@@ -139,7 +136,7 @@ class DATAPREP:
         
         
         if str(filename).find('.xlsx') > -1:
-            self.data.type = "numeric"
+            self.data.data_type = "numeric"
             file.save(str(self.info_dict['userid']) + filename,filesize)
             output = pd.read_excel(filename)
             os.remove(str(self.info_dict['userid']) + filename)
@@ -147,7 +144,7 @@ class DATAPREP:
 
             
         if str(filename).find('.csv') > -1:
-            self.data.type = "numeric"
+            self.data.data_type = "numeric"
             file.save(str(self.info_dict['userid']) + filename,filesize)
             output = pd.read_csv(filename)
             os.remove(str(self.info_dict['userid']) + filename)
@@ -180,9 +177,9 @@ class DATAPREP:
         
         data = pd.DataFrame()
         for n,entry in enumerate(self.data.data):
-            if self.data.type == 'image':
+            if self.data.data_type == 'image':
                 data.loc[n] = np.reshape(entry,data.dimensions)
-            if self.data.type == 'numeric':
+            if self.data.data_type == 'numeric':
                 if n == 0:
                     data = entry
                 else:
@@ -199,14 +196,13 @@ class DATAPREP:
             if str(col).lower() == 'labels':
                 self.data.labels = self.data.data[n]
                 self.data.data = np.delete(self.data,n)
-                self.data.type = 'supervised'
+                self.data.analysis_type = 'supervised'
                 return
             
-        self.data.type = 'unsupervised'
+        self.data.analysis_type = 'unsupervised'
                 
 
-
-    ### TODO: add in text data handling + unsupervised learning  
+    ### TODO: add in text data handling
     def eval_text_data(self):
         pass
     
@@ -216,25 +212,17 @@ class DATAPREP:
         score = 1
         data_features = []
 
-        if self.data.descriptive_info == None: 
+        if self.data.descriptive_info == None:  ###or in list form??
             score -= 0.25
 
-        ### TODO: zero + nan, not just nan
-        if self.multifile == False:
-            nan_count = 0
-            for arr in self.data.data:
-                nan_count += list(np.isnan(arr)).count('True')
+
+        nan_count = 0
+        for arr in self.data.data:
+            nan_count += list(np.isnan(arr)).count('True')
             
-            sparsity = nan_count/len(self.data.data)
-            oratio = self.outlier_ratio(self.data.data)/len(self.data.data)
-            
-        else:
-            sparsity  = self.get_sparsity() 
-            oratio = 0
-            for num,i in enumerate(self.data.data):
-                    oratio += self.outlier_ratio(self.data.data[i])
-            oratio = oratio/num
-                
+        sparsity = nan_count/len(self.data.data)
+        oratio = self.outlier_ratio(self.data.data)/len(self.data.data)
+                 
         if sparsity > 0.1:
             data_features.append("sparse")
             if sparsity > 0.25:
@@ -249,21 +237,22 @@ class DATAPREP:
             data_features.append("small dataset")
             if len(self.data.labels) < 25:
                 score -= 0.25
+        
+        if self.data.analyis_type == 'supervised':
+            if len(list(set(self.data.labels))) > 2:
+                data_features.append("multiclass")
             
-        if len(list(set(self.data.labels))) > 2:
-            data_features.append("multiclass")
+            elif len(list(set(self.data.labels))) == 2:
+                data_features.append("binary")
             
-        elif len(list(set(self.data.labels))) == 2:
-            data_features.append("binary")
-            
-        else:
-            data_features.append("one-class")
+            else:
+                data_features.append("one-class")
         
          
-        if self.get_label_ratios() > (1/len(set(self.data.labels)))/3:
-            data_features.append("imbalance")
-            if self.get_label_ratios() > (1/len(set(self.data.labels)))/2:
-                score -= 0.1
+            if self.get_label_ratios() > (1/len(set(self.data.labels)))/3:
+                data_features.append("imbalance")
+                if self.get_label_ratios() > (1/len(set(self.data.labels)))/2:
+                    score -= 0.1
         
 
         self.data.descriptive_info.extend(data_features)
@@ -274,10 +263,7 @@ class DATAPREP:
         
         return self.data
     
-    
-    def eval_unsupervised(self):
-        pass 
-    
+ 
     
     def get_label_ratios(self):
         
@@ -290,7 +276,6 @@ class DATAPREP:
             ratios.append(lst.count(i)/leng)
             
         return np.std(ratios)
-    
     
     
     def get_sparsity(self):

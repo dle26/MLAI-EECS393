@@ -9,14 +9,14 @@ Abstract class for ensuring ML techniques in package are properly structured
 import abc
 
 class Technique(abc.ABC):
-    
-    TECHNIQUE_TYPE = None
 
+    TECHNIQUE_TYPE = None
+    GENERAL_USE = None 
+    
     @abc.abstractmethod
     def preprocess(data):
-        pass 
-        
-
+        pass  
+    
     @abc.abstractmethod
     def get_category():
         pass
@@ -30,23 +30,13 @@ class Technique(abc.ABC):
         pass
     
     @abc.abstractmethod
-    
     def train(self):
         pass
     
-    
     @abc.abstractmethod
-    
-    def predict(self):
-        pass
-    
-    
-    @abc.abstractmethod
-
     def set_model(self):
         pass
     
     @abc.abstractmethod
-    
     def get_model(self):
         pass
