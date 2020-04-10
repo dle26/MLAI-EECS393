@@ -59,7 +59,7 @@ Please note that the server and website need to be run on two seperate terminals
 
      username: sadsad
 
-     password: password 
+     password: 123 
 
   ### Main Dashboard after log in sucessfully (Updated 3/20/2020)
 
