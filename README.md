@@ -1,4 +1,4 @@
-Machine Learning Accessibility Initiative (MLAI)
+# Machine Learning Accessibility Initiative (MLAI)
 
 Instructions for running MLAI on a personal device 
 
