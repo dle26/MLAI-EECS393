@@ -11,10 +11,10 @@ class Pipeline:
         
         ### list of files data type?
         ### single file data type?
-        #### where are the labels being stored 
-                  # - we need to define a protocol for the user to upload labels...
+        #### user will upload labels in a separate form
         #### where is the information on the data, the time constraint, and user info?
-        
+        #### access to the original files names? --- so i can find the labels
+
         pass 
     
     
