@@ -62,6 +62,8 @@ class TEXTMINE:
         combos = self.generate_combinations(self.user_keywords,tech_words)
         print("-----UNKNOWN DATA DETECTED: INITIATING TEXT MINING-----")
         print()
+        allurls = []
+        
         for n,combo in enumerate(combos[0:5]):
              print("SEARCH QUERY " + str(n+1) + ":")
              print(combo)
@@ -80,19 +82,19 @@ class TEXTMINE:
                  
                  DOI = res['prism:doi']
                  URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?APIkey=" + str(config['apikey'])
-                
-                 r = requests.get(URL)
+                 if URL not in allurls:
+                     r = requests.get(URL)
+                     allurls.append(URL)
+                        
+                     with open(str(self.user_id),'w') as f:
+                        f.write(r.text)
+                     f.close()
                  
-                 with open(str(self.user_id),'w') as f:
-                     f.write(r.text)
-                 f.close()
-                 
-                 foundwords,allwords,numlines = TEXTPROCESS.findkeywords(str(self.user_id),searchwords,str(self.user_keywords))
-                 textmine_results['words'].extend(list(foundwords.keys()))
-                 textmine_results['scores'].extend(list(foundwords.values()))
-                 textmine_results['allwords'].extend(allwords)
-
-                 os.remove(str(self.user_id))
+                     foundwords,allwords,numlines = TEXTPROCESS.findkeywords(str(self.user_id),searchwords,str(self.user_keywords))
+                     textmine_results['words'].extend(list(foundwords.keys()))
+                     textmine_results['scores'].extend(list(foundwords.values()))
+                     textmine_results['allwords'].extend(allwords)
+                     os.remove(str(self.user_id))
                  
         print("------MINING COMPLETE: SEARCHING FOR KEYWORDS-----")
         keywords,keyword_scores = self.adjust_output(textmine_results)
