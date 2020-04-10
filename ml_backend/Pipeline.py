@@ -20,16 +20,3 @@ class Pipeline:
     
     def run_MLAI(data):
         pass
-
-    
-
-
-def main():
-    pass
-
-if __name__ == "__main__":
-    main()
-
-
-    
-    
