@@ -28,12 +28,12 @@ class INTERPRET:
         
         self.data = self.supervised_accuracy_metrics()
         
-       # if self.data.feature_importances is not None:
-        #    self.data = self.fi_interpret()
+        if self.data.feature_importances is not None:
+            self.data = self.fi_interpret()
         
-       # self.data = self.assign_top_model()
-       # self.data = self.NLResults()
-       # self.data = self.assign_top_model()
+        self.data = self.assign_top_model()
+        self.data = self.NLResults()
+        self.data = self.assign_top_model()
         
         return self.data
     

@@ -88,7 +88,7 @@ class VGG_CNN:
         return 'vgg_16 cnn'
     
     def get_category():
-        return 'convolutional neural network'
+        return 'cnn'
     
     def get_class_name():
         return 'VGG_CNN'

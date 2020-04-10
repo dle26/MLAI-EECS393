@@ -7,12 +7,11 @@ Created on Mon Mar 23 17:44:58 2020
 """
 
 import numpy as np
-import scipy as sp
 import nltk
 import cv2
 import pandas as pd
 import itertools
-import json
+import os 
 
 class DATA:
     
@@ -58,66 +57,155 @@ class DATA:
         
         self.evalscore = 1
         
+        self.analysis_type = None
+        
+        self.original_features = None
+        
         
 
 
 class DATAPREP:
     
-    def __init__(self,data,multifile=False):
+    def __init__(self,datafiles,datafilenames,datafilesize,labelfile,labelfilename,labelfilesize,info_dict):
     
-        self.multifile = False
-        self.data = data
+        self.data = DATA()
+        self.datafiles = datafiles
+        self.info_dict = info_dict
+        self.labelfile = labelfile
+        self.datafilenames = datafilenames
+        self.labelfilename = labelfilename
+        self.datafilesize = datafilesize
+        self.labelfilesize = labelfilesize
         
+        
+    def run(self):
+        pass
 
-    def from_json(self):
+    def from_fileobject(self):
         
-        file=open(self.filename, 'r')
-        decoded = json.load(file)
-        file.close()
+        data_files = []
         
-        for item in decoded:
-            datatype = item.get('type')
-            userid = item.get('userid')
-            userinput = str(item.get('input'))
-            time_const = int(item.get('time constraint'))
-            
-        return -1
+        for n,file in self.datafiles:
+            data_files.append(self.process_data(file,self.datafilenames[n],self.datafilesize[n]))
+
+
+        if len(data_files) > 1:
+            data_files = self.consolidate_data(data_files)
+        self.data.data = data_files
     
-    def process_data(self):
+    
+        if self.labelfile is not None:
+             self.data.labels = self.process_labels()
+             self.data.analysis_type = 'supervised'
+             
+        elif self.data.type == 'numeric' and self.labelfile is None:
+            self.data.labels = self.extract_labels()
+            
+        else:
+            self.data.labels = None
+            self.data.analysis_type = 'unsupervised'
         
-        if self.data.type == 'image':
-            pass
-        if self.data.type == 'numeric':
-            pass
-        if self.data.type == 'text':
-            pass
         
-        ####HANDLE PRIOR MODELS HERE
+        self.data.time_constraint = int(self.user_dict["time"])
+        self.data.descriptive_information = str(self.user_dict["user_input"])
+        self.data.user_id = str(self.user_dict["userid"])
+        
         return self.data
     
     
-    def process_images(self):
+    
+    def process_data(self,file,filename,filesize):
         
-        final_data = []
-        ### TODO: MULTIPLE CHANNELS??
-        if self.multifile:
-            for data in self.data.data:
-                img = cv2.imread(data,cv2.IMREAD_GRAYSCALE)
-                final_data.append(np.ravel(img))
-                
+        
+        if str(filename).find('.jpg') > -1 or str(filename).find('.jpg') > -1:
+            self.data.type = "image"
+            file.save(str(self.info_dict['userid']) + filename,filesize)
+            output = np.asarray(cv2.imread(file,cv2.IMREAD_GRAYSCALE))
+            self.data.dimension = output.shape
+            os.remove(str(self.info_dict['userid']) + filename)
+            return (output,filename)
+
+
+        if str(filename).find('.txt') > -1 or str(filename).find('.text') > -1:
+            self.data.type = "text"
+            file.save(str(self.info_dict['userid']) + filename,filesize)
+            string = ""
+            with open(str(self.info_dict['userid']) + filename, 'r') as f:
+                for line in f.readlines():
+                    string += str(line)
+            f.close()
+            os.remove(str(self.info_dict['userid']) + filename)
+            return (self.process_txt(filename),filename)
+        
+        
+        if str(filename).find('.xlsx') > -1:
+            self.data.type = "numeric"
+            file.save(str(self.info_dict['userid']) + filename,filesize)
+            output = pd.read_excel(filename)
+            os.remove(str(self.info_dict['userid']) + filename)
+            return (output,filename)
+
+            
+        if str(filename).find('.csv') > -1:
+            self.data.type = "numeric"
+            file.save(str(self.info_dict['userid']) + filename,filesize)
+            output = pd.read_csv(filename)
+            os.remove(str(self.info_dict['userid']) + filename)
+            return (output,filename)
+  
+  
+
+    def process_labels(self):
+        
+        
+        self.labelfile.save(str(self.info_dict['userid']) + self.labelfilename,self.labelfilesize)
+        
+        if str(self.labelfilename).find('.csv') > -1:
+            output = pd.read_csv(self.labelfilename)
         else:
-            return np.asarray(self.data.data)
+            output = pd.read_excel(self.labelfilename)
+            
+        os.remove(str(self.info_dict['userid']) + self.labelfilename)
+        names = output.columns[0] 
         
-        return final_data
+        labels = []
+        for name in self.datafilenames:
+            labels.append(names.index(name))
+        
+        return np.asarray(labels)
+            
+
+    
+    def consolidate_data(self):
+        
+        data = pd.DataFrame()
+        for n,entry in enumerate(self.data.data):
+            if self.data.type == 'image':
+                data.loc[n] = np.reshape(entry,data.dimensions)
+            if self.data.type == 'numeric':
+                if n == 0:
+                    data = entry
+                else:
+                    data = pd.concat([data,entry],0)
+
+        self.data.data = data.values
+        self.data.original_features = list(data.columns)
+        
+        
+    
+    def extract_labels(self):
+        
+        for n,col in enumerate(self.data.original_features):
+            if str(col).lower() == 'labels':
+                self.data.labels = self.data.data[n]
+                self.data.data = np.delete(self.data,n)
+                self.data.type = 'supervised'
+                return
+            
+        self.data.type = 'unsupervised'
                 
-        
-    def process_excel(self):
-        return np.asarray(self.data.data)
-    
-    def process_txt(self):
-        pass
-        
-    
+
+
     ### TODO: add in text data handling + unsupervised learning  
     def eval_text_data(self):
         pass
@@ -187,7 +275,7 @@ class DATAPREP:
         return self.data
     
     
-    def eval_without_labels(self):
+    def eval_unsupervised(self):
         pass 
     
     
@@ -214,11 +302,7 @@ class DATAPREP:
             sparsity += np.count_nonzero(np.isnan(data[file]))/len(data[file])
         
         return sparsity/len(data)
-    
 
-    def extract_labels(self):
-        pass
-    
 
     def outlier_ratio(self,data):
         

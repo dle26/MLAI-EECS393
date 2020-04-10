@@ -11,7 +11,7 @@ from .Technique import Technique
 
 class GradientBoost(Technique):
     
-    
+
     GENERAL_USE = True
     
     TECHNIQUE_TYPE = "supervised"
@@ -27,7 +27,7 @@ class GradientBoost(Technique):
         return 'gradient boosted classifier'
 
     def get_category():
-        return 'gradient'
+        return 'gradient boost'
         
     def preprocess(self,data):
         pass
