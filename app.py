@@ -10,6 +10,10 @@ import jwt
 import pandas as pd
 import pymongo
 from werkzeug.utils import secure_filename
+import cv2
+import numpy as np
+import pandas as pd
+from ml_backend.Pipeline import Pipeline
 
 
 app = Flask(__name__)
@@ -96,7 +100,7 @@ def user():
         'lastname': user['lastname'],
     })
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'])
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -112,11 +116,23 @@ def upload_file():
     files = request.files.getlist('files[]')
     details = request.form.get('details')
     time = request.form.get('time')
+    print(files)
+    names = []
+    sizes = []
     for file in files:
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            print(filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            names.append(filename)
+            size = len(file.read())
+            sizes.append(size)
+    print(files)
+    print(names)
+    print(sizes)
+    print(time)
+    print(details)
+    result = Pipeline.run_MLAI(files, names, sizes, None, None, None, {'time': time, 'userid': '111111', 'user_input': details})   
+    print(result)
+            
     resp = jsonify({'message' : 'File successfully uploaded'})
     resp.status_code = 201
     return resp
