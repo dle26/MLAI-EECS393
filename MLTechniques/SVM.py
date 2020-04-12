@@ -40,7 +40,9 @@ class SVM(Technique):
             return features
         
         if data.data_type == 'numeric':
-            pass
+            features = StandardScaler().fit_transform(data.data)
+            return features
+
         
         if data.data_type == 'text':
             pass
@@ -62,8 +64,8 @@ class SVM(Technique):
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
             model.fit(X_train,y_train)
             results = model.predict(X_test)
-            data.test_data = X_test
-            data.test_labels = y_test
+            test_data = X_test
+            test_labels = y_test
 
         if time_constraint == 2:
             
@@ -72,7 +74,8 @@ class SVM(Technique):
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
                 model.fit(X_train,y_train)
                 results = model.predict(X_test)
-                data.test_labels = y_test
+                test_data.extend(X_test)
+                test_labels.extend(y_test)
                 
         if time_constraint == 3:
             
@@ -82,14 +85,14 @@ class SVM(Technique):
             for train, test in cv.split(X,y):
                  model.fit(X[train],y[train])
                  results.extend(model.predict(X[test]))
-                 data.test_labels.extend(y[test])
+                 test_data.extend(X[test])
+                 test_labels.extend(y[test])
                  
             
         if time_constraint == 4:
             model = SVC(gamma = 'auto')
             parameters = {'kernel':('linear', 'rbf'), 'C':[1/len(X),1, 10]}
             clf = GridSearchCV(model, parameters)
-            
             cv = StratifiedKFold(n_splits=5,shuffle=True)
             
             for train, test in cv.split(X,y):

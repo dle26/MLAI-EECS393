@@ -12,7 +12,7 @@ import cv2
 import pandas as pd
 import itertools
 import os 
-from io import StringIO
+import string
 
 
 
@@ -80,7 +80,7 @@ class DATAPREP:
     def run(self):
        
         self.data = self.from_fileobject()
-        return self.evaldata()
+        return self.eval_data()
 
     def from_fileobject(self):
         
@@ -101,16 +101,16 @@ class DATAPREP:
              self.data.analysis_type = 'supervised'
              
         elif self.data.data_type == 'numeric' and self.labelfile is None:
-            self.data.labels = self.extract_labels()
-            
+            self.extract_labels()
+            print("here")
         else:
             self.data.labels = None
             self.data.analysis_type = 'unsupervised'
         
         
-        self.data.time_constraint = int(self.user_dict["time"])
-        self.data.descriptive_information = str(self.user_dict["user_input"])
-        self.data.user_id = str(self.user_dict["userid"])
+        self.data.time_constraint = int(self.info_dict["time"])
+        self.data.descriptive_info = self.process_user_info(str(self.info_dict["user_input"]))
+        self.data.userid = str(self.info_dict["userid"])
         
         return self.data
     
@@ -126,7 +126,7 @@ class DATAPREP:
             output = np.asarray(cv2.imread(str(self.info_dict['userid']) + filename,cv2.IMREAD_GRAYSCALE))
             self.data.dimension = output.shape
             os.remove(str(self.info_dict['userid']) + filename)
-            return (output,filename)
+            return output
 
 
         if str(filename).find('.txt') > -1 or str(filename).find('.text') > -1:
@@ -139,7 +139,7 @@ class DATAPREP:
                     string += str(line)
             f.close()
             os.remove(str(self.info_dict['userid']) + filename)
-            return (self.process_txt(filename),filename)
+            return self.process_txt(filename)
         
         
         if str(filename).find('.xlsx') > -1:
@@ -148,7 +148,7 @@ class DATAPREP:
             file.save(str(self.info_dict['userid']) + filename,filesize)
             output = pd.read_excel(str(self.info_dict['userid']) + filename)
             os.remove(str(self.info_dict['userid']) + filename)
-            return (output,filename)
+            return output
 
             
         if str(filename).find('.csv') > -1:
@@ -157,9 +157,35 @@ class DATAPREP:
             file.save(str(self.info_dict['userid']) + filename,filesize)
             output=pd.read_csv(str(self.info_dict['userid']) + filename)
             os.remove(str(self.info_dict['userid']) + filename)
-            return (output,filename)
+            return output
   
   
+    
+    def process_user_info(self,userinput):
+        
+        words =  nltk.word_tokenize(userinput) 
+        words = [word.lower() for word in words if word not in string.punctuation or word == '.']
+        tagged_words = nltk.pos_tag(words)
+        search_words = []
+        bigram = False
+        for n,word in enumerate(tagged_words):
+ 
+            if n < len(tagged_words)-1:
+                if (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'J') or (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'N'):
+                    if word[0] + " " + tagged_words[n+1][0] not in search_words:
+                        search_words.append(word[0] + " " + tagged_words[n+1][0])
+                    bigram = True
+
+            if (word[1][0] == 'N') and word[0].find('data') == -1 and not bigram:
+                    if word[0] not in search_words:
+                        search_words.append(word[0])
+        
+            bigram = False
+            
+        return search_words
+        
+  
+        
 
     def process_labels(self):
         
@@ -200,17 +226,18 @@ class DATAPREP:
         
     
     def extract_labels(self):
-        
+
         self.data.original_features = list(self.data.data.columns)
-        self.data.data = self.data.data.values
-        
-        for n,col in enumerate(self.data.original_features):
-            if str(col).lower() == 'labels':
-                self.data.labels = self.data.data[n]
-                self.data.data = np.delete(self.data,n)
+
+        for n,col in enumerate(self.data.data.columns):
+            if str(col).lower().find('label') > -1:
+                self.data.labels = self.data.data[col].values
+                print(self.data.labels)
+                self.data.data.drop(col,1)
                 self.data.analysis_type = 'supervised'
+                self.data.data = self.data.data.values
                 return
-            
+
         self.data.analysis_type = 'unsupervised'
                 
 
@@ -250,7 +277,7 @@ class DATAPREP:
             if len(self.data.labels) < 25:
                 score -= 0.25
         
-        if self.data.analyis_type == 'supervised':
+        if self.data.analysis_type == 'supervised':
             if len(list(set(self.data.labels))) > 2:
                 data_features.append("multiclass")
             
@@ -266,7 +293,7 @@ class DATAPREP:
                 if self.get_label_ratios() > (1/len(set(self.data.labels)))/2:
                     score -= 0.1
         
-
+        
         self.data.descriptive_info.extend(data_features)
         info = self.data.descriptive_info
         self.data.descriptive_info = []

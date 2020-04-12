@@ -27,10 +27,11 @@ class INTERPRET:
         if self.data.analysis_type == 'supervised':
             self.data = self.supervised_accuracy_metrics()
         
-            if self.data.feature_importances is not None:
+            if self.data.feature_importances != []:
                 self.data = self.fi_interpret()
         else:
             self.data = self.uns_accuracy_metrics()
+        
         return self.data
     
     
@@ -45,19 +46,19 @@ class INTERPRET:
             
             int_results = {}
             
-            preds = np.asarray(self.data.prediction_results[n][0])
-            true_labels = np.asarray(self.data.test_labels)
+            preds = np.asarray(self.data.prediction_results[n])
+            true_labels = np.asarray(self.data.test_labels[n])
 
             int_results["Accuracy"] = metrics.accuracy_score(true_labels,preds)
             int_results['F1 Score'] = metrics.f1_score(true_labels,preds,average='macro')
             int_results["Confusion Matrix"] = metrics.confusion_matrix(true_labels, preds)
-            int_results["NL Results"] = self.NLResults()
+            # int_results["NL Results"] = self.NLResults()
             
             all_results[tech] = int_results
-        all_results['best'] = self.assign_top_model_sup()
+        all_results['best'] = self.assign_top_model_sup(all_results)
         all_results['analysis type'] = 'supervised'
         self.data.interpreted_results = all_results
-
+        print(self.data.interpreted_results)
         return self.data
             
  
@@ -74,7 +75,7 @@ class INTERPRET:
             
             int_results = {}
             
-            preds = np.asarray(self.data.prediction_results[n][0])
+            preds = np.asarray(self.data.prediction_results[n])
 
             int_results["Silhouette"] = metrics.silhouette_score(self.data.test_data,preds)
             int_results['CH Score'] = metrics.calinski_harabasz_score(self.data.test_data,preds)
@@ -84,7 +85,7 @@ class INTERPRET:
             all_results[tech] = int_results
             
         '''ALLRESULTS - a dict of dicts which will be returned to frontend '''
-        all_results['best'] = self.assign_top_model_unsup()
+        all_results['best'] = self.assign_top_model_unsup(all_results)
         all_results['analysis type'] = 'unsupervised'
         
         self.data.interpreted_results = all_results
@@ -94,7 +95,7 @@ class INTERPRET:
     
     
     def fi_interpret(self):
-        pass 
+        return self.data
     
     
     def NL_results(self,name):
@@ -108,7 +109,7 @@ class INTERPRET:
         
         for technique in class_results.keys():
             
-          self.update_result_tup(technique,class_results[technique]["F1 Score"])
+            # self.update_result_tup(technique,class_results[technique]["F1 Score"])
           
           if class_results[technique]["F1 Score"] > highest_F1:
                 highest_F1 = class_results[technique]["F1 Score"]
@@ -122,8 +123,8 @@ class INTERPRET:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
 
-        self.data.set_best_model((best_technique,class_results[best_technique]["F1 Score"]))
-        return self.data
+        self.data.best_model = (best_technique,class_results[best_technique]["F1 Score"])
+        return best_technique
     
     
     def assign_top_model_unsup(self,class_results):
@@ -147,8 +148,8 @@ class INTERPRET:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
 
-        self.data.set_best_model((best_technique,class_results[best_technique]["Silhouette"]))
-        return self.data
+        self.data.best_model = (best_technique,class_results[best_technique]["Silhouette"])
+        return best_technique
         
     
     

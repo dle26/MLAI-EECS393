@@ -44,17 +44,20 @@ for n,word in enumerate(tagged_words):
  
     if n < len(tagged_words)-1:
        if (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'J') or (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'N'):
-        search_words.append(word[0] + " " + tagged_words[n+1][0])
+        if word[0] + " " + tagged_words[n+1][0] not in search_words:
+            search_words.append(word[0] + " " + tagged_words[n+1][0])
         bigram = True
 
     if (word[1][0] == 'N') and word[0].find('data') == -1 and not bigram:
-        search_words.append(word[0])
+        if word[0] not in search_words:
+            search_words.append(word[0])
         
     bigram = False
  
 data = DATA()
 data.data = train_data
-data.type = 'image'
+data.data_type = 'image'
+data.analysis_type = 'supervised'
 data.dimensions = (28,28)
 data.labels = labels
 data.time_constraint = 1
@@ -94,9 +97,9 @@ def test_analysis():
     assert(True == ('svm' in newdata.feature_importances[0][1])),"Invalid Feature Importances"
     assert(True == (isinstance(newdata.current_models[0][0],MLTechniques.SVM))),"Incorrect model used"
 
-newdata = INTERPRET(newdata,0.75).interpret_supervised()
-
+newdata = INTERPRET(newdata,0.75).interpret()
+print(newdata.interpreted_results['SVM']['F1 Score'])
 def test_interpretation():
     
     assert(True == (['Accuracy','AUC','F1 Score','Confusion Matrix'] == list(newdata.interpreted_results['svm'].keys()))),"Intepretation Incomplete"
-    assert(True == (newdata.interpreted_results['svm']['Accuracy'] > 0.75)),"Model performance Failed"
+    assert(True == (newdata.interpreted_results['svm']['F1 Score'] > 0.75)),"Model performance Failed"

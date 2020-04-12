@@ -26,12 +26,13 @@ class ANALYZE:
             mlmodel = ml_package[ml_package.index(technique)+1]
             test_data,test_labels,prediction_results,feature_importances = mlmodel.train(self.data)
             
-            self.data.test_data.extend(test_data)
-            self.data.prediction_results.extend(prediction_results)
-            self.data.feature_importances.extend(feature_importances)
+            self.data.test_data.append(test_data)
+            self.data.test_labels.append(test_labels)
+            self.data.prediction_results.append(prediction_results)
+            self.data.feature_importances.append(feature_importances)
             
             if self.data.analysis_type == 'unsupervised':
-                self.data.test_labels.extend(test_data)
+                self.data.test_labels = None
             
         print("-----ANALYSIS COMPLETE: INTERPRETING RESULTS NOW-----")
         print()

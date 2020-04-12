@@ -72,5 +72,5 @@ class Pipeline:
         
         data_object = INTERPRET(data_object).interpret()
         
-        
+        print(data_object.interpreted_results)
         return data_object.interpreted_results
