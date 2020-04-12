@@ -13,9 +13,6 @@ Accepted formats (single file or dir):
  - directory of images - combined into a single array w/original dimensions stored
  - .txt - converted to nd.array
 
- 
-  TODO: Add more approaches!!!
-  TODO: Add protections against highly specific approaches
   
   Current Requirements (Python 3.7):
     numpy,
@@ -26,4 +23,4 @@ Accepted formats (single file or dir):
     OpenCV,
     nltk,
     elsapy,
-    requests,
+    requests

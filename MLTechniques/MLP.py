@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  6 00:43:56 2020
+Created on Mon Apr  6 00:11:58 2020
 
 @author: anibaljt
 """
@@ -9,24 +9,24 @@ Created on Mon Apr  6 00:43:56 2020
 
 from .Technique import Technique
 
-class LSTM(Technique):
+class MLP(Technique):
     
     
-    GENERAL_USE = False
+    GENERAL_USE = True
     
     TECHNIQUE_TYPE = "supervised"
     
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'MLP'
+    
     def get_name():
-        return 'lstm'
+        return 'multilayer perceptron'
 
     def get_category():
-        return 'rnn'
-    
-    def get_general_category():
-        return 'deep learning'
+        return 'multilayer perceptron'
     
     def preprocess(self,data):
         pass

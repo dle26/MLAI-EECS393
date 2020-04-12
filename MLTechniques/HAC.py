@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  6 00:59:40 2020
 
 @author: anibaljt
 """
@@ -18,14 +17,14 @@ class HAC(Technique):
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'HAC'
+    
     def get_name():
         return 'hierarchical agglomerative clustering'
 
     def get_category():
         return 'hierarchical'
-    
-    def get_general_category():
-        return 'machine learning'
     
     def preprocess(self,data):
         pass

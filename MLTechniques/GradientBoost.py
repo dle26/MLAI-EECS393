@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Apr  5 23:40:12 2020
+
 
 @author: anibaljt
 """
@@ -9,26 +9,26 @@ Created on Sun Apr  5 23:40:12 2020
 
 from .Technique import Technique
 
-class NaiveBayes(Technique):
+class GradientBoost(Technique):
     
-    
+
     GENERAL_USE = True
     
     TECHNIQUE_TYPE = "supervised"
     
     def __init__(self):
         self.model = None
- 
+        
+        
+    def get_class_name():
+        return 'GradientBoost'
     
     def get_name():
-        return 'naive bayes'
+        return 'gradient boosted classifier'
 
     def get_category():
-        return 'bayesian'
-    
-    def get_general_category():
-        return 'machine learning'
-    
+        return 'gradient boost'
+        
     def preprocess(self,data):
         pass
         
@@ -44,6 +44,4 @@ class NaiveBayes(Technique):
     
     def get_model(self):
         return self.model
-    
-
     

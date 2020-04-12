@@ -19,14 +19,14 @@ class DecisionTree(Technique):
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'DecisionTree'
+    
     def get_name():
         return 'decision tree'
 
     def get_category():
         return 'decision tree'
-    
-    def get_general_category():
-        return 'machine learning'
     
     def preprocess(self,data):
         pass

@@ -1,33 +1,35 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
-Created on Mon Apr  6 00:11:58 2020
 
 @author: anibaljt
+
+
 """
 
 
 from .Technique import Technique
 
-class MLP(Technique):
+class Autoencoder(Technique):
     
     
-    GENERAL_USE = True
+    GENERAL_USE = False
     
-    TECHNIQUE_TYPE = "supervised"
+    TECHNIQUE_TYPE = "unsupervised"
     
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'Autoencoder'
+    
     def get_name():
-        return 'multilayer perceptron'
+        return 'autoencoder'
 
     def get_category():
-        return 'ann'
-    
-    def get_general_category():
-        return 'deep learning'
-    
+        return 'autoencoder'
+        
     def preprocess(self,data):
         pass
         
@@ -43,4 +45,3 @@ class MLP(Technique):
     
     def get_model(self):
         return self.model
-    

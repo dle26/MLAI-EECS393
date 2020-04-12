@@ -1,31 +1,33 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Apr  5 23:45:21 2020
 
 @author: anibaljt
+
 """
+
 
 from .Technique import Technique
 
-class RandomForest(Technique):
+class LSTM(Technique):
     
     
-    GENERAL_USE = True
+    GENERAL_USE = False
     
     TECHNIQUE_TYPE = "supervised"
     
     def __init__(self):
         self.model = None
  
+    
+    def get_class_name():
+        return 'LSTM'
+    
     def get_name():
-        return 'random forest'
+        return 'lstm'
 
     def get_category():
-        return 'random forest'
-    
-    def get_general_category():
-        return 'machine learning'
+        return 'rnn'
     
     def preprocess(self,data):
         pass

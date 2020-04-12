@@ -1,32 +1,34 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Apr  6 00:54:21 2020
 
-@author: anibaljt
 """
+@author: anibaljt
+
+"""
+
+
 
 
 from .Technique import Technique
 
-class DBSCAN(Technique):
+class KNN(Technique):
     
     
-    GENERAL_USE = False
+    GENERAL_USE = True
     
-    TECHNIQUE_TYPE = "unsupervised"
+    TECHNIQUE_TYPE = "supervised"
     
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'KNN'
+    
     def get_name():
-        return 'dbscan'
+        return 'k-nearest neighbor'
 
     def get_category():
-        return 'density'
-    
-    def get_general_category():
-        return 'machine learning'
+        return 'nearest neighbor'
     
     def preprocess(self,data):
         pass
@@ -43,3 +45,4 @@ class DBSCAN(Technique):
     
     def get_model(self):
         return self.model
+    

@@ -1,33 +1,34 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  6 00:49:50 2020
+
 
 @author: anibaljt
+
 """
 
 
 from .Technique import Technique
 
-class KMeans(Technique):
+class MeanShift(Technique):
     
     
-    GENERAL_USE = True
+    GENERAL_USE = False
     
     TECHNIQUE_TYPE = "unsupervised"
     
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'MeanShift'
+    
     def get_name():
-        return 'k-Means'
+        return 'mean shift'
 
     def get_category():
-        return 'k-Means'
-    
-    def get_general_category():
-        return 'machine learning'
-    
+        return 'density'
+
     def preprocess(self,data):
         pass
         
@@ -43,4 +44,3 @@ class KMeans(Technique):
     
     def get_model(self):
         return self.model
-    

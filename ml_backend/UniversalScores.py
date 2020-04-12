@@ -71,7 +71,7 @@ class UniversalScores:
         
     
     def key_sort(keys,values): 
-  
+      if len(list(values)) > 0:
         for i in range(1, len(values)): 
             
             key = values[i] 
@@ -85,7 +85,7 @@ class UniversalScores:
             values[j+1] = key 
             keys[j+1] = key2
             
-        return keys,values
+      return keys,values
     
     
 
@@ -135,9 +135,9 @@ class UniversalScores:
         else:
              normal = {}
         
+
         all_scores = []
-        for cat in names:
-         for name in cat:
+        for name in names:
             name_score = []
             name_uses = []
             found = False
@@ -165,13 +165,13 @@ class UniversalScores:
             elif len(name_score) == 0 and not found:
                 all_scores.append(0)
    
-         if np.sum(all_scores) == 0: #### arbitrary threshold for handling very sparse info (early uses) - optimize this
+        if np.sum(all_scores) == 0: #### arbitrary threshold for handling very sparse info (early uses) - optimize this
             all_scores = None
-         else:
+        else:
             all_scores = np.array(all_scores)/np.sum(all_scores)
-         techniques.append(np.random.choice(cat,number,p=all_scores))
-         all_scores = []
-                
+            
+        techniques.append(np.random.choice(names,number,p=all_scores))
+
         return list(np.ravel(np.asarray(techniques)))
         
     

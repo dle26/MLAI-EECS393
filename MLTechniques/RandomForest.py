@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  6 00:40:11 2020
 
 @author: anibaljt
-"""
 
+"""
 
 from .Technique import Technique
 
-class GradientBoost(Technique):
+class RandomForest(Technique):
     
     
     GENERAL_USE = True
@@ -20,13 +19,14 @@ class GradientBoost(Technique):
         self.model = None
  
     def get_name():
-        return 'gradient boosted classifier'
+        return 'random forest'
 
     def get_category():
-        return 'gradient'
+        return 'random forest'
     
-    def get_general_category():
-        return 'machine learning'
+    def get_class_name():
+        return 'RandomForest'
+    
     
     def preprocess(self,data):
         pass

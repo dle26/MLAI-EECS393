@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  6 00:51:00 2020
+
 
 @author: anibaljt
 """
@@ -9,7 +9,7 @@ Created on Mon Apr  6 00:51:00 2020
 
 from .Technique import Technique
 
-class MeanShift(Technique):
+class DBSCAN(Technique):
     
     
     GENERAL_USE = False
@@ -19,15 +19,15 @@ class MeanShift(Technique):
     def __init__(self):
         self.model = None
  
+    def get_class_name():
+        return 'DBSCAN'
+    
     def get_name():
-        return 'mean shift'
+        return 'dbscan'
 
     def get_category():
         return 'density'
-    
-    def get_general_category():
-        return 'machine learning'
-    
+        
     def preprocess(self,data):
         pass
         

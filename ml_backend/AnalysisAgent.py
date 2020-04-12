@@ -17,16 +17,25 @@ class ANALYZE:
         self.data = copy.deepcopy(data)
         
         
-        
-    def train_approaches(self,unsupervised=False):
+    def train_approaches(self):
 
         ml_package = list(np.asarray(inspect.getmembers(MLTechniques)).flatten())
 
         for technique in [self.data.techniques[-1]]:
-            mlmodel = ml_package[ml_package.index(technique.upper())+1]
-            self.data = mlmodel().train(self.data,1)
+            
+            mlmodel = ml_package[ml_package.index(technique)+1]
+            test_data,test_labels,prediction_results,feature_importances = mlmodel.train(self.data)
+            
+            self.data.test_data.extend(test_data)
+            self.data.prediction_results.extend(prediction_results)
+            self.data.feature_importances.extend(feature_importances)
+            
+            if self.data.analysis_type == 'unsupervised':
+                self.data.test_labels.extend(test_data)
             
         print("-----ANALYSIS COMPLETE: INTERPRETING RESULTS NOW-----")
         print()
 
         return self.data
+    
+    
