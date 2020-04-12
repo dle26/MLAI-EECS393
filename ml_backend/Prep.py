@@ -12,6 +12,9 @@ import cv2
 import pandas as pd
 import itertools
 import os 
+from io import StringIO
+
+
 
 class DATA:
     
@@ -65,7 +68,6 @@ class DATAPREP:
     def __init__(self,datafiles,datafilenames,datafilesize,labelfile,labelfilename,labelfilesize,info_dict):
     
         self.data = DATA()
-        self.data.userid = info_dict["userid"]
         self.datafiles = datafiles
         self.info_dict = info_dict
         self.labelfile = labelfile
@@ -76,26 +78,29 @@ class DATAPREP:
         
         
     def run(self):
-        pass
+       
+        self.data = self.from_fileobject()
+        return self.evaldata()
 
     def from_fileobject(self):
         
         data_files = []
         
-        for n,file in self.datafiles:
+        for n,file in enumerate(self.datafiles):
             data_files.append(self.process_data(file,self.datafilenames[n],self.datafilesize[n]))
 
 
         if len(data_files) > 1:
             data_files = self.consolidate_data(data_files)
-        self.data.data = data_files
+        else:
+            self.data.data = data_files[0]
     
     
         if self.labelfile is not None:
              self.data.labels = self.process_labels()
              self.data.analysis_type = 'supervised'
              
-        elif self.data.type == 'numeric' and self.labelfile is None:
+        elif self.data.data_type == 'numeric' and self.labelfile is None:
             self.data.labels = self.extract_labels()
             
         else:
@@ -116,8 +121,9 @@ class DATAPREP:
         
         if str(filename).find('.jpg') > -1 or str(filename).find('.jpg') > -1:
             self.data.data_type = "image"
+            file.stream.seek(0)
             file.save(str(self.info_dict['userid']) + filename,filesize)
-            output = np.asarray(cv2.imread(file,cv2.IMREAD_GRAYSCALE))
+            output = np.asarray(cv2.imread(str(self.info_dict['userid']) + filename,cv2.IMREAD_GRAYSCALE))
             self.data.dimension = output.shape
             os.remove(str(self.info_dict['userid']) + filename)
             return (output,filename)
@@ -125,6 +131,7 @@ class DATAPREP:
 
         if str(filename).find('.txt') > -1 or str(filename).find('.text') > -1:
             self.data.data_type = "text"
+            file.stream.seek(0)
             file.save(str(self.info_dict['userid']) + filename,filesize)
             string = ""
             with open(str(self.info_dict['userid']) + filename, 'r') as f:
@@ -137,16 +144,18 @@ class DATAPREP:
         
         if str(filename).find('.xlsx') > -1:
             self.data.data_type = "numeric"
+            file.stream.seek(0)
             file.save(str(self.info_dict['userid']) + filename,filesize)
-            output = pd.read_excel(filename)
+            output = pd.read_excel(str(self.info_dict['userid']) + filename)
             os.remove(str(self.info_dict['userid']) + filename)
             return (output,filename)
 
             
         if str(filename).find('.csv') > -1:
             self.data.data_type = "numeric"
+            file.stream.seek(0)
             file.save(str(self.info_dict['userid']) + filename,filesize)
-            output = pd.read_csv(filename)
+            output=pd.read_csv(str(self.info_dict['userid']) + filename)
             os.remove(str(self.info_dict['userid']) + filename)
             return (output,filename)
   
@@ -191,6 +200,9 @@ class DATAPREP:
         
     
     def extract_labels(self):
+        
+        self.data.original_features = list(self.data.data.columns)
+        self.data.data = self.data.data.values
         
         for n,col in enumerate(self.data.original_features):
             if str(col).lower() == 'labels':
