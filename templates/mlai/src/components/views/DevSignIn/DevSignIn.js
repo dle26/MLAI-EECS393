@@ -98,7 +98,9 @@ class DevSignIn extends Component {
           <Avatar className={classes.avatar}>
             <DeveloperModeIcon />
           </Avatar>
-
+          <Typography component="h1" variant="h5">
+            Developer Sign in
+          </Typography>
           <Form
             {...layout}
             name="basic"

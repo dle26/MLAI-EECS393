@@ -84,6 +84,13 @@ class Dashboard extends Component {
 
   render() {
     const { Dragger } = Upload;
+    
+    const dummyRequest = ({ file, onSuccess }) => {
+      setTimeout(() => {
+        onSuccess("ok");
+      }, 0);
+    };
+
 
     if (this.state.token == null) return <Redirect to="/signIn" />;
 
@@ -91,7 +98,8 @@ class Dashboard extends Component {
       <Grid container spacing={6}>
         <Grid item lg={12} md={12} xl={9} xs={12} alignItems={'stretch'}>
           <Dragger
-            action={"https://www.mocky.io/v2/5cc8019d300000980a055e76"}
+            // action={"https://www.mocky.io/v2/5cc8019d300000980a055e76"}
+            customRequest={dummyRequest}
             multiple={true}
             name={"file"}
             onChange={this.onChange.bind(this)}
@@ -117,7 +125,8 @@ class Dashboard extends Component {
 
         <Grid item lg={8} md={12} xl={9} xs={12}>
           <Upload
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            // action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            customRequest={dummyRequest}
             directory
             onChange={this.onChange.bind(this)}
           >
