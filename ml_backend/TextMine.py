@@ -13,7 +13,7 @@ import inspect
 import numpy as np
 import os
 import MLTechniques
-from TextProcess import TEXTPROCESS
+from .TextProcess import TEXTPROCESS
 import requests
 import copy
 
