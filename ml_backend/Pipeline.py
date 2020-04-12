@@ -4,10 +4,10 @@
 @author: anibaljt
 """
 
-from Prep import DATAPREP
-from SelectionAgent import SELECT
-from AnalysisAgent import ANALYZE
-from Interpret import INTERPRET
+from .Prep import DATAPREP
+from .SelectionAgent import SELECT
+from .AnalysisAgent import ANALYZE
+from .Interpret import INTERPRET
 
 class Pipeline:
     
