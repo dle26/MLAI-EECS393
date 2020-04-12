@@ -8,8 +8,8 @@
 
 import MLTechniques
 import copy
-from TextMine import TEXTMINE
-from UniversalScores import UniversalScores
+from .TextMine import TEXTMINE
+from .UniversalScores import UniversalScores
 import inspect
 import numpy as np
 
