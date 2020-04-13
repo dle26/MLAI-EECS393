@@ -66,6 +66,8 @@ class DATA:
 
         self.blind_prediction_results = []
 
+        self.educational_info = []
+
         
         
 

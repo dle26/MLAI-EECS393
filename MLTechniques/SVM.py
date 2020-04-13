@@ -23,6 +23,8 @@ class SVM(Technique):
     
     TECHNIQUE_TYPE = "supervised"
     
+    def get_website():
+        return 'https://scikit-learn.org/stable/modules/svm.html#classification'
     
     def get_class_name():
         return 'SVM'

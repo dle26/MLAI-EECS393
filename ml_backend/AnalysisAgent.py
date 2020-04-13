@@ -27,6 +27,7 @@ class ANALYZE:
             test_data,test_labels,prediction_results,feature_importances,blind_results = mlmodel.train(self.data)
             
             self.data.test_data.append(test_data)
+            self.data.educational_info.append(mlmode.get_website())
             self.data.test_labels.append(test_labels)
             self.data.prediction_results.append(prediction_results)
             self.data.blind_prediction_results.append(blind_results)

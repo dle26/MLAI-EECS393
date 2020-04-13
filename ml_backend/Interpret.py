@@ -58,6 +58,7 @@ class INTERPRET:
             all_results[tech] = int_results
         all_results['best'] = self.assign_top_model_sup(all_results)
         all_results['analysis type'] = 'supervised'
+        all_results['education'] = self.data.educational_info
         self.data.interpreted_results = all_results
         return self.data
             
@@ -94,6 +95,7 @@ class INTERPRET:
             
         '''ALLRESULTS - a dict of dicts which will be returned to frontend '''
         all_results['best'] = self.assign_top_model_unsup(all_results)
+        all_results['education'] = self.data.educational_info
         all_results['analysis type'] = 'unsupervised'
         
         self.data.interpreted_results = all_results
