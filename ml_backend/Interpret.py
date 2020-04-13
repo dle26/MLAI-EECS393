@@ -50,6 +50,11 @@ class INTERPRET:
             preds = np.asarray(self.data.prediction_results[n])
             true_labels = np.asarray(self.data.test_labels[n])
 
+            if self.data.feature_importances[n] is not None:
+                int_result["Feature Importances"] = self.fi_interpret(self.data.feature_importances[n])
+            else:
+                int_result["Feature Importances"] = None
+            
             int_results["Accuracy"] = metrics.accuracy_score(true_labels,preds)
             int_results['F1 Score'] = metrics.f1_score(true_labels,preds,average='macro')
             int_results["Confusion Matrix"] = metrics.confusion_matrix(true_labels, preds)
