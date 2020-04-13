@@ -9,7 +9,6 @@ from .DecisionTree import DecisionTree
 from .MLP import MLP
 from .KNN import KNN
 from .GradientBoost import GradientBoost
-from .LSTM import LSTM
 from .SVM import SVM
 from .VGG_CNN import VGG_CNN
 from .NaiveBayes import NaiveBayes
