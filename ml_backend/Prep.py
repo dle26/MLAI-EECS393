@@ -59,9 +59,15 @@ class DATA:
         self.test_data = []
         
         self.test_labels = []
-        
-        
 
+        self.prior_test_data = None
+
+        self.prior_test_indicies = None
+
+        self.blind_prediction_results = []
+
+        
+        
 
 class DATAPREP:
     
@@ -85,16 +91,16 @@ class DATAPREP:
     def from_fileobject(self):
         
         data_files = []
-        
+
         for n,file in enumerate(self.datafiles):
             data_files.append(self.process_data(file,self.datafilenames[n],self.datafilesize[n]))
 
-
+        
         if len(data_files) > 1:
             data_files = self.consolidate_data(data_files)
         else:
             self.data.data = data_files[0]
-    
+        
     
         if self.labelfile is not None:
              self.data.labels = self.process_labels()
@@ -119,36 +125,23 @@ class DATAPREP:
     def process_data(self,file,filename,filesize):
         
         
-        if str(filename).find('.jpg') > -1 or str(filename).find('.jpg') > -1:
+        if str(filename).find('.jpg') > -1 or str(filename).find('.png') > -1:
             self.data.data_type = "image"
             file.stream.seek(0)
             file.save(str(self.info_dict['userid']) + filename,filesize)
             output = np.asarray(cv2.imread(str(self.info_dict['userid']) + filename,cv2.IMREAD_GRAYSCALE))
             self.data.dimension = output.shape
             os.remove(str(self.info_dict['userid']) + filename)
-            return output
+            return (output,filename)
 
 
-        if str(filename).find('.txt') > -1 or str(filename).find('.text') > -1:
-            self.data.data_type = "text"
-            file.stream.seek(0)
-            file.save(str(self.info_dict['userid']) + filename,filesize)
-            string = ""
-            with open(str(self.info_dict['userid']) + filename, 'r') as f:
-                for line in f.readlines():
-                    string += str(line)
-            f.close()
-            os.remove(str(self.info_dict['userid']) + filename)
-            return self.process_txt(filename)
-        
-        
         if str(filename).find('.xlsx') > -1:
             self.data.data_type = "numeric"
             file.stream.seek(0)
             file.save(str(self.info_dict['userid']) + filename,filesize)
             output = pd.read_excel(str(self.info_dict['userid']) + filename)
             os.remove(str(self.info_dict['userid']) + filename)
-            return output
+            return (output,filename)
 
             
         if str(filename).find('.csv') > -1:
@@ -157,7 +150,7 @@ class DATAPREP:
             file.save(str(self.info_dict['userid']) + filename,filesize)
             output=pd.read_csv(str(self.info_dict['userid']) + filename)
             os.remove(str(self.info_dict['userid']) + filename)
-            return output
+            return (output,filename)
   
   
     
@@ -208,19 +201,32 @@ class DATAPREP:
             
 
     
-    def consolidate_data(self):
+    def consolidate_data(self,datafiles):
         
         data = pd.DataFrame()
-        for n,entry in enumerate(self.data.data):
-            if self.data.data_type == 'image':
-                data.loc[n] = np.reshape(entry,data.dimensions)
-            if self.data.data_type == 'numeric':
+        testdata = pd.DataFrame()
+        
+        for n,entry in enumerate(datafiles):
+          if entry[1].find('test') == -1:
+              if self.data.data_type == 'image':
+                  data.loc[entry[1]] = np.reshape(entry,data.dimensions[0]*data.dimensions[1])
+              if self.data.data_type == 'numeric':
+                   if n == 0:
+                       data = entry[0]
+                   else:
+                       data = pd.concat([data,entry[0]],0)
+          else:
+             if self.data.data_type == 'image':
+                  testdata.loc[entry[1]] = np.reshape(entry,data.dimensions)
+             if self.data.data_type == 'numeric':
                 if n == 0:
-                    data = entry
+                    testdata = entry[0]
                 else:
-                    data = pd.concat([data,entry],0)
+                    testdata = pd.concat([data,entry[0]],0)
 
-        self.data.data = data.values
+        self.data.data = data
+        self.data.prior_test_data = testdata.values
+        self.data.prior_test_indicies = list(testdata.index)
         self.data.original_features = list(data.columns)
         
         
@@ -237,13 +243,9 @@ class DATAPREP:
                 self.data.analysis_type = 'supervised'
                 self.data.data = self.data.data.values
                 return
-
+        
+        self.data.data = self.data.data.values
         self.data.analysis_type = 'unsupervised'
-                
-
-    ### TODO: add in text data handling
-    def eval_text_data(self):
-        pass
     
     
     def eval_data(self):

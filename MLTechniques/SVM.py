@@ -37,29 +37,35 @@ class SVM(Technique):
         
         if data.data_type == 'image':
             features = StandardScaler().fit_transform(data.data)
-            return features
+            if data.prior_test_data is not None:
+                test_features = StandardScaler().fit_transform(data.data)
+                return features,test_features
+            return features,None
         
         if data.data_type == 'numeric':
             features = StandardScaler().fit_transform(data.data)
-            return features
-
-        
-        if data.data_type == 'text':
-            pass
-        
-        return -1 
+            if data.prior_test_data is not None:
+                test_features = StandardScaler().fit_transform(data.data)
+                return features,test_features
+            return features,None
         
     
     def train(data):
  
-        X = SVM.preprocess(data)
+        X,Xtest = SVM.preprocess(data)
         y = np.asarray(data.labels)
         test_labels = []
         test_data = []
         time_constraint = data.time_constraint
         
+        if data.prior_test_data is not None:
+            model = SVC(gamma = 'auto')
+            model.fit(X,y)
+            blind_results = model.predict(Xtest)
+            blind_test_data = Xtest
+
+    
         if time_constraint == 1:
-            
             model = SVC(gamma = 'auto')
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
             model.fit(X_train,y_train)
@@ -116,4 +122,4 @@ class SVM(Technique):
                  test_data.extend(X[test])
                  
         
-        return test_data,test_labels,results,None
+        return test_data,test_labels,results,None, blind_results

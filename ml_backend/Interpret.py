@@ -25,15 +25,11 @@ class INTERPRET:
     def interpret(self):
         
         if self.data.analysis_type == 'supervised':
-            self.data = self.supervised_accuracy_metrics()
+            return self.supervised_accuracy_metrics()
         
-            if self.data.feature_importances != []:
-                self.data = self.fi_interpret()
-        else:
-            self.data = self.uns_accuracy_metrics()
+        return self.uns_accuracy_metrics()
         
-        return self.data
-    
+
     
     def supervised_accuracy_metrics(self):
         
@@ -43,9 +39,14 @@ class INTERPRET:
         
         ## TODO: run for all techniques - currently just 1
         for n,tech in enumerate([techniques[-1]]):
-            
             int_results = {}
-            
+            if self.data.prior_test_data is not None:
+                int_results['samples'] = self.data.prior_test_indicies
+                int_results['results'] = self.data.blind_prediction_results[n]
+            else:
+                int_results['samples'] = None
+                int_results['results'] = None
+ 
             preds = np.asarray(self.data.prediction_results[n])
             true_labels = np.asarray(self.data.test_labels[n])
 
@@ -58,7 +59,6 @@ class INTERPRET:
         all_results['best'] = self.assign_top_model_sup(all_results)
         all_results['analysis type'] = 'supervised'
         self.data.interpreted_results = all_results
-        print(self.data.interpreted_results)
         return self.data
             
  
@@ -74,12 +74,20 @@ class INTERPRET:
         for n,tech in enumerate([techniques[-1]]):
             
             int_results = {}
+            if self.data.prior_test_data is not None:
+                int_results['samples'] = self.data.prior_test_indicies
+                int_results['results'] = self.data.blind_prediction_results[n]
+            else:
+                int_results['samples'] = None
+                int_results['results'] = None
             
             preds = np.asarray(self.data.prediction_results[n])
 
             int_results["Silhouette"] = metrics.silhouette_score(self.data.test_data,preds)
             int_results['CH Score'] = metrics.calinski_harabasz_score(self.data.test_data,preds)
-            int_results["NL Results"] = self.NLResults()
+            
+            if self.data.feature_importances[n] == None:
+                int_results["Features"] = self.fi_interpret()
 
             
             all_results[tech] = int_results
@@ -94,14 +102,20 @@ class INTERPRET:
     
     
     
-    def fi_interpret(self):
-        return self.data
-    
-    
-    def NL_results(self,name):
-        pass
-    
-    
+    def fi_interpret(self,feat_imp):
+        
+        feature_ranking = []
+        features = self.data.original_features
+        
+        for n,imp in enumerate(feat_imp):
+            feature_ranking.append(self.data.original_features[n])
+        
+        feature_ranking = two_list_sort(feature_ranking,feat_imp)
+        
+        return feature_ranking.reverse()
+
+        
+
     def assign_top_model_sup(self,class_results):
         
         best_technique = None
@@ -152,7 +166,7 @@ class INTERPRET:
         return best_technique
         
     
-    
+
     ''' BIG TODO HERE '''
     def update_result_tup(self,technique,score):
         
@@ -164,3 +178,22 @@ class INTERPRET:
                 self.data.data_for_update[n] = tuple(ml_update)
                 
          return -1 
+
+
+
+
+def two_list_sort(tosort,basis):
+    
+    for i in range(1, len(basis)):
+        key = basis[i]
+        key2 = tosort[i]
+        j = i-1
+        while j >=0 and key <basis[j] :
+            basis[j+1] = basis[j]
+            tosort[j+1] = tosort[j]
+            j -= 1
+        
+        basis[j+1] = key
+        tosort[j+1] = key2
+            
+    return tosort,basis

@@ -7,40 +7,114 @@
 """
 
 from .Technique import Technique
+from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import StandardScaler
+
+
+
 
 class RandomForest(Technique):
-    
     
     GENERAL_USE = True
     
     TECHNIQUE_TYPE = "supervised"
     
-    def __init__(self):
-        self.model = None
- 
+    
+    def get_class_name():
+        return 'RandomForest'
+    
     def get_name():
         return 'random forest'
 
     def get_category():
         return 'random forest'
-    
-    def get_class_name():
-        return 'RandomForest'
-    
-    
-    def preprocess(self,data):
-        pass
         
-    def train(self,data,time_constraint):
-        pass
+    
+    def preprocess(data):
+        
+        if data.data_type == 'image':
+            features = StandardScaler().fit_transform(data.data)
+            return features
+        
+        if data.data_type == 'numeric':
+            features = StandardScaler().fit_transform(data.data)
+            return features
 
-    def predict(self,data,labels,model):
-        pass
+        
+        if data.data_type == 'text':
+            pass
+        
+        return -1 
+        
     
-    def set_model(self,model):
-        self.model = model
-    
-    
-    def get_model(self):
-        return self.model
-    
+    def train(data):
+ 
+        X = RandomForest.preprocess(data)
+        y = np.asarray(data.labels)
+        test_labels = []
+        test_data = []
+        time_constraint = data.time_constraint
+        
+        if time_constraint == 1:
+            
+            model = RandomForestClassifier(n_estimators=50)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+            model.fit(X_train,y_train)
+            results = model.predict(X_test)
+            test_data = X_test
+            test_labels = y_test
+
+        if time_constraint == 2:
+            
+            for i in range(2):
+                model = RandomForestClassifier(n_estimators=50)
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+                model.fit(X_train,y_train)
+                results = model.predict(X_test)
+                test_data.extend(X_test)
+                test_labels.extend(y_test)
+                
+        if time_constraint == 3:
+            
+            model = RandomForestClassifier(n_estimators=50)
+            results = []
+            cv = StratifiedKFold(n_splits=5,shuffle=True)
+            for train, test in cv.split(X,y):
+                 model.fit(X[train],y[train])
+                 results.extend(model.predict(X[test]))
+                 test_data.extend(X[test])
+                 test_labels.extend(y[test])
+                 
+            
+        if time_constraint == 4:
+            model = RandomForestClassifier()
+            parameters = {'kernel':('linear', 'rbf'), 'C':[1/len(X),1, 10]}
+            clf = GridSearchCV(model, parameters)
+            cv = StratifiedKFold(n_splits=5,shuffle=True)
+            
+            for train, test in cv.split(X,y):
+                 clf.fit(X[train],y[train])
+                 results.extend(clf.predict(X[test]))
+                 test_labels.extend(y[test])
+                 test_data.extend(X[test])
+                 
+        if time_constraint == 5:
+            
+            model = RandomForestClassifier(n_estimators=50)
+            parameters = {'kernel':('linear','rbf','poly','sigmoid'), 'C':[1/len(X),0.1,0.5,1,5,10],
+                          'gamma':('auto','scale')}
+            clf = GridSearchCV(model, parameters)
+            
+            cv = StratifiedKFold(n_splits=5,shuffle=True)
+            for train, test in cv.split(X,y):
+                 clf.fit(X[train],y[train])
+                 results.extend(clf.predict(X[test]))
+                 test_labels.extend(y[test])
+                 test_data.extend(X[test])
+                 
+        
+        return test_data,test_labels,results,None
