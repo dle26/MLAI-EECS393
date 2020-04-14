@@ -4,15 +4,10 @@ from flask_cors import CORS
 from flask_pymongo import PyMongo
 from functools import wraps
 from util import *
-import csv
 import datetime
 import jwt
-import pandas as pd
 import pymongo
 from werkzeug.utils import secure_filename
-import cv2
-import numpy as np
-import pandas as pd
 from ml_backend.Pipeline import Pipeline
 
 
@@ -21,9 +16,6 @@ CORS(app)
 
 app.config['MONGO_URI'] = Config.MONGO_URI
 mongodb = PyMongo(app)
-
-UPLOAD_FOLDER = ''
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 def token_required(f):
@@ -100,7 +92,7 @@ def user():
         'lastname': user['lastname'],
     })
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'])
+ALLOWED_EXTENSIONS = set(['xlsx', 'pdf', 'png', 'jpg', 'csv'])
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -125,11 +117,6 @@ def upload_file():
             names.append(filename)
             size = len(file.read())
             sizes.append(size)
-    print(files)
-    print(names)
-    print(sizes)
-    print(time)
-    print(details)
     result = Pipeline.run_MLAI(files, names, sizes, None, None, None, {'time': time, 'userid': '111111', 'user_input': details})   
     print(result)
             
