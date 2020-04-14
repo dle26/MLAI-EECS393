@@ -79,7 +79,7 @@ class SignIn extends Component {
   render() {
     const { classes } = this.props;
 
-    if (this.state.routeToHome) return <Redirect to="/" />;
+    if (this.state.routeToHome || sessionStorage.getItem("Token") != null) return <Redirect to="/" />;
 
     return (
       <Container component="main" maxWidth="xs">
