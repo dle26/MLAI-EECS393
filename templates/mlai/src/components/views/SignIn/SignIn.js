@@ -8,7 +8,8 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
-import WebAssetIcon from '@material-ui/icons/WebAsset';import Typography from "@material-ui/core/Typography";
+import WebAssetIcon from "@material-ui/icons/WebAsset";
+import Typography from "@material-ui/core/Typography";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -76,10 +77,14 @@ class SignIn extends Component {
       });
   }
 
+  componentDidMount() {
+    if (sessionStorage.getItem("Token") != null) sessionStorage.clear();
+  }
+
   render() {
     const { classes } = this.props;
 
-    if (this.state.routeToHome || sessionStorage.getItem("Token") != null) return <Redirect to="/" />;
+    if (this.state.routeToHome) return <Redirect to="/" />;
 
     return (
       <Container component="main" maxWidth="xs">

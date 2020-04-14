@@ -92,7 +92,7 @@ class Dashboard extends Component {
     };
 
 
-    if (this.state.token == null) return <Redirect to="/signIn" />;
+    if (sessionStorage.getItem("Token") == null) return <Redirect to="/signIn" />;
 
     return (
       <Grid container spacing={6}>
