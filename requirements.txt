@@ -6,3 +6,7 @@ flask_cors
 pandas
 python-csv
 sendgrid
+opencv-python
+nltk
+elsapy
+sklearn
