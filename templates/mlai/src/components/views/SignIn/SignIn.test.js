@@ -28,9 +28,17 @@ describe("<SignIn />", () => {
         expect(wrapper.text()).toContain('Sign In');
     })
 
-    it("Contains Session Storage", () => {
-        sessionStorage.setItem("Token", "123");
-        expect(wrapper.text()).toContain('Sign In');
+    // it("Contains Session Storage", () => {
+    //     sessionStorage.setItem("Token", "123");
+    //     wrapper = mount(
+    //         <MemoryRouter>
+    //           <SignIn />
+    //         </MemoryRouter>
+    //       )
+    //     expect(wrapper.text()).toContain('Upload Directory');
+    // })
+
+    afterEach(() => {
         sessionStorage.clear();
     })
 })

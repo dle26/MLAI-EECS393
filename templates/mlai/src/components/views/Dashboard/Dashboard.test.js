@@ -21,7 +21,23 @@ describe("<Dashboard />", () => {
         )
     })
 
-    it("render without crashing", () => {
+    it("render without token", () => {
         expect(wrapper.find(Redirect)).toHaveLength(1);
     });
+
+    it("render with token", () => {
+
+      sessionStorage.setItem("Token", "123");
+      wrapper = mount(
+        <MemoryRouter>
+          <Dashboard />
+        </MemoryRouter>
+      )
+      console.log("in Test:" + sessionStorage.getItem("Token"));
+      expect(wrapper.text()).toContain("Click or drag file to this area to upload")
+    })
+
+    afterEach(() => {
+      sessionStorage.clear();
+    })
 })

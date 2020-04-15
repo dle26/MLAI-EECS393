@@ -29,12 +29,6 @@ class Topbar extends Component {
 
   render() {
     const { classes, className, onSidebarOpen, ...rest } = this.props;
-    // const [notifications] = useState([]);
-    console.log("sessionStorage.getItem: " + sessionStorage.getItem("Token"));
-
-    if (sessionStorage.getItem("Token") == null)
-      return <Redirect to="/signIn" />;
-
     return (
       <AppBar {...rest} className={clsx(classes.root, className)}>
         <Toolbar>
