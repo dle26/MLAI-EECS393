@@ -7,7 +7,8 @@ import { AppBar, Toolbar } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
   root: {
-    boxShadow: 'none'
+    boxShadow: 'none',
+    backgroundColor: "#61646b" 
   }
 }));
 
@@ -20,7 +21,6 @@ const Topbar = props => {
     <AppBar
       {...rest}
       className={clsx(classes.root, className)}
-      color="primary"
       position="fixed"
     >
       <Toolbar>

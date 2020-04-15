@@ -98,7 +98,6 @@ class Dashboard extends Component {
       <Grid container spacing={6}>
         <Grid item lg={12} md={12} xl={9} xs={12} alignItems={'stretch'}>
           <Dragger
-            // action={"https://www.mocky.io/v2/5cc8019d300000980a055e76"}
             customRequest={dummyRequest}
             multiple={true}
             name={"file"}

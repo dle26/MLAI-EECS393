@@ -13,6 +13,7 @@ import { Redirect } from "react-router-dom";
 const styles = (theme) => ({
   root: {
     boxShadow: "none",
+    backgroundColor: "#61646b" 
   },
   flexGrow: {
     flexGrow: 1,

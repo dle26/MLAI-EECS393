@@ -129,6 +129,7 @@ class SignIn extends Component {
             color="primary"
             className={classes.submit}
             onClick={this.login.bind(this)}
+            style={{backgroundColor: "#61646b"}}
           >
             Sign In
           </Button>
