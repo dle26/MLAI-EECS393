@@ -14,8 +14,6 @@ import itertools
 import os 
 import string
 
-
-
 class DATA:
     
     def __init__(self):
@@ -45,7 +43,7 @@ class DATA:
         
         self.prediction_results = []
                 
-        self.data_for_update = None
+        self.data_for_update = []
         
         ### for images only 
         self.dimensions = None
@@ -115,7 +113,6 @@ class DATAPREP:
             self.data.labels = None
             self.data.analysis_type = 'unsupervised'
         
-        
         self.data.time_constraint = int(self.info_dict["time"])
         self.data.descriptive_info = self.process_user_info(str(self.info_dict["user_input"]))
         self.data.userid = str(self.info_dict["userid"])
@@ -176,9 +173,8 @@ class DATAPREP:
                         search_words.append(word[0])
         
             bigram = False
-            
-        return search_words
         
+        return search_words
   
         
 
@@ -266,42 +262,22 @@ class DATAPREP:
         sparsity = nan_count/len(self.data.data)
         oratio = self.outlier_ratio(self.data.data)/len(self.data.data)
                  
-        if sparsity > 0.1:
-            data_features.append("sparse")
-            if sparsity > 0.25:
-                score -= 0.15
+            
+        if sparsity > 0.25:
+            score -= 0.15
              
-        if oratio > 0.05:
-             data_features.append("outliers")
-             if oratio > 0.1:
+        if oratio > 0.1:
                 score -= 0.1
-                       
-        if len(self.data.labels) < 100:
-            data_features.append("small dataset")
-            if len(self.data.labels) < 25:
-                score -= 0.25
-        
-        if self.data.analysis_type == 'supervised':
-            if len(list(set(self.data.labels))) > 2:
-                data_features.append("multiclass")
-            
-            elif len(list(set(self.data.labels))) == 2:
-                data_features.append("binary")
-            
-            else:
-                data_features.append("one-class")
-        
-         
-            if self.get_label_ratios() > (1/len(set(self.data.labels)))/3:
-                data_features.append("imbalance")
-                if self.get_label_ratios() > (1/len(set(self.data.labels)))/2:
+
+        if self.get_label_ratios() > (1/len(set(self.data.labels)))/2:
                     score -= 0.1
         
         
         self.data.descriptive_info.extend(data_features)
         info = self.data.descriptive_info
         self.data.descriptive_info = []
-        self.data.descriptive_info = list(itertools.combinations(info,2))
+        print()
+        self.data.descriptive_info = separate_bigrams(list(itertools.combinations(info,2)))
         self.data.eval_score = score
         
         return self.data
@@ -351,3 +327,28 @@ class DATAPREP:
                 outlier_ratio  += (len(outliers)/len(data[i]))
         
         return outlier_ratio
+
+def separate_bigrams(lst):
+    
+    lst2 = []
+    for tup in lst:
+        if len(tup[0].split()) > 1:
+            if (tup[0],"") not in lst2:
+                lst2.append((tup[0],""))
+            if len(tup[1].split()) > 1:
+                if (tup[1],"") not in lst2:
+                    lst2.append((tup[1],""))
+                continue
+            continue
+        lst2.append(tup)
+            
+    return lst2
+            
+        
+            
+            
+        
+
+
+
+    

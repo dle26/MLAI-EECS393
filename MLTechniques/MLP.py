@@ -26,7 +26,7 @@ class MLP(Technique):
         return 'multilayer perceptron'
 
     def get_category():
-        return 'multilayer perceptron'
+        return 'mlp'
     
     def preprocess(self,data):
         pass

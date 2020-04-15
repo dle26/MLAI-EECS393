@@ -34,7 +34,6 @@ class INTERPRET:
     def supervised_accuracy_metrics(self):
         
         techniques = self.data.techniques
-
         all_results = {}
         
         ## TODO: run for all techniques - currently just 1
@@ -51,9 +50,9 @@ class INTERPRET:
             true_labels = np.asarray(self.data.test_labels[n])
 
             if self.data.feature_importances[n] is not None:
-                int_result["Feature Importances"] = self.fi_interpret(self.data.feature_importances[n])
+                int_results["Feature Importances"] = self.fi_interpret(self.data.feature_importances[n])
             else:
-                int_result["Feature Importances"] = None
+                int_results["Feature Importances"] = None
             
             int_results["Accuracy"] = metrics.accuracy_score(true_labels,preds)
             int_results['F1 Score'] = metrics.f1_score(true_labels,preds,average='macro')
@@ -111,16 +110,9 @@ class INTERPRET:
     
     def fi_interpret(self,feat_imp):
         
-        feature_ranking = []
-        features = self.data.original_features
-        
-        for n,imp in enumerate(feat_imp):
-            feature_ranking.append(self.data.original_features[n])
-        
-        feature_ranking = two_list_sort(feature_ranking,feat_imp)
-        
-        return feature_ranking.reverse()
-
+        feature_ranking,_ = two_list_sort(self.data.original_features,feat_imp)
+        feature_ranking.reverse()
+        return feature_ranking
         
 
     def assign_top_model_sup(self,class_results):
@@ -143,11 +135,11 @@ class INTERPRET:
               elif class_results[technique]["Accuracy"] == class_results[best_technique]["Accuracy"]:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
+          self.data.data_for_update.append((technique,class_results[technique]["F1 Score"],self.data.descriptive_info))
 
-        self.data.best_model = (best_technique,class_results[best_technique]["F1 Score"])
         return best_technique
     
-    
+
     def assign_top_model_unsup(self,class_results):
         
         best_technique = None
@@ -169,24 +161,9 @@ class INTERPRET:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
 
-        self.data.best_model = (best_technique,class_results[best_technique]["Silhouette"])
+        
+          self.data.data_for_update.append((technique,class_results[technique]["Silhouette"],self.data.descriptive_info))
         return best_technique
-        
-    
-
-    ''' BIG TODO HERE '''
-    def update_result_tup(self,technique,score):
-        
-         for n,tup in enumerate(self.data.data_for_update):
-             
-             if technique in tup:
-                ml_update = list(self.data.data_for_update[n])
-                ml_update.append(score)
-                self.data.data_for_update[n] = tuple(ml_update)
-                
-         return -1 
-
-
 
 
 def two_list_sort(tosort,basis):

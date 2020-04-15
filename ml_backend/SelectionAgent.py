@@ -29,7 +29,7 @@ class SELECT:
         print()
 
         user_input = self.data.descriptive_info
-        top2_approaches,matches = UniversalScores.reference(user_input,self.data.analysis_type)
+        top2_approaches,matches = UniversalScores.reference(user_input)
         
 
         if (len(np.ravel(matches))/len(self.data.descriptive_info)) < self.mining_threshold:
@@ -37,7 +37,7 @@ class SELECT:
             keywords,keyword_scores,searchwords = TEXTMINE(self.data.descriptive_info,self.data.userid).from_database()
             top2_approaches = self.select_from_textmine(keywords,keyword_scores,searchwords,self.data.analysis_type)
             
-        self.data.data_for_update = zip(top2_approaches,[user_input,user_input])
+    
         
         self.data.techniques = list(np.ravel(np.asarray(top2_approaches)))
         print()
@@ -74,9 +74,7 @@ class SELECT:
 
         for app in technique_names:
              specific_names,class_names = select_approach(app,"specific",analysis_type)
-             tech = UniversalScores.select_from_usage(specific_names,1,analysis_type)
-             classes.append(class_names[specific_names.index(tech[0])])
-
+             classes.append(UniversalScores.select_from_usage(class_names,1))
 
         return classes
 

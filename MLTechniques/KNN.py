@@ -29,7 +29,7 @@ class KNN(Technique):
         return 'KNN'
     
     def get_name():
-        return 'nearest neighbours'
+        return 'knn'
 
     def get_category():
         return 'nearest neighbours'

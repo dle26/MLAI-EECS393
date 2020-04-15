@@ -12,23 +12,28 @@ import MLTechniques
 import pickle
 import os
 
+'''
+
+Structure of FeatureDict
+
+{'BOOST':{'SVM': [('images',0.73,num_uses,num_possibilies,'supervised')]},"TECHNIQUES:"{}}
+
+
+'''
+
+
+
 class UniversalScores:
     
     
-    def reference(keywords,type_indentifier='supervised',top_approaches=None):
+    def reference(keywords):
 
-        if (type_indentifier == 'supervised'): 
-           boost,scores = UniversalScores.initialize('supervised')
-            
-        if (type_indentifier=='unsupervised'): 
-            boost,scores = UniversalScores.initialize('unsupervised')
-        
-
-        results,values,matched_words = UniversalScores.compare_keywords(scores,boost,keywords)
+     
+        model = UniversalScores.initialize()
+        results,values,matched_words = UniversalScores.compare_keywords(model,keywords)
         if np.sum(values) > 0:
             results = UniversalScores.weighted_select(results,values)
-        
-
+    
         return results,matched_words
     
     
@@ -46,27 +51,21 @@ class UniversalScores:
         
 
     
-    def initialize(type_identifier):
+    def initialize():
         
-        if os.path.exists('BOOST.pkl'):
-            boost = pickle.load(open('BOOST.pkl','rb'))
+        if os.path.exists('MODEL.pkl'):
+            model = pickle.load(open('MODEL.pkl','rb'))
         else:
-            boost = {"supervised":{},"unsupervised":{}}
-        
-        if os.path.exists('TECHNIQUE_SCORES.pkl'):
-            normal = pickle.load(open('TECHNIQUE_SCORES.pkl','rb'))
-        else:
-            normal = {"supervised":{},"unsupervised":{}}
+            model = {"BOOST":{},"TECHNIQUES":{}}
         
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
-                if obj.TECHNIQUE_TYPE == type_identifier and (obj.get_name() not in boost[type_identifier] and obj.get_name() not in normal[type_identifier]):
-                     boost[type_identifier][obj.get_name()] = {}
+               if (obj.get_class_name() not in model['BOOST'] and obj.get_name() not in model['TECHNIQUES']):
+                     model['BOOST'][obj.get_class_name()] = []
         
-        pickle.dump(boost,open("BOOST.pkl","wb"))
-        pickle.dump(normal,open("TECHNIQUE_SCORES.pkl","wb"))
-        
-        return boost[type_identifier],normal[type_identifier]
+        pickle.dump(model,open("MODEL.pkl","wb"))
+
+        return model
         
         
     
@@ -89,30 +88,29 @@ class UniversalScores:
     
     
 
-    def compare_keywords(scores,boost,keywords):
+    def compare_keywords(model,keywords):
         
         #### which techniques correspond to which words? - need adagram here!!!!
         technique_matches = {}
         match_percentage = {}
         matches = []
-
-        for dic in (scores,boost):
-            for technique in dic:
+        for dic in model:
+            for technique in model[dic]:
                 num_matches = 0
                 technique_matches[technique] = []
                 matched_words = []
-                
-                for keyword in dic[technique].keys():
-                    if keyword in keywords:
-                        technique_matches[technique][keyword] = dic[technique][keyword][1]
+                for tup in model[dic][technique]:
+                    if len(list(set(keywords) & set(tup))) > 0:
+                        technique_matches[technique].append(tup[0])
                         num_matches += 1
-                        matched_words.append(keyword)
+                        matched_words.append(tup[0])
                         
                 match_percentage[technique] = num_matches/len(keywords)
                 matches.append(matched_words)
-     
-            for scoreset in list(technique_matches.values()):
-                technique_matches[technique] = np.average([sum(list(scoreset)),match_percentage[technique]],weights=[0.75,0.25])
+
+            if num_matches > 0:
+                for scoreset in list(technique_matches.values()):
+                   technique_matches[technique] = np.average([sum(list(scoreset)),match_percentage[technique]],weights=[0.75,0.25])
     
         results,values = UniversalScores.key_sort(list(technique_matches.keys()),list(technique_matches.values()))
 
@@ -120,28 +118,25 @@ class UniversalScores:
     
     
     
-    def select_from_usage(names,number,analysis_type):
+    def select_from_usage(names,number):
         
+        
+        ''' TODO: UPDATE WITH NEW TUPLE SET '''
+
         techniques = []
         
-        if os.path.exists('BOOST.pkl'):
+        if os.path.exists('MODEL.pkl'):
 
-            boost = pickle.load(open('BOOST.pkl','rb'))
+            model= pickle.load(open('MODEL.pkl','rb'))
         else:
-            boost = {}
-        
-        if os.path.exists('TECHNIQUE_SCORES.pkl'):
-            normal = pickle.load(open('TECHNIQUE_SCORES.pkl','rb'))
-        else:
-             normal = {}
-        
+            model = {}
 
         all_scores = []
         for name in names:
             name_score = []
             name_uses = []
             found = False
-            for tup in boost[analysis_type][name]:
+            for tup in model["BOOST"][name]:
                 if tup[0] == name:
                    name_score.append(tup[1])
                    name_uses.append(tup[2])
@@ -154,8 +149,8 @@ class UniversalScores:
             name_score = []
             name_uses = []
             
-            if name in normal[analysis_type].keys():
-              for tup in normal[analysis_type][name]:
+            if name in model["TECHNIQUES"].keys():
+              for tup in model["TECHNIQUES"][name]:
                 if tup[0] == name:
                    name_score.append(tup[1])
                    name_uses.append(tup[2])

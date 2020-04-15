@@ -30,7 +30,7 @@ class NaiveBayes(Technique):
         return 'naive bayes'
 
     def get_category():
-        return 'naive bayes'
+        return 'bayes'
         
     
     def preprocess(data):

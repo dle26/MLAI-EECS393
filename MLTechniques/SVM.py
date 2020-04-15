@@ -33,7 +33,7 @@ class SVM(Technique):
         return 'support vector machine'
 
     def get_category():
-        return 'support vector machine'
+        return 'svm'
         
     def preprocess(data):
         
@@ -59,13 +59,14 @@ class SVM(Technique):
         test_labels = []
         test_data = []
         time_constraint = data.time_constraint
+        blind_results = None
         
         if data.prior_test_data is not None:
             model = SVC(gamma = 'auto')
             model.fit(X,y)
             blind_results = model.predict(Xtest)
-            blind_test_data = Xtest
-
+ 
+    
     
         if time_constraint == 1:
             model = SVC(gamma = 'auto')
@@ -102,6 +103,7 @@ class SVM(Technique):
             parameters = {'kernel':('linear', 'rbf'), 'C':[1/len(X),1, 10]}
             clf = GridSearchCV(model, parameters)
             cv = StratifiedKFold(n_splits=5,shuffle=True)
+            results = []
             
             for train, test in cv.split(X,y):
                  clf.fit(X[train],y[train])
@@ -115,7 +117,7 @@ class SVM(Technique):
             parameters = {'kernel':('linear','rbf','poly','sigmoid'), 'C':[1/len(X),0.1,0.5,1,5,10],
                           'gamma':('auto','scale')}
             clf = GridSearchCV(model, parameters)
-            
+            results = []
             cv = StratifiedKFold(n_splits=5,shuffle=True)
             for train, test in cv.split(X,y):
                  clf.fit(X[train],y[train])
