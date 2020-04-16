@@ -99,7 +99,7 @@ class DATAPREP:
         if len(data_files) > 1:
             data_files = self.consolidate_data(data_files)
         else:
-            self.data.data = data_files[0]
+            self.data.data = data_files[0][0]
         
     
         if self.labelfile is not None:

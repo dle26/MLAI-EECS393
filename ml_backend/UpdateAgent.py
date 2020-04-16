@@ -39,6 +39,8 @@ class UpdateAgent:
         '''
         technique_score_tup
             (classname,score,keywords)
+            
+        TODO: EXPLICTLY DEFINE THE SCORING FUNCTION
         '''
 
         model = pickle.load('MODEL.pkl')
@@ -78,6 +80,7 @@ class UpdateAgent:
         
 
     '''
+    TODO
     def update_score_dict(technique_score_tups,data_score):
            
         
