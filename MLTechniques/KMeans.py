@@ -23,10 +23,10 @@ class KMeans(Technique):
         return 'KMeans'
     
     def get_name():
-        return 'k-Means'
+        return 'k-means'
 
     def get_category():
-        return 'k-Means'
+        return 'k-means'
     
     def preprocess(self,data):
         pass

@@ -20,13 +20,7 @@ import copy
 
 class TEXTMINE:
     
-    SUP_TECHNICAL_KEYWORDS = ["machine learning"]
-    
-    UNS_TECHNICAL_KEYWORDS = ["clustering"]
-    
-    
-    
-    def __init__(self,user_keywords,user_id,analysis_type='supervised'):
+    def __init__(self,user_keywords,user_id,analysis_type):
         
         self.user_keywords = user_keywords
         self.user_id = user_id
@@ -43,10 +37,10 @@ class TEXTMINE:
         searchwords = {'specific':[],'names':[]}
         
         if self.analysis_type == 'supervised':
-            tech_words = TEXTMINE.SUP_TECHNICAL_KEYWORDS
+            tech_words = ["machine learning"]
             
         elif self.analysis_type == 'unsupervised': 
-             tech_words = TEXTMINE.UNS_TECHNICAL_KEYWORDS
+             tech_words = ["clustering"]
 
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):

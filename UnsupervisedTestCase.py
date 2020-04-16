@@ -34,7 +34,7 @@ time = datetime.now()
 
     
 ### toy data
-X,_ = make_classification(n_samples=500, n_features=15,
+train_data,_ = make_classification(n_samples=500, n_features=15,
                                n_informative=2, n_redundant=0,
                                random_state=0, shuffle=False)
 

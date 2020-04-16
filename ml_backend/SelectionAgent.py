@@ -34,7 +34,7 @@ class SELECT:
 
         if (len(np.ravel(matches))/len(self.data.descriptive_info)) < self.mining_threshold:
         
-            keywords,keyword_scores,searchwords = TEXTMINE(self.data.descriptive_info,self.data.userid).from_database()
+            keywords,keyword_scores,searchwords = TEXTMINE(self.data.descriptive_info,self.data.userid,self.data.analysis_type).from_database()
             top2_approaches = self.select_from_textmine(keywords,keyword_scores,searchwords,self.data.analysis_type)
             
     

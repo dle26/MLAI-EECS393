@@ -268,8 +268,9 @@ class DATAPREP:
              
         if oratio > 0.1:
                 score -= 0.1
-
-        if self.get_label_ratios() > (1/len(set(self.data.labels)))/2:
+        
+        if self.data.labels is not None:
+            if self.get_label_ratios() > (1/len(set(self.data.labels)))/2:
                     score -= 0.1
         
         

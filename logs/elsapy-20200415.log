@@ -1,0 +1,71 @@
+2020-04-15 20:40:19,327 - elsapy.elsclient - INFO - Module loaded.
+2020-04-15 20:40:19,328 - elsapy.utils - INFO - Module loaded.
+2020-04-15 20:40:19,328 - elsapy.elssearch - INFO - Module loaded.
+2020-04-15 20:40:36,949 - elsapy.elsclient - INFO - Module loaded.
+2020-04-15 20:40:36,950 - elsapy.utils - INFO - Module loaded.
+2020-04-15 20:40:36,950 - elsapy.elssearch - INFO - Module loaded.
+2020-04-15 20:41:37,002 - elsapy.elsclient - INFO - Module loaded.
+2020-04-15 20:41:37,002 - elsapy.utils - INFO - Module loaded.
+2020-04-15 20:41:37,003 - elsapy.elssearch - INFO - Module loaded.
+2020-04-15 20:41:50,847 - elsapy.elsclient - INFO - Module loaded.
+2020-04-15 20:41:50,847 - elsapy.utils - INFO - Module loaded.
+2020-04-15 20:41:50,848 - elsapy.elssearch - INFO - Module loaded.
+2020-04-15 20:41:51,849 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:41:54,167 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=25&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:41:56,802 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=50&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:41:59,419 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=75&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:42:01,408 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=100&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:42:03,609 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=125&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:42:05,394 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=150&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:42:07,187 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=175&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:42:09,530 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=200&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:42:11,958 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=225&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:42:14,318 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=250&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:42:16,102 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=275&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:42:18,458 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=300&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:42:20,383 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=325&count=25&query=high-dimensional+phenotypes++machine+learning+
+2020-04-15 20:47:08,028 - elsapy.elsclient - INFO - Module loaded.
+2020-04-15 20:47:08,029 - elsapy.utils - INFO - Module loaded.
+2020-04-15 20:47:08,029 - elsapy.elssearch - INFO - Module loaded.
+2020-04-15 20:47:09,029 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:11,305 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=25&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:13,350 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=50&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:15,277 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=75&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:17,244 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=100&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:19,183 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=125&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:21,086 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=150&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:22,975 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=175&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:25,518 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=200&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:27,477 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=225&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:29,423 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=250&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:31,390 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=275&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:33,615 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=300&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:47:36,594 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=325&count=25&query=high-dimensional+phenotypes++clustering+
+2020-04-15 20:55:25,711 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?query=pbmc+samples++clustering+
+2020-04-15 20:55:27,633 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=25&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:29,577 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=50&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:31,341 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=75&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:33,203 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=100&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:35,107 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=125&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:37,058 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=150&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:38,794 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=175&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:40,522 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=200&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:42,314 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=225&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:44,058 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=250&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:45,948 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=275&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:48,315 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=300&count=25&query=pbmc+samples++clustering+
+2020-04-15 20:55:50,158 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=325&count=25&query=pbmc+samples++clustering+
+2020-04-15 21:04:34,897 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?query=mass+cytometry++clustering+
+2020-04-15 21:04:37,367 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=25&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:04:39,165 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=50&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:04:42,068 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=75&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:04:43,887 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=100&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:04:45,718 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=125&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:04:47,974 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=150&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:04:49,771 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=175&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:04:52,232 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=200&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:04:54,679 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=225&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:04:57,279 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=250&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:04:59,318 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=275&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:05:01,318 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=300&count=25&query=mass+cytometry++clustering+
+2020-04-15 21:05:03,235 - elsapy.elsclient - INFO - Sending GET request to https://api.elsevier.com/content/search/sciencedirect?start=325&count=25&query=mass+cytometry++clustering+
