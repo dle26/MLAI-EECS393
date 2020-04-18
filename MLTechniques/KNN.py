@@ -24,6 +24,9 @@ class KNN(Technique):
     
     TECHNIQUE_TYPE = "supervised"
     
+        
+    def get_website():
+        return 'https://scikit-learn.org/stable/modules/neighbors.html#classification'
     
     def get_class_name():
         return 'KNN'
@@ -93,7 +96,7 @@ class KNN(Technique):
             
         if time_constraint == 4:
             model = KNC()
-            parameters = {'kernel':('linear', 'rbf'), 'C':[1/len(X),1, 10]}
+            parameters = {'n_neighbors':(5,6,7,8,9), 'algorithm':['ball_tree','kd_tree']}
             clf = GridSearchCV(model, parameters)
             cv = StratifiedKFold(n_splits=5,shuffle=True)
             
@@ -106,8 +109,8 @@ class KNN(Technique):
         if time_constraint == 5:
             
             model = KNC()
-            parameters = {'kernel':('linear','rbf','poly','sigmoid'), 'C':[1/len(X),0.1,0.5,1,5,10],
-                          'gamma':('auto','scale')}
+            parameters = {'n_neighbors':(2,3,4,5,6,7,8,9,10,11,12), 'algorithm':['ball_tree','kd_tree','brute','auto'],
+                          'p':(1,2)}
             clf = GridSearchCV(model, parameters)
             
             cv = StratifiedKFold(n_splits=5,shuffle=True)

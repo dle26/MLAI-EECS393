@@ -77,7 +77,7 @@ class NaiveBayes(Technique):
                 test_data.extend(X_test)
                 test_labels.extend(y_test)
                 
-        if time_constraint == 3:
+        if time_constraint > 2:
             
             model = GNB()
             results = []
@@ -88,34 +88,6 @@ class NaiveBayes(Technique):
                  test_data.extend(X[test])
                  test_labels.extend(y[test])
                  
-            
-        if time_constraint == 4:
-            model = GNB()
-            parameters = {'kernel':('linear', 'rbf'), 'C':[1/len(X),1, 10]}
-            clf = GridSearchCV(model, parameters)
-            cv = StratifiedKFold(n_splits=5,shuffle=True)
-            
-            for train, test in cv.split(X,y):
-                 clf.fit(X[train],y[train])
-                 results.extend(clf.predict(X[test]))
-                 test_labels.extend(y[test])
-                 test_data.extend(X[test])
-                 
-        if time_constraint == 5:
-            
-            model = GNB()
-            parameters = {'kernel':('linear','rbf','poly','sigmoid'), 'C':[1/len(X),0.1,0.5,1,5,10],
-                          'gamma':('auto','scale')}
-            clf = GridSearchCV(model, parameters)
-            
-            cv = StratifiedKFold(n_splits=5,shuffle=True)
-            for train, test in cv.split(X,y):
-                 clf.fit(X[train],y[train])
-                 results.extend(clf.predict(X[test]))
-                 test_labels.extend(y[test])
-                 test_data.extend(X[test])
-                 
-        
         return test_data,test_labels,results,None
     
     
