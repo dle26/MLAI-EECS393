@@ -108,7 +108,9 @@ def upload_file():
     files = request.files.getlist('files[]')
     details = request.form.get('details')
     time = request.form.get('time')
-    print(files)
+    print("request.files: " + str(request.files))
+    print("request.form: " + str(request.form))
+    
     names = []
     sizes = []
     for file in files:

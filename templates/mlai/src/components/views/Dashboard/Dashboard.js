@@ -124,7 +124,6 @@ class Dashboard extends Component {
 
         <Grid item lg={8} md={12} xl={9} xs={12}>
           <Upload
-            // action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
             customRequest={dummyRequest}
             directory
             onChange={this.onChange.bind(this)}

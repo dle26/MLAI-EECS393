@@ -4,10 +4,10 @@ import {
   DialogTitle,
   Typography,
   Grid,
-  DialogContent
+  DialogContent,
 } from "@material-ui/core";
 import axios from "axios";
-import { Form, Input, Slider, Button } from "antd";
+import { Form, Input, Slider, Button, Upload, message } from "antd";
 import { UploadOutlined, InboxOutlined } from "@ant-design/icons";
 
 export default class MoreDetails extends Component {
@@ -18,8 +18,15 @@ export default class MoreDetails extends Component {
       files,
       // more details info
       details: "",
-      timeContraint: 1
+      timeContraint: 1,
+      uploading: false,
     };
+  }
+
+  uploadingToggle() {
+    this.setState({
+      uploading: !this.state.uploading,
+    });
   }
 
   closeModal() {
@@ -30,43 +37,69 @@ export default class MoreDetails extends Component {
   upload() {
     const url = "http://localhost:5000/upload";
     const formData = new FormData();
-    this.props.files.forEach(file => formData.append('files[]', file, file.name));
+    console.log("more details");
+    console.log(this.state);
+    this.props.files.forEach((file) =>
+      formData.append("files[]", file, file.name)
+    );
+
+    formData.append("labelFile", this.state.labelFile);
     formData.set("details", this.state.details);
     formData.set("time", this.state.timeContraint);
 
     const headers = {
-      headers: { "Content-Type": "multipart/form-data" }
+      headers: { "Content-Type": "multipart/form-data" },
     };
+
+    this.uploadingToggle();
 
     axios
       .post(url, formData, headers)
-      .then(response => {
+      .then((response) => {
         //handle success
         console.log(response);
         this.props.addFile([]);
         this.closeModal();
       })
-      .catch(response => {
+      .catch((response) => {
         //handle error
         console.log(response);
       });
+
+    this.uploadingToggle();
   }
 
+  detailsOnChange = (e) => {
+    const { value } = e.target;
+    this.setState({ details: value });
+  };
 
-  detailsOnChange = e => {
-      const {value} = e.target
-      this.setState({details: value})
-  }
-
-  timeContraintOnChange = e => {
+  timeContraintOnChange = (e) => {
     //   const {value} = e.target
-      this.setState({timeContraint: e});
+    this.setState({ timeContraint: e });
+  };
+
+  onChange(info) {
+    if (info.file.status !== "uploading") {
+      console.log(info.file, info.fileList);
+    }
+    if (info.file.status === "done") {
+      message.success(`${info.file.name} file uploaded successfully`);
+      this.setState({ labelFile: info.file.originFileObj });
+    } else if (info.file.status === "error") {
+      message.error(`${info.file.name} file upload failed.`);
+    }
   }
 
   render() {
     const layout = {
       labelCol: { span: 8 },
-      wrapperCol: { span: 50 }
+      wrapperCol: { span: 50 },
+    };
+
+    const props = {
+      name: "file",
+      action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
     };
 
     return (
@@ -93,8 +126,8 @@ export default class MoreDetails extends Component {
               rules={[
                 {
                   required: true,
-                  message: "Please input your description"
-                }
+                  message: "Please input your description",
+                },
               ]}
             >
               <Input.TextArea
@@ -112,25 +145,35 @@ export default class MoreDetails extends Component {
                   2: "2",
                   3: "3",
                   4: "4",
-                  5: "5"
+                  5: "5",
                 }}
                 max={5}
                 min={1}
               />
             </Form.Item>
 
+            <Form.Item size="large" name="labelsFile" label="Label Files">
+              <Upload {...props} onChange={this.onChange.bind(this)}>
+                <Button>
+                  <UploadOutlined /> Click to Upload
+                </Button>
+              </Upload>
+            </Form.Item>
+
             <Form.Item
               wrapperCol={{
                 xs: { span: 24, offset: 0 },
-                sm: { span: 16, offset: 8 }
+                sm: { span: 16, offset: 8 },
               }}
             >
               <Button
                 type="primary"
-                htmlType="submit"
                 onClick={this.upload.bind(this)}
+                disabled={this.state.details.length === 0}
+                // loading={! this.state.uploading}
+                style={{ marginTop: 16 }}
               >
-                Submit
+                {!this.state.uploading ? "Submit" : "Submitting..."}
               </Button>
             </Form.Item>
           </Form>
