@@ -274,11 +274,11 @@ class DATAPREP:
                     score -= 0.1
         
         
-        self.data.descriptive_info.extend(data_features)
-        info = self.data.descriptive_info
-        self.data.descriptive_info = []
-        print()
-        self.data.descriptive_info = separate_bigrams(list(itertools.combinations(info,2)))
+        if len(self.data.descriptive_info) > 1:
+            self.data.descriptive_info = separate_bigrams(list(itertools.combinations(self.data.descriptive_info,2)))
+        elif len(self.data.descriptive_info) == 1:
+            self.data.descriptive_info = [(self.data.descriptive_info[0],)]
+            
         self.data.eval_score = score
         
         return self.data
