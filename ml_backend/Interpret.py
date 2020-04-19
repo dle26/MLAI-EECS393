@@ -124,7 +124,8 @@ class INTERPRET:
         
         feature_ranking,_ = two_list_sort(self.data.original_features,feat_imp)
         feature_ranking.reverse()
-        return feature_ranking
+        feature_ranking = np.asarray(feature_ranking)[[f for f in feature_ranking if f > 0]]
+        return list(feature_ranking)
         
 
     def assign_top_model_sup(self,class_results):

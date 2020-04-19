@@ -242,8 +242,7 @@ class DATAPREP:
         for n,col in enumerate(self.data.data.columns):
             if str(col).lower().find('label') > -1:
                 self.data.labels = self.data.data[col].values
-                print(self.data.labels)
-                self.data.data.drop(col,1)
+                self.data.data = self.data.data.drop([col],1)
                 self.data.analysis_type = 'supervised'
                 self.data.data = self.data.data.values
                 return
