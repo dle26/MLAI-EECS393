@@ -7,6 +7,7 @@ from util import *
 import datetime
 import jwt
 import pymongo
+import os
 from werkzeug.utils import secure_filename
 from ml_backend.Pipeline import Pipeline
 
@@ -110,7 +111,7 @@ def upload_file():
     time = request.form.get('time')
     print("request.files: " + str(request.files))
     print("request.form: " + str(request.form))
-    
+
     names = []
     sizes = []
     for file in files:
@@ -119,22 +120,50 @@ def upload_file():
             names.append(filename)
             size = len(file.read())
             sizes.append(size)
-    result = Pipeline.run_MLAI(files, names, sizes, None, None, None, {'time': time, 'userid': '111111', 'user_input': details})   
+    result = Pipeline.run_MLAI(files, names, sizes, None, None, None, {'time': time, 'userid': '111111', 'user_input': details})
     print(result)
-            
+
     resp = jsonify({'message' : 'File successfully uploaded'})
     resp.status_code = 201
     return resp
 
+
+DEV_ALLOWED_EXTENSIONS = set(['py'])
+
+def dev_allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in DEV_ALLOWED_EXTENSIONS
+
 @app.route("/developerfeedback", methods=['POST'])
 def developer_feedback():
-    email_address = request.get_json(force = True)['email_address']
-    name = request.get_json(force = True)['name']
-    feedback = request.get_json(force = True)['feedback']
-    subject = request.get_json(force = True)['subject']
+    devname = request.get_json(force = True)['devname']
 
-    return send_feedback_email(email_address, name, feedback, subject)
+    # check if developer feedback has any files
+    if 'files[]' not in request.files:
+            resp = jsonify({'message' : 'No file part in the request'})
+            resp.status_code = 400
+            print(request.files)
+            return resp
 
+    details = request.form.get('details')
+    files = request.files.getlist('files[]')
+
+    for file in files:
+        if file and dev_allowed_file(file.filename):
+            filename = file.filename
+        else:
+            resp.status_code = 422
+            return resp
+
+        path = "./ml_backend/devUpload/" + devname
+
+        os.mkdir(path)
+
+        for file in files:
+            if file and dev_allowed_file(file.filename):
+                filename = file.filename
+                shutil.copy(fname, path)
+    resp.status_code = 201
+    return resp
 
 @app.route("/dev/register", methods=['POST'])
 def developer_register():
@@ -151,7 +180,7 @@ def developer_register():
 
         if existing_dev is None:
             devs.insert({
-                'devname': username,
+                'devname': devname,
                 'password': password,
                 'firstname': firstname,
                 'lastname': lastname

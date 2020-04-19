@@ -84,7 +84,7 @@ class Dashboard extends Component {
 
   render() {
     const { Dragger } = Upload;
-    
+
     const dummyRequest = ({ file, onSuccess }) => {
       setTimeout(() => {
         onSuccess("ok");
@@ -118,7 +118,7 @@ class Dashboard extends Component {
 
         <Grid item lg={8} md={12} xl={9} xs={12} alignItems={'stretch'}>
           <Typography variant="h4" gutterBottom>
-              Or, if you prefer old school: click below.
+              Or, if you prefer to upload an entire directory, go below.
           </Typography>
         </Grid>
 

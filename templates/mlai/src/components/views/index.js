@@ -3,6 +3,8 @@ export { default as Dashboard } from './Dashboard';
 export { default as SignIn} from './SignIn';
 export { default as SignUp} from './SignUp';
 export { default as DevSignIn} from './DevSignIn';
+export { default as DevSignUp} from './DevSignUp';
+export { default as Developer} from './Developer';
 // export { default as Icons } from './Icons';
 // export { default as NotFound } from './NotFound';
 // export { default as ProductList } from './ProductList';

@@ -130,7 +130,7 @@ class SignUp extends Component {
           {this.state.usernameExisted && (
             <Grid item xs={12}>
               <Typography component="h4" variant="h5" color="secondary">
-                username exsited
+                username existed
               </Typography>
             </Grid>
           )}
