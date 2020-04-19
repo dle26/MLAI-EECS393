@@ -132,22 +132,25 @@ class INTERPRET:
         best_technique = None
         highest_F1 = 0
         
-        for technique in class_results.keys():
+        for n,technique in enumerate(class_results.keys()):
             
             # self.update_result_tup(technique,class_results[technique]["F1 Score"])
           
-          if class_results[technique]["F1 Score"] > highest_F1:
-                highest_F1 = class_results[technique]["F1 Score"]
+          if class_results['techniques']["f1_score"][n] > highest_F1:
+                highest_F1 = class_results[technique]["f1_score"][n]
                 best_technique = technique
+                bt_index = n
                 
-          if class_results[technique]["F1 Score"] == highest_F1:
-              if class_results[technique]["Accuracy"] < class_results[best_technique]["Accuracy"]:
+          if class_results[technique]["f1_score"][n] == highest_F1:
+              if class_results[technique]["accuracy"] > class_results['techniques']["acccuracy"][bt_index]:
                     best_technique = technique
+                    bt_index = n
                         
-              elif class_results[technique]["Accuracy"] == class_results[best_technique]["Accuracy"]:
+              elif class_results[technique]["accuracy"] == class_results['techniques']["acccuracy"][bt_index]:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
-          self.data.data_for_update.append((technique,class_results[technique]["F1 Score"],self.data.descriptive_info))
+                       bt_index = n
+          self.data.data_for_update.append((technique,class_results[technique]["f1_score"],self.data.descriptive_info))
 
         return best_technique
     
@@ -157,24 +160,27 @@ class INTERPRET:
         best_technique = None
         highest_sil = 0
         
-        for technique in class_results.keys():
+        for n,technique in enumerate(class_results.keys()):
             
-          self.update_result_tup(technique,class_results[technique]["Silhouette"])
+          #self.update_result_tup(technique,class_results['techniques']["silhouette"][n])
           
-          if class_results[technique]["Silhouette"] > highest_sil:
-                highest_sil = class_results[technique]["Silhouette"]
+          if class_results['techniques']["silhouette"][n] > highest_sil:
+                highest_sil = class_results['techniques']["silhouette"][n]
                 best_technique = technique
+                bt_index = n
                 
-          if class_results[technique]["Silhouette"] == highest_sil:
-              if class_results[technique]["CH Score"] < class_results[best_technique]["Accuracy"]:
+          if class_results['techniques']["silhouette"][n] == highest_sil:
+              if class_results['techniques']["ch_score"][n] > class_results['techniques']["ch_score"][bt_index]:
                     best_technique = technique
+                    bt_index = n
                         
-              elif class_results[technique]["CH Score"] == class_results[best_technique]["CH Score"]:
+              elif class_results[technique]["CH Score"] == class_results['techniques']["ch_score"][bt_index]:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
+                       bt_index = n
 
         
-          self.data.data_for_update.append((technique,class_results[technique]["Silhouette"],self.data.descriptive_info))
+          self.data.data_for_update.append((technique,class_results['techniques']["silhouette"][n],self.data.descriptive_info))
         return best_technique
 
 
