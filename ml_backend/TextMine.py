@@ -86,7 +86,7 @@ class TEXTMINE:
                         f.write(r.text)
                      f.close()
                  
-                     foundwords,allwords,numlines = TEXTPROCESS.findkeywords(str(self.user_id),searchwords,self.user_keywords,tech_words)
+                     foundwords,allwords,numlines = TEXTPROCESS.findkeywords(str(self.user_id),searchwords,self.user_keywords)
                      textmine_results['words'].extend(list(foundwords.keys()))
                      textmine_results['scores'].extend(list(foundwords.values()))
                      textmine_results['allwords'].extend(allwords)

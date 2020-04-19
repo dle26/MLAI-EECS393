@@ -10,7 +10,7 @@ import numpy as np
 
 class TEXTPROCESS: 
     
-    def findkeywords(file,searchwords,user_input,tech_words):
+    def findkeywords(file,searchwords,user_input):
         
          tracker = 0
          allresults = {}
@@ -20,16 +20,15 @@ class TEXTPROCESS:
          all_matches = {}
          punctuation = list(string.punctuation)
          punctuation.remove('-')
-
-         user_words =""
          
+         user_words =""
          for tup in user_input:
-
-             if user_words.find(tup[0]) == -1 and str(tech_words).find(tup[0]) == -1:
+        
+             if user_words.find(tup[0]) == -1:
                  user_words += (tup[0] + " ")
-                 
-             if user_words.find(tup[1]) == -1 and str(tech_words).find(tup[0]) == -1:
-                 user_words += (tup[1] + " ")
+             if len(tup) > 1:
+                 if user_words.find(tup[1]) == -1:
+                    user_words += (tup[1] + " ")
                  
          with open(file,'r') as f:
              
