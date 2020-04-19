@@ -36,13 +36,14 @@ export default class DevMoreDetails extends Component {
   upload() {
     const url = "http://localhost:5000/developerfeedback";
     const formData = new FormData();
-    console.log("more details");
-    console.log(this.state);
+    console.log("more detail files");
+    console.log(this.props.files);
     this.props.files.forEach((file) =>
       formData.append("files[]", file, file.name)
     );
 
     formData.set("details", this.state.details);
+    formData.set("Devname", sessionStorage.getItem("Devname"));
 
     const headers = {
       headers: { "Content-Type": "multipart/form-data" },

@@ -135,33 +135,42 @@ def dev_allowed_file(filename):
 
 @app.route("/developerfeedback", methods=['POST'])
 def developer_feedback():
-    devname = request.get_json(force = True)['devname']
-
-    # check if developer feedback has any files
+        # check if the post request has the file part
     if 'files[]' not in request.files:
-            resp = jsonify({'message' : 'No file part in the request'})
-            resp.status_code = 400
-            print(request.files)
-            return resp
-
-    details = request.form.get('details')
+        resp = jsonify({'message' : 'No file part in the request'})
+        resp.status_code = 400
+        print(request.files)
+        return resp
     files = request.files.getlist('files[]')
+    details = request.form.get('details')
+    devname = request.form.get('Devname');
+    print("request.files: " + str(request.files))
+    print("request.form: " + str(request.form))
 
+    # Testing code below
+    for file in files:
+         if file and dev_allowed_file(file.filename):
+             filename = file.filename
+         else:
+             resp = jsonify({'message' : 'Wrong format'})
+             resp.status_code = 422
+             return resp
+    #
+    path = "./ml_backend/devUpload/" + devname
+    #
+    ## @Daniel still need to add details to this save
+    try:
+        os.mkdir(path)
+    except OSError:
+        print ("Creation of the directory %s failed (likely already created)" % path)
+    else:
+        print ("Successfully created the directory %s " % path)
+    #
     for file in files:
         if file and dev_allowed_file(file.filename):
             filename = file.filename
-        else:
-            resp.status_code = 422
-            return resp
-
-        path = "./ml_backend/devUpload/" + devname
-
-        os.mkdir(path)
-
-        for file in files:
-            if file and dev_allowed_file(file.filename):
-                filename = file.filename
-                shutil.copy(fname, path)
+            os.path.join(path,filename)
+    resp = jsonify({'message' : 'File successfully uploaded'})
     resp.status_code = 201
     return resp
 
