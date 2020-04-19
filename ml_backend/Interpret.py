@@ -34,35 +34,39 @@ class INTERPRET:
     def supervised_accuracy_metrics(self):
         
         techniques = self.data.techniques
-        all_results = {}
+        all_results = {"techniques":{"names":[],"samples":[],"results":[],"accuracy":[],
+                                     "f1_score":[],"silhouette":[],"ch_score":[],"feature_importances":[]}}
         
         ## TODO: run for all techniques - currently just 1
-        for n,tech in enumerate([techniques[-1]]):
-            int_results = {}
+        for n,tech in enumerate(techniques):
+            all_results['techniques']['names'].append(tech)
             if self.data.prior_test_data is not None:
-                int_results['samples'] = self.data.prior_test_indicies
-                int_results['results'] = self.data.blind_prediction_results[n]
+                all_results['techniques']['samples'].append(self.data.prior_test_indicies)
+                all_results['techniques']['results'].append(self.data.blind_prediction_results[n])
             else:
-                int_results['samples'] = None
-                int_results['results'] = None
+                 all_results['techniques']['samples'].append([]) 
+                 all_results['techniques']['results'].append([]) 
  
             preds = np.asarray(self.data.prediction_results[n])
             true_labels = np.asarray(self.data.test_labels[n])
 
             if self.data.feature_importances[n] is not None:
-                int_results["Feature Importances"] = self.fi_interpret(self.data.feature_importances[n])
+                 all_results['techniques']["feature_importances"].append(self.fi_interpret(self.data.feature_importances[n]))
             else:
-                int_results["Feature Importances"] = None
+                 all_results['techniques']["feature_importances"].append([])
             
-            int_results["Accuracy"] = metrics.accuracy_score(true_labels,preds)
-            int_results['F1 Score'] = metrics.f1_score(true_labels,preds,average='macro')
-            int_results["Confusion Matrix"] = metrics.confusion_matrix(true_labels, preds)
+            all_results['techniques']["accuracy"].append(metrics.accuracy_score(true_labels,preds))
+            all_results['techniques']['f1_score'].append(metrics.f1_score(true_labels,preds,average='macro'))
+            all_results['techniques']['silhouette'] = None
+            all_results['techniques']['ch_score'] = None
+            all_results['techniques']["confusion_matrix"] = metrics.confusion_matrix(true_labels, preds)
             # int_results["NL Results"] = self.NLResults()
-            
-            all_results[tech] = int_results
+
         all_results['best'] = self.assign_top_model_sup(all_results)
         all_results['analysis type'] = 'supervised'
+        all_results['labels'] = self.data.label_names
         all_results['education'] = self.data.educational_info
+        
         self.data.interpreted_results = all_results
         return self.data
             
@@ -71,42 +75,50 @@ class INTERPRET:
            
         techniques = self.data.techniques
 
-        all_results = {}
+
+        all_results = {"techniques":{"names":[],"samples":[],"results":[],"accuracy":[],
+                                     "f1_score":[],"silhouette":[],"ch_score":[],"feature_importances":[]}}
         
         ## TODO: run for all techniques - currently just 1
         ### TODO: add more eval methods??
         
         for n,tech in enumerate([techniques[-1]]):
+
+            all_results['techniques']['names'].append(tech)
             
-            int_results = {}
             if self.data.prior_test_data is not None:
-                int_results['samples'] = self.data.prior_test_indicies
-                int_results['results'] = self.data.blind_prediction_results[n]
+                all_results['techniques']['samples'].append(self.data.prior_test_indicies)
+                all_results['techniques']['results'].append(self.data.blind_prediction_results[n])
             else:
-                int_results['samples'] = None
-                int_results['results'] = None
-            
+                 all_results['techniques']['samples'].append([]) 
+                 all_results['techniques']['results'].append([]) 
             preds = np.asarray(self.data.prediction_results[n])
 
-            int_results["Silhouette"] = metrics.silhouette_score(self.data.test_data,preds)
-            int_results['CH Score'] = metrics.calinski_harabasz_score(self.data.test_data,preds)
+            all_results['techniques']["Silhouette"].append(metrics.silhouette_score(self.data.test_data,preds))
+            all_results['techniques']['ch_score'].append(metrics.calinski_harabasz_score(self.data.test_data,preds))
+            all_results['techniques']['accuracy'] = None
+            all_results['techniques']['f1_score'] = None
+            all_results['techniques']["confusion_matrix"] = None
             
             if self.data.feature_importances[n] == None:
-                int_results["Features"] = self.fi_interpret()
+                all_results['techniques']["feature_importances"].append(self.fi_interpret())
+            else:
+                all_results['techniques']["feature_importances"].append([])
+            
 
-            
-            all_results[tech] = int_results
-            
+           
         '''ALLRESULTS - a dict of dicts which will be returned to frontend '''
         all_results['best'] = self.assign_top_model_unsup(all_results)
         all_results['education'] = self.data.educational_info
         all_results['analysis type'] = 'unsupervised'
+        all_results['labels'] = {}
+        
         
         self.data.interpreted_results = all_results
 
         return self.data
     
-    
+     
     
     def fi_interpret(self,feat_imp):
         
@@ -120,22 +132,25 @@ class INTERPRET:
         best_technique = None
         highest_F1 = 0
         
-        for technique in class_results.keys():
+        for n,technique in enumerate(class_results.keys()):
             
             # self.update_result_tup(technique,class_results[technique]["F1 Score"])
           
-          if class_results[technique]["F1 Score"] > highest_F1:
-                highest_F1 = class_results[technique]["F1 Score"]
+          if class_results['techniques']["f1_score"][n] > highest_F1:
+                highest_F1 = class_results[technique]["f1_score"][n]
                 best_technique = technique
+                bt_index = n
                 
-          if class_results[technique]["F1 Score"] == highest_F1:
-              if class_results[technique]["Accuracy"] < class_results[best_technique]["Accuracy"]:
+          if class_results[technique]["f1_score"][n] == highest_F1:
+              if class_results[technique]["accuracy"][n] > class_results['techniques']["accuracy"][bt_index]:
                     best_technique = technique
+                    bt_index = n
                         
-              elif class_results[technique]["Accuracy"] == class_results[best_technique]["Accuracy"]:
+              elif class_results[technique]["accuracy"][n] == class_results['techniques']["accuracy"][bt_index]:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
-          self.data.data_for_update.append((technique,class_results[technique]["F1 Score"],self.data.descriptive_info))
+                       bt_index = n
+          self.data.data_for_update.append((technique,class_results[technique]["f1_score"],self.data.descriptive_info))
 
         return best_technique
     
@@ -145,24 +160,27 @@ class INTERPRET:
         best_technique = None
         highest_sil = 0
         
-        for technique in class_results.keys():
+        for n,technique in enumerate(class_results.keys()):
             
-          self.update_result_tup(technique,class_results[technique]["Silhouette"])
+          #self.update_result_tup(technique,class_results['techniques']["silhouette"][n])
           
-          if class_results[technique]["Silhouette"] > highest_sil:
-                highest_sil = class_results[technique]["Silhouette"]
+          if class_results['techniques']["silhouette"][n] > highest_sil:
+                highest_sil = class_results['techniques']["silhouette"][n]
                 best_technique = technique
+                bt_index = n
                 
-          if class_results[technique]["Silhouette"] == highest_sil:
-              if class_results[technique]["CH Score"] < class_results[best_technique]["Accuracy"]:
+          if class_results['techniques']["silhouette"][n] == highest_sil:
+              if class_results['techniques']["ch_score"][n] > class_results['techniques']["ch_score"][bt_index]:
                     best_technique = technique
+                    bt_index = n
                         
-              elif class_results[technique]["CH Score"] == class_results[best_technique]["CH Score"]:
+              elif class_results[technique]["ch_score"][n] == class_results['techniques']["ch_score"][bt_index]:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
+                       bt_index = n
 
         
-          self.data.data_for_update.append((technique,class_results[technique]["Silhouette"],self.data.descriptive_info))
+          self.data.data_for_update.append((technique,class_results['techniques']["silhouette"][n],self.data.descriptive_info))
         return best_technique
 
 

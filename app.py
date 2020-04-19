@@ -147,32 +147,34 @@ def developer_feedback():
     print("request.files: " + str(request.files))
     print("request.form: " + str(request.form))
 
-    # Testing code below
-    for file in files:
-         if file and dev_allowed_file(file.filename):
-             filename = file.filename
-         else:
-             resp = jsonify({'message' : 'Wrong format'})
-             resp.status_code = 422
-             return resp
-    #
-    path = "./ml_backend/devUpload/" + devname
-    #
-    ## @Daniel still need to add details to this save
-    try:
-        os.mkdir(path)
-    except OSError:
-        print ("Creation of the directory %s failed (likely already created)" % path)
-    else:
-        print ("Successfully created the directory %s " % path)
-    #
+    UPLOAD_FOLDER = '' + devname
+    os.mkdir(UPLOAD_FOLDER)
+
     for file in files:
         if file and dev_allowed_file(file.filename):
-            filename = file.filename
-            os.path.join(path,filename)
-    resp = jsonify({'message' : 'File successfully uploaded'})
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+    resp = jsonify({"message": "Files successfully uploaded"})
     resp.status_code = 201
     return resp
+    # #
+    # path = "./ml_backend/devUpload/" + devname
+    # #
+    # ## @Daniel still need to add details to this save
+    # try:
+    #     os.mkdir(path)
+    # except OSError:
+    #     print ("Creation of the directory %s failed (likely already created)" % path)
+    # else:
+    #     print ("Successfully created the directory %s " % path)
+    # #
+    # for file in files:
+    #     if file and dev_allowed_file(file.filename):
+    #         filename = file.filename
+    #         os.path.join(path,filename)
+    # resp = jsonify({'message' : 'File successfully uploaded'})
+    # resp.status_code = 201
+    # return resp
 
 @app.route("/dev/register", methods=['POST'])
 def developer_register():

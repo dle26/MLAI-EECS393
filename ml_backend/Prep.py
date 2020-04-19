@@ -65,6 +65,8 @@ class DATA:
         self.blind_prediction_results = []
 
         self.educational_info = []
+        
+        self.label_names = {}
 
         
         
@@ -113,6 +115,10 @@ class DATAPREP:
             self.data.labels = None
             self.data.analysis_type = 'unsupervised'
         
+        
+        if self.data.labels is not None:
+            self.data.labels,self.data.label_names = map_labels(self.data.labels)
+
         self.data.time_constraint = int(self.info_dict["time"])
         self.data.descriptive_info = self.process_user_info(str(self.info_dict["user_input"]))
         self.data.userid = str(self.info_dict["userid"])
@@ -249,7 +255,6 @@ class DATAPREP:
     def eval_data(self):
         
         score = 1
-        data_features = []
 
         if self.data.descriptive_info == None:  ###or in list form??
             score -= 0.25
@@ -329,6 +334,11 @@ class DATAPREP:
         
         return outlier_ratio
 
+
+
+
+''' --------------- UTILS ----------------- '''
+
 def separate_bigrams(lst):
     
     lst2 = []
@@ -344,10 +354,24 @@ def separate_bigrams(lst):
         lst2.append(tup)
             
     return lst2
-            
+      
+
+      
+def map_labels(labels):
+    
+    label_set = list(set(labels))
+    label_dict = {}
+    
+    for n,label in enumerate(label_set):
+        label_dict[n] = label
         
-            
-            
+    
+    new_labels = []
+    for label in labels:
+        new_labels.append(label_set.index(label))
+    
+    return new_labels,label_dict
+        
         
 
 
