@@ -56,7 +56,7 @@ class INTERPRET:
                  all_results['techniques']["feature_importances"].append([])
             
             all_results['techniques']["accuracy"].append(metrics.accuracy_score(true_labels,preds))
-            all_results['techniques']['f1_Score'].append(metrics.f1_score(true_labels,preds,average='macro'))
+            all_results['techniques']['f1_score'].append(metrics.f1_score(true_labels,preds,average='macro'))
             all_results['techniques']['silhouette'] = None
             all_results['techniques']['ch_score'] = None
             all_results['techniques']["confusion_matrix"] = metrics.confusion_matrix(true_labels, preds)
@@ -64,7 +64,7 @@ class INTERPRET:
 
         all_results['best'] = self.assign_top_model_sup(all_results)
         all_results['analysis type'] = 'supervised'
-        all_results['labels'] = list(set(self.data.labels))
+        all_results['labels'] = self.data.label_names
         all_results['education'] = self.data.educational_info
         
         self.data.interpreted_results = all_results
@@ -77,7 +77,7 @@ class INTERPRET:
 
 
         all_results = {"techniques":{"names":[],"samples":[],"results":[],"accuracy":[],
-                                     "f1_score":[],"silhouette":[],"cH_score":[],"feature_importances":[]}}
+                                     "f1_score":[],"silhouette":[],"ch_score":[],"feature_importances":[]}}
         
         ## TODO: run for all techniques - currently just 1
         ### TODO: add more eval methods??
@@ -94,14 +94,14 @@ class INTERPRET:
                  all_results['techniques']['results'].append([]) 
             preds = np.asarray(self.data.prediction_results[n])
 
-            all_results['techniques']["Silhouette"] = metrics.silhouette_score(self.data.test_data,preds)
-            all_results['techniques']['ch_Score'] = metrics.calinski_harabasz_score(self.data.test_data,preds)
+            all_results['techniques']["Silhouette"].append(metrics.silhouette_score(self.data.test_data,preds))
+            all_results['techniques']['ch_score'].append(metrics.calinski_harabasz_score(self.data.test_data,preds))
             all_results['techniques']['accuracy'] = None
-            all_results['techniques']['f1_Score'] = None
+            all_results['techniques']['f1_score'] = None
             all_results['techniques']["confusion_matrix"] = None
             
             if self.data.feature_importances[n] == None:
-                all_results['techniques']["feature_importances"] = self.fi_interpret()
+                all_results['techniques']["feature_importances"].append(self.fi_interpret())
             else:
                 all_results['techniques']["feature_importances"].append([])
             
@@ -111,7 +111,7 @@ class INTERPRET:
         all_results['best'] = self.assign_top_model_unsup(all_results)
         all_results['education'] = self.data.educational_info
         all_results['analysis type'] = 'unsupervised'
-        all_results['labels'] = list(set(self.data.labels))
+        all_results['labels'] = {}
         
         
         self.data.interpreted_results = all_results
@@ -142,11 +142,11 @@ class INTERPRET:
                 bt_index = n
                 
           if class_results[technique]["f1_score"][n] == highest_F1:
-              if class_results[technique]["accuracy"] > class_results['techniques']["acccuracy"][bt_index]:
+              if class_results[technique]["accuracy"][n] > class_results['techniques']["accuracy"][bt_index]:
                     best_technique = technique
                     bt_index = n
                         
-              elif class_results[technique]["accuracy"] == class_results['techniques']["acccuracy"][bt_index]:
+              elif class_results[technique]["accuracy"][n] == class_results['techniques']["accuracy"][bt_index]:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
                        bt_index = n
@@ -174,7 +174,7 @@ class INTERPRET:
                     best_technique = technique
                     bt_index = n
                         
-              elif class_results[technique]["ch_score"] == class_results['techniques']["ch_score"][bt_index]:
+              elif class_results[technique]["ch_score"][n] == class_results['techniques']["ch_score"][bt_index]:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
                        bt_index = n
