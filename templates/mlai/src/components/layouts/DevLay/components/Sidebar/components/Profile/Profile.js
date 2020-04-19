@@ -27,16 +27,16 @@ class Profile extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: sessionStorage.getItem("Username")
+      devname: sessionStorage.getItem("Devname")
     }
   }
 
-  componentDidMount() {    
+  componentDidMount() {
 
-    if(this.state.username != null) {
+    if(this.state.devname != null) {
       axios
-      .post("http://localhost:5000/userinfo", {
-        "username": this.state.username
+      .post("http://localhost:5000/devuserinfo", {
+        "Devname": this.state.devname
       })
       .then(response => {
         this.setState({firstname: response.data.firstname, lastname: response.data.lastname})
