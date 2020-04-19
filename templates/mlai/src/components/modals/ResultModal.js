@@ -24,7 +24,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 
 const styles = (theme) => ({
   root: {
@@ -59,7 +59,8 @@ class ResultModal extends Component {
 
   render() {
     if (!this.props.modalVisible) return <React.Fragment> </React.Fragment>;
-
+    if( !this.props.result) return <React.Fragment></React.Fragment>;
+    
     const {labels} = this.props.result
     const { classes } = this.props;
     const {
@@ -107,6 +108,9 @@ class ResultModal extends Component {
                   primary={"Accuracy"}
                   secondary={accuracy[index]}
                 />
+                <ListItemSecondaryAction>
+
+                </ListItemSecondaryAction>
               </ListItem>
             ) : null}
 
@@ -242,7 +246,7 @@ class ResultModal extends Component {
             <ListItemText primary="Techniques" />
             {this.state.techniquesOpen ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
-          <Collapse in={this.state.techniquesOpen} timeout="auto" unmountOnExit>
+          <Collapse in  ={this.state.techniquesOpen} timeout="auto" unmountOnExit>
             {techniques}
           </Collapse>
 
