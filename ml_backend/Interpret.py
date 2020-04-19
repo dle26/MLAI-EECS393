@@ -34,8 +34,8 @@ class INTERPRET:
     def supervised_accuracy_metrics(self):
         
         techniques = self.data.techniques
-        all_results = {"techniques":{"names":[],"samples":[],"results":[],"Accuracy":[],
-                                     "F1 score":[],"Silhouette Score":[],"CH Score":[],"Feature Importances":[]}}
+        all_results = {"techniques":{"names":[],"samples":[],"results":[],"accuracy":[],
+                                     "f1_score":[],"silhouette":[],"ch_score":[],"feature_importances":[]}}
         
         ## TODO: run for all techniques - currently just 1
         for n,tech in enumerate(techniques):
@@ -51,15 +51,15 @@ class INTERPRET:
             true_labels = np.asarray(self.data.test_labels[n])
 
             if self.data.feature_importances[n] is not None:
-                 all_results['techniques']["Feature Importances"].append(self.fi_interpret(self.data.feature_importances[n]))
+                 all_results['techniques']["feature_importances"].append(self.fi_interpret(self.data.feature_importances[n]))
             else:
-                 all_results['techniques']["Feature Importances"].append([])
+                 all_results['techniques']["feature_importances"].append([])
             
-            all_results['techniques']["Accuracy"].append(metrics.accuracy_score(true_labels,preds))
-            all_results['techniques']['F1 Score'].append(metrics.f1_score(true_labels,preds,average='macro'))
-            all_results['techniques']['Silhouette'] = None
-            all_results['techniques']['CH Score'] = None
-            all_results['techniques']["Confusion Matrix"] = metrics.confusion_matrix(true_labels, preds)
+            all_results['techniques']["accuracy"].append(metrics.accuracy_score(true_labels,preds))
+            all_results['techniques']['f1_Score'].append(metrics.f1_score(true_labels,preds,average='macro'))
+            all_results['techniques']['silhouette'] = None
+            all_results['techniques']['ch_score'] = None
+            all_results['techniques']["confusion_matrix"] = metrics.confusion_matrix(true_labels, preds)
             # int_results["NL Results"] = self.NLResults()
 
         all_results['best'] = self.assign_top_model_sup(all_results)
@@ -76,8 +76,8 @@ class INTERPRET:
         techniques = self.data.techniques
 
 
-        all_results = {"techniques":{"names":[],"samples":[],"results":[],"Accuracy":[],
-                                     "F1 score":[],"Silhouette Score":[],"CH Score":[],"Feature Importances":[]}}
+        all_results = {"techniques":{"names":[],"samples":[],"results":[],"accuracy":[],
+                                     "f1_score":[],"silhouette":[],"cH_score":[],"feature_importances":[]}}
         
         ## TODO: run for all techniques - currently just 1
         ### TODO: add more eval methods??
@@ -95,14 +95,15 @@ class INTERPRET:
             preds = np.asarray(self.data.prediction_results[n])
 
             all_results['techniques']["Silhouette"] = metrics.silhouette_score(self.data.test_data,preds)
-            all_results['techniques']['CH Score'] = metrics.calinski_harabasz_score(self.data.test_data,preds)
-            all_results['techniques']['Accuracy'] = None
-            all_results['techniques']['F1 Score'] = None
+            all_results['techniques']['ch_Score'] = metrics.calinski_harabasz_score(self.data.test_data,preds)
+            all_results['techniques']['accuracy'] = None
+            all_results['techniques']['f1_Score'] = None
+            all_results['techniques']["confusion_matrix"] = None
             
             if self.data.feature_importances[n] == None:
-                all_results['techniques']["Feature Importances"] = self.fi_interpret()
+                all_results['techniques']["feature_importances"] = self.fi_interpret()
             else:
-                all_results['techniques']["Feature Importances"].append([])
+                all_results['techniques']["feature_importances"].append([])
             
 
            
@@ -117,7 +118,7 @@ class INTERPRET:
 
         return self.data
     
-    
+     
     
     def fi_interpret(self,feat_imp):
         
