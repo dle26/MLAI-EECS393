@@ -9,10 +9,8 @@ import { Upload, message, Button } from "antd";
 import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
 
 // import { Button } from "@material-ui/core";
-
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import MoreDetails from "../../modals/MoreDetails";
+import ResultModal from "../../modals/ResultModal";
 
 const styles = theme => ({
   root: {},
@@ -32,13 +30,23 @@ class Dashboard extends Component {
       token: sessionStorage.getItem("Token"),
       files: [],
       uploading: false,
-      moreDetailsVisible: false
+      moreDetailsVisible: false,
+
+      //result
+      resultVisible: false,
+      result: {},
     };
   }
 
   moreDetailsVisible() {
     this.setState({
       moreDetailsVisible: ! this.state.moreDetailsVisible
+    });
+  }
+
+  resultModalVisible() {
+    this.setState({
+      resultVisible: ! this.state.resultVisible
     });
   }
 
@@ -55,6 +63,12 @@ class Dashboard extends Component {
   addFile(file) {
     this.setState({
       files: file
+    });
+  }
+
+  setResult(r) {
+    this.setState({
+      result: r
     });
   }
 
@@ -151,7 +165,16 @@ class Dashboard extends Component {
             uploadingToggle={this.uploadingToggle.bind(this)}
             addFile={this.addFile.bind(this)}
             files={this.state.files}
-            step={1}
+            resultModalVisible={this.resultModalVisible.bind(this)}
+            setResult={this.setResult.bind(this)}
+          />
+
+          <ResultModal
+            modalVisible={this.state.resultVisible}
+            resultModalVisible={this.resultModalVisible.bind(this)}
+            result={this.state.result}
+            files={this.state.files}
+            addFile={this.addFile.bind(this)}
           />
         </Grid>
       </Grid>

@@ -19,7 +19,7 @@ export default class MoreDetails extends Component {
       // more details info
       details: "",
       timeContraint: 1,
-      uploading: false,
+      uploading: false,      
     };
   }
 
@@ -31,11 +31,12 @@ export default class MoreDetails extends Component {
 
   closeModal() {
     this.props.moreDetailsVisible();
+    this.props.resultModalVisible();
     this.props.uploadingToggle();
   }
 
   upload() {
-    const url = "http://localhost:5000/upload";
+    const url = "http://localhost:5000/test";
     const formData = new FormData();
     console.log("more details");
     console.log(this.state);
@@ -58,12 +59,13 @@ export default class MoreDetails extends Component {
       .then((response) => {
         //handle success
         console.log(response);
-        this.props.addFile([]);
+        this.props.setResult(response.data);
         this.closeModal();
       })
       .catch((response) => {
         //handle error
         console.log(response);
+        this.props.addFile([]);
       });
 
     this.uploadingToggle();
@@ -153,7 +155,7 @@ export default class MoreDetails extends Component {
             </Form.Item>
 
             <Form.Item size="large" name="labelsFile" label="Label Files">
-              <Upload {...props} onChange={this.onChange.bind(this)}>
+              <Upload {...props} onChange={this.onChange.bind(this)} >
                 <Button>
                   <UploadOutlined /> Click to Upload
                 </Button>
