@@ -34,35 +34,39 @@ class INTERPRET:
     def supervised_accuracy_metrics(self):
         
         techniques = self.data.techniques
-        all_results = {}
+        all_results = {"techniques":{"names":[],"samples":[],"results":[],"Accuracy":[],
+                                     "F1 score":[],"Silhouette Score":[],"CH Score":[],"Feature Importances":[]}}
         
         ## TODO: run for all techniques - currently just 1
-        for n,tech in enumerate([techniques[-1]]):
-            int_results = {}
+        for n,tech in enumerate(techniques):
+            all_results['techniques']['names'].append(tech)
             if self.data.prior_test_data is not None:
-                int_results['samples'] = self.data.prior_test_indicies
-                int_results['results'] = self.data.blind_prediction_results[n]
+                all_results['techniques']['samples'].append(self.data.prior_test_indicies)
+                all_results['techniques']['results'].append(self.data.blind_prediction_results[n])
             else:
-                int_results['samples'] = None
-                int_results['results'] = None
+                 all_results['techniques']['samples'].append([]) 
+                 all_results['techniques']['results'].append([]) 
  
             preds = np.asarray(self.data.prediction_results[n])
             true_labels = np.asarray(self.data.test_labels[n])
 
             if self.data.feature_importances[n] is not None:
-                int_results["Feature Importances"] = self.fi_interpret(self.data.feature_importances[n])
+                 all_results['techniques']["Feature Importances"].append(self.fi_interpret(self.data.feature_importances[n]))
             else:
-                int_results["Feature Importances"] = None
+                 all_results['techniques']["Feature Importances"].append([])
             
-            int_results["Accuracy"] = metrics.accuracy_score(true_labels,preds)
-            int_results['F1 Score'] = metrics.f1_score(true_labels,preds,average='macro')
-            int_results["Confusion Matrix"] = metrics.confusion_matrix(true_labels, preds)
+            all_results['techniques']["Accuracy"].append(metrics.accuracy_score(true_labels,preds))
+            all_results['techniques']['F1 Score'].append(metrics.f1_score(true_labels,preds,average='macro'))
+            all_results['techniques']['Silhouette'] = None
+            all_results['techniques']['CH Score'] = None
+            all_results['techniques']["Confusion Matrix"] = metrics.confusion_matrix(true_labels, preds)
             # int_results["NL Results"] = self.NLResults()
-            
-            all_results[tech] = int_results
+
         all_results['best'] = self.assign_top_model_sup(all_results)
         all_results['analysis type'] = 'supervised'
+        all_results['labels'] = list(set(self.data.labels))
         all_results['education'] = self.data.educational_info
+        
         self.data.interpreted_results = all_results
         return self.data
             
@@ -71,36 +75,43 @@ class INTERPRET:
            
         techniques = self.data.techniques
 
-        all_results = {}
+
+        all_results = {"techniques":{"names":[],"samples":[],"results":[],"Accuracy":[],
+                                     "F1 score":[],"Silhouette Score":[],"CH Score":[],"Feature Importances":[]}}
         
         ## TODO: run for all techniques - currently just 1
         ### TODO: add more eval methods??
         
         for n,tech in enumerate([techniques[-1]]):
+
+            all_results['techniques']['names'].append(tech)
             
-            int_results = {}
             if self.data.prior_test_data is not None:
-                int_results['samples'] = self.data.prior_test_indicies
-                int_results['results'] = self.data.blind_prediction_results[n]
+                all_results['techniques']['samples'].append(self.data.prior_test_indicies)
+                all_results['techniques']['results'].append(self.data.blind_prediction_results[n])
             else:
-                int_results['samples'] = None
-                int_results['results'] = None
-            
+                 all_results['techniques']['samples'].append([]) 
+                 all_results['techniques']['results'].append([]) 
             preds = np.asarray(self.data.prediction_results[n])
 
-            int_results["Silhouette"] = metrics.silhouette_score(self.data.test_data,preds)
-            int_results['CH Score'] = metrics.calinski_harabasz_score(self.data.test_data,preds)
+            all_results['techniques']["Silhouette"] = metrics.silhouette_score(self.data.test_data,preds)
+            all_results['techniques']['CH Score'] = metrics.calinski_harabasz_score(self.data.test_data,preds)
+            all_results['techniques']['Accuracy'] = None
+            all_results['techniques']['F1 Score'] = None
             
             if self.data.feature_importances[n] == None:
-                int_results["Features"] = self.fi_interpret()
+                all_results['techniques']["Feature Importances"] = self.fi_interpret()
+            else:
+                all_results['techniques']["Feature Importances"].append([])
+            
 
-            
-            all_results[tech] = int_results
-            
+           
         '''ALLRESULTS - a dict of dicts which will be returned to frontend '''
         all_results['best'] = self.assign_top_model_unsup(all_results)
         all_results['education'] = self.data.educational_info
         all_results['analysis type'] = 'unsupervised'
+        all_results['labels'] = list(set(self.data.labels))
+        
         
         self.data.interpreted_results = all_results
 
