@@ -37,26 +37,34 @@ class NaiveBayes(Technique):
         
         if data.data_type == 'image':
             features = StandardScaler().fit_transform(data.data)
-            return features
+            if data.prior_test_data is not None:
+                test_features = StandardScaler().fit_transform(data.data)
+                return features,test_features
+            return features,None
         
         if data.data_type == 'numeric':
             features = StandardScaler().fit_transform(data.data)
-            return features
+            if data.prior_test_data is not None:
+                test_features = StandardScaler().fit_transform(data.data)
+                return features,test_features
+            return features,None
 
-        
-        if data.data_type == 'text':
-            pass
-        
-        return -1 
-        
     
     def train(data):
  
-        X = NaiveBayes.preprocess(data)
+        X,Xtest = NaiveBayes.preprocess(data)
         y = np.asarray(data.labels)
         test_labels = []
         test_data = []
         time_constraint = data.time_constraint
+        
+        blind_results = None
+        
+        if data.prior_test_data is not None:
+            model = GNB()
+            model.fit(X,y)
+            blind_results = model.predict(Xtest)
+        
         
         if time_constraint == 1:
             
@@ -88,6 +96,6 @@ class NaiveBayes(Technique):
                  test_data.extend(X[test])
                  test_labels.extend(y[test])
                  
-        return test_data,test_labels,results,None
+        return test_data,test_labels,results,None,blind_results
     
     
