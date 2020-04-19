@@ -21,7 +21,7 @@ class ANALYZE:
 
         ml_package = list(np.asarray(inspect.getmembers(MLTechniques)).flatten())
 
-        for technique in [self.data.techniques[-1]]:
+        for technique in self.data.techniques:
             
             mlmodel = ml_package[ml_package.index(technique)+1]
             test_data,test_labels,prediction_results,feature_importances,blind_results = mlmodel.train(self.data)

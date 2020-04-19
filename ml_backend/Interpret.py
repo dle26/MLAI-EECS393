@@ -82,7 +82,7 @@ class INTERPRET:
         ## TODO: run for all techniques - currently just 1
         ### TODO: add more eval methods??
         
-        for n,tech in enumerate([techniques[-1]]):
+        for n,tech in enumerate(techniques):
 
             all_results['techniques']['names'].append(tech)
             
@@ -122,9 +122,9 @@ class INTERPRET:
     
     def fi_interpret(self,feat_imp):
         
-        feature_ranking,_ = two_list_sort(self.data.original_features,feat_imp)
+        feature_ranking,feats = two_list_sort(self.data.original_features,feat_imp)
         feature_ranking.reverse()
-        feature_ranking = np.asarray(feature_ranking)[[f for f in feature_ranking if f > 0]]
+        feature_ranking = np.asarray(feature_ranking)[[f for f in range(len(feats)) if feats[f] > 0]]
         return list(feature_ranking)
         
 
