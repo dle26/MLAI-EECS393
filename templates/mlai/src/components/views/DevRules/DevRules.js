@@ -101,55 +101,47 @@ class Developer extends Component {
 
 
     return (
-      <Grid container spacing={6}>
-        <Grid item lg={12} md={12} xl={9} xs={12} alignItems={'stretch'}>
-          <Dragger
-            customRequest={dummyRequest}
-            multiple={true}
-            name={"file"}
-            onChange={this.onChange.bind(this)}
-          >
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">
-              Click or drag file to this area to upload
-            </p>
-            <p className="ant-upload-hint">
-              Support for a single or bulk upload. Strictly prohibited from
-              uploading company data or other banned files
-            </p>
-          </Dragger>
-        </Grid>
+ <Grid> <h1> Guidelines for Submitting Source Code to MLAI platform (as of April 5th 2020)</h1>
+<h3> Please use these guidelines if you plan to submit your machine learning project for use on the MLAI platform</h3>
 
-        <Grid item lg={8} md={12} xl={9} xs={12} alignItems={'stretch'}>
-          <Typography variant="h4" gutterBottom>
-               Upload your Machine Learning Techniques
-          </Typography>
-        </Grid>
+<h2> General Guidelines: </h2>
+
+<h4> <ol>
+<li>All source code must be written in Python 3 </li>
+
+<li>You must include all description of your project, proposed applications, and a README with package requirements </li>
+
+<li>All projects must be relevant to machine learning. MLAI, inc. reserves the right to reject any submitted projects </li>
+</ol>
+</h4>
 
 
-        <Grid item lg={8} md={12} xl={9} xs={12}>
-          <Button
-            type="primary"
-            onClick={this.upload.bind(this)}
-            disabled={this.state.files.length === 0}
-            loading={this.state.uploading}
-            style={{ marginTop: 16 }}
-          >
-            {this.state.uploading ? "Uploading" : "Start Upload"}
-          </Button>
 
-          <DevMoreDetails
-            modalVisible={this.state.moreDetailsVisible}
-            moreDetailsVisible={this.moreDetailsVisible.bind(this)}
-            uploadingToggle={this.uploadingToggle.bind(this)}
-            addFile={this.addFile.bind(this)}
-            files={this.state.files}
-            step={1}
-          />
-        </Grid>
-      </Grid>
+<h2>Specific Formatting Guidelines:</h2>
+
+<h4> <ol>
+<li>All source code needed to run your technique must be in a single Python file with a name that uniquely identifies your project (i.e. VGG16_CNN)</li>
+
+<li>You must implement all the functions in the Technique Abstract Class inside a class object corresponding to the name of your technique (you may include as many additional utility functions as are needed)</li>
+
+<li>You must ensure that the data will be automatically formatted/structured in a manner that will not crash your algorithm. The data will be input as a multidimensional numpy array, where each index corresponds to a sample. Original dimensions of each sample are also available (Appendix C).</li>
+
+<li>Please reference Appendix B for a specific example of acceptable MLAI source code </li></ol> </h4>
+
+
+<h3>
+
+Appendix A:</h3> <h4>Technique Abstract Class (All techniques in the MLAI package are subclasses of Technique </h4>
+
+<h3>Appendix B: </h3><h4>Example of acceptable source code for the SVM algorithm </h4>
+
+<h3>Appendix C:</h3><h4> Documentation for MLAI Data class </h4>
+<h1> Please note this page is a work in progress. </h1>
+
+ </Grid>
+
+
+
     );
   }
 }
