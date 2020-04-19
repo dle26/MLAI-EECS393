@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { Grid, Typography } from "@material-ui/core";
 import { DropzoneArea } from "material-ui-dropzone";
@@ -7,12 +7,16 @@ import { withStyles } from "@material-ui/core/styles";
 import axios, { post } from "axios";
 import { Upload, message, Button } from "antd";
 import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
+import clsx from 'clsx';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { useMediaQuery } from '@material-ui/core';
 
 // import { Button } from "@material-ui/core";
 
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowRightIcon from "@material-ui/icons/ArrowRight";
-import MoreDetails from "../../modals/MoreDetails";
+import DevMoreDetails from "../../modals/DevMoreDetails";
+import { Topbar } from "../../layouts/Main/components/Sidebar";
 
 const styles = theme => ({
   root: {},
@@ -24,6 +28,7 @@ const styles = theme => ({
     justifyContent: "flex-end"
   }
 });
+
 
 class Dashboard extends Component {
   constructor(props) {
@@ -92,7 +97,8 @@ class Dashboard extends Component {
     };
 
 
-    if (sessionStorage.getItem("Token") == null) return <Redirect to="/signIn" />;
+    if (sessionStorage.getItem("Token") == null) return <Redirect to="/devSignIn" />;
+
 
     return (
       <Grid container spacing={6}>
@@ -118,21 +124,10 @@ class Dashboard extends Component {
 
         <Grid item lg={8} md={12} xl={9} xs={12} alignItems={'stretch'}>
           <Typography variant="h4" gutterBottom>
-              Or, if you prefer to upload an entire directory, go below.
+               Upload your Machine Learning Techniques
           </Typography>
         </Grid>
 
-        <Grid item lg={8} md={12} xl={9} xs={12}>
-          <Upload
-            customRequest={dummyRequest}
-            directory
-            onChange={this.onChange.bind(this)}
-          >
-            <Button>
-              <UploadOutlined /> Upload Directory
-            </Button>
-          </Upload>
-        </Grid>
 
         <Grid item lg={8} md={12} xl={9} xs={12}>
           <Button
@@ -145,7 +140,7 @@ class Dashboard extends Component {
             {this.state.uploading ? "Uploading" : "Start Upload"}
           </Button>
 
-          <MoreDetails
+          <DevMoreDetails
             modalVisible={this.state.moreDetailsVisible}
             moreDetailsVisible={this.moreDetailsVisible.bind(this)}
             uploadingToggle={this.uploadingToggle.bind(this)}

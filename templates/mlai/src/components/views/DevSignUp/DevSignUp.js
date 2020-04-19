@@ -50,40 +50,40 @@ const styles = theme => ({
   }
 });
 
-class SignUp extends Component {
+class DevSignUp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
+      devname: "",
       password: "",
       firstname: "",
       lastname: "",
-      routeToSignIn: false,
-      usernameExisted: false
+      routeToDevSignIn: false,
+      devnameExisted: false
     };
   }
 
-  signUp() {
+  dev_signUp() {
     axios
-      .post("http://localhost:5000/register", {
-        username: this.state.username,
+      .post("http://localhost:5000/dev/register", {
+        devname: this.state.devname,
         password: this.state.password,
         firstname: this.state.firstname,
         lastname: this.state.lastname
       })
       .then(response => {
-        this.setState({ routeToSignIn: true });
+        this.setState({ routeToDevSignIn: true });
       })
       .catch(error => {
-        console.log("User name existed");
-        this.setState({ usernameExisted: true });
+        console.log("Dev name existed");
+        this.setState({ devnameExisted: true });
       });
   }
 
   render() {
     const { classes } = this.props;
 
-    if (this.state.routeToSignIn) return <Redirect to="/" />;
+    if (this.state.routeToDevSignIn) return <Redirect to="/devSignIn" />;
 
     return (
       <Container component="main" maxWidth="xs">
@@ -93,7 +93,7 @@ class SignUp extends Component {
             <FiberNewIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign Up
+         Create New Developer Account
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -127,10 +127,10 @@ class SignUp extends Component {
               />
             </Grid>
           </Grid>
-          {this.state.usernameExisted && (
+          {this.state.devnameExisted && (
             <Grid item xs={12}>
               <Typography component="h4" variant="h5" color="secondary">
-                username existed
+                devname existed
               </Typography>
             </Grid>
           )}
@@ -139,12 +139,12 @@ class SignUp extends Component {
             margin="normal"
             required
             fullWidth
-            id="username"
-            label="username"
-            defaultValue={this.state.username}
+            id="devname"
+            label="devname"
+            defaultValue={this.state.devname}
             autoFocus
             onChange={e => {
-              this.setState({ username: e.target.value });
+              this.setState({ devname: e.target.value });
             }}
           />
           <TextField
@@ -166,14 +166,14 @@ class SignUp extends Component {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={this.signUp.bind(this)}
+            onClick={this.dev_signUp.bind(this)}
           >
             Sign Up
           </Button>
           <Grid container>
             <Grid item>
-              <RouterLink to="/signin">
-                Already have an account? Sign In
+              <RouterLink to="/devSignin">
+                Already have a developer account? Sign In
               </RouterLink>
             </Grid>
           </Grid>
@@ -185,8 +185,8 @@ class SignUp extends Component {
     );
   }
 }
-SignUp.propTypes = {
+DevSignUp.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withRouter(withStyles(styles)(SignUp));
+export default withRouter(withStyles(styles)(DevSignUp));

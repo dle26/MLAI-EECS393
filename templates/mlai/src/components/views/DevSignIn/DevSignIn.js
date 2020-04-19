@@ -55,22 +55,22 @@ class DevSignIn extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
+      devname: "",
       password: "",
       routeToHome: false,
       routeToSignUp: false,
     };
   }
 
-  login() {
+  dev_login() {
     axios
-      .post("http://localhost:5000/login", {
-        username: this.state.username,
+      .post("http://localhost:5000/dev/login", {
+        devname: this.state.devname,
         password: this.state.password,
       })
       .then((response) => {
         sessionStorage.setItem("Token", response.data.token);
-        sessionStorage.setItem("Username", this.state.username);
+        sessionStorage.setItem("Devname", this.state.devname);
         this.setState({ routeToHome: true });
       })
       .catch((error) => {
@@ -89,7 +89,7 @@ class DevSignIn extends Component {
       wrapperCol: { offset: 8, span: 16 },
     };
 
-    if (this.state.routeToHome) return <Redirect to="/" />;
+    if (this.state.routeToHome) return <Redirect to="/developer" />;
 
     return (
       <Container component="main" maxWidth="xs">
@@ -101,50 +101,48 @@ class DevSignIn extends Component {
           <Typography component="h1" variant="h5">
             Developer Sign in
           </Typography>
-          <Form
-            {...layout}
-            name="basic"
-            // initialValues={{ remember: true }}
-            // onFinish={onFinish}
-            // onFinishFailed={onFinishFailed}
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="devname"
+            label="devname"
+            defaultValue={this.state.devname}
+            autoFocus
+            onChange={(e) => {
+              this.setState({ devname: e.target.value });
+            }}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            label="Password"
+            type="password"
+            id="password"
+            defaultValue={this.state.password}
+            onChange={(e) => {
+              this.setState({ password: e.target.value });
+            }}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            onClick={this.dev_login.bind(this)}
+            style={{backgroundColor: "#61646b"}}
           >
-            <Form.Item
-              label="Username"
-              name="username"
-              rules={[
-                { required: true, message: "Please input your username!" },
-              ]}
-            >
-              <Input
-                prefix={<UserOutlined className="site-form-item-icon" />}
-                placeholder="Username"
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                { required: true, message: "Please input your password!" },
-              ]}
-            >
-              <Input.Password
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                type="password"
-                placeholder="Password"
-              />
-            </Form.Item>
-            {/* <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              onClick={this.login.bind(this)}
-            >
-              Sign In
-            </Button> */}
-          </Form>
+            Sign In
+          </Button>
+          <Grid item xs>
+          <RouterLink to="/devSignup">
+          Create new Developer Account
+          </RouterLink>
+          </Grid>
           <Grid item xs>
             <RouterLink to="/signin">Sign in as an user</RouterLink>
           </Grid>
