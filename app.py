@@ -215,6 +215,21 @@ def dev_login():
 
     return jsonify({'error':'Could not verify!', 'WWW-Authenticate': 'Basic realm="Login Required"'}), 401
 
+@app.route('/test', methods=['GET'])
+def test():
+    result = { 'SVM': {'samples': [1, 2, 3, 1000, 1001, 1002], 'results': [4, 7, 3, 8, 9, 7], 'Accuracy': 0.9555555555555556, 'F1 Score': 0.9552061891642257, 'Feature Importances' : None, 'Confusion Matrix': [[350,   0,   3,   2,   0,   1,   7,   1,   0,   0],
+       [  0, 403,   4,   1,   0,   0,   0,   1,   2,   0],
+       [  2,   0, 329,   0,   2,   0,   1,   1,   1,   0],
+       [  2,   3,   7, 327,   0,   8,   1,   4,   5,   2],
+       [  0,   2,   1,   0, 344,   0,   2,   2,   0,   1],
+       [  0,   0,   2,   6,   2, 341,   2,   0,   2,   3],
+       [  0,   1,   7,   0,   1,   1, 339,   0,   0,   0],
+       [  0,   2,  11,   2,   2,   1,   0, 366,   2,   5],
+       [  0,   1,   4,   1,   1,   6,   1,   1, 312,   2],
+       [  0,   0,   7,   4,   3,   1,   0,   6,   1, 329]]}, 'best': 'SVM', 'analysis type': 'supervised', 'education': ['https://scikit-learn.org/stable/modules/svm.html#classification']}
+
+    print(result)
+    return result
 
 
 def save_upload(f):
