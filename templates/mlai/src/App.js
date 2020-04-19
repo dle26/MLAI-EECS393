@@ -8,7 +8,8 @@ import {
   SignUp as SignUpView,
   DevSignIn as DevSignInView,
   DevSignUp as DevSignUpView,
-  Developer as DeveloperView
+  Developer as DeveloperView,
+  DevRules as DevRulesView
 } from './components/views';
 
 import RouteWithLayout from './components/RouteWithLayout/RouteWithLayout'
@@ -24,6 +25,7 @@ export default class App extends Component {
             <Route key="signIn" path="/signIn" exact component={SignInView} />
             <Route key="devSignIn" path="/devSignIn" exact component={DevSignInView} />
             <RouteWithLayout key ="developer" path="/developer" exact layout = {DevLayout} strict component={DeveloperView} />
+            <RouteWithLayout key ="devRules" path="/developer/rules" exact layout = {DevLayout} strict component={DevRulesView} />
             <Route key ="devSignUp" path="/devSignUp" exact component={DevSignUpView} />
           </Switch>
         </div>

@@ -93,6 +93,18 @@ def user():
         'lastname': user['lastname'],
     })
 
+
+@app.route("/devuserinfo", methods=['POST'])
+def devuser():
+    devname = request.get_json(force = true)('Devname');
+
+    devs = mongodb.db.devs
+    devs = devs.find_one({'devname': devname})
+    return jsonify({
+        'firstname': devs['firstname'],
+        'lastname': devs['lastname'],
+    })
+
 ALLOWED_EXTENSIONS = set(['xlsx', 'pdf', 'png', 'jpg', 'csv'])
 
 def allowed_file(filename):
@@ -146,14 +158,29 @@ def developer_feedback():
     devname = request.form.get('Devname');
     print("request.files: " + str(request.files))
     print("request.form: " + str(request.form))
+    try:
+        path = "./ml_backend/devUpload/"
 
-    UPLOAD_FOLDER = '' + devname
-    os.mkdir(UPLOAD_FOLDER)
+        UPLOAD_FOLDER = path + devname
+        os.mkdir(UPLOAD_FOLDER)
+    except:
+        print ("Directory creation failed (may already be made)")
+    else:
+        print ("Directory creation successful")
+
+    lastfilename = ""
 
     for file in files:
         if file and dev_allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(UPLOAD_FOLDER, filename))
+            lastfilename = file.filename
+    lastfilename = lastfilename[:-3]
+    f = open(UPLOAD_FOLDER + "/" + lastfilename + ".txt","w+")
+    f.write(details)
+    f.close()
+
+
     resp = jsonify({"message": "Files successfully uploaded"})
     resp.status_code = 201
     return resp
