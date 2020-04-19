@@ -74,7 +74,7 @@ newdata = dp.eval_data()
 
 def test_preparation():
     
-    assert (True == (('multiclass', 'images') in newdata.descriptive_info) or ('images', 'multiclass') in newdata.descriptive_info),"Structural Eval. Failed"
+    assert (True == ('images' in newdata.descriptive_info[0])),"Structural Eval. Failed"
     assert (True == (newdata.eval_score is not None and newdata.eval_score > 0.5 and newdata.eval_score < 1.01)),"Data Scoring Failed"
 
      
@@ -86,9 +86,9 @@ newdata = SELECT(newdata).selectAnalysisApproach()
 
 def test_select():
     
-    assert (True == ('vgg_16 cnn' in newdata.techniques)),"Selection Failed"
-    assert (True == os.path.exists("BOOST.pkl")),"Scoring System not initialized"
-    assert (True == os.path.exists("TECHNIQUE_SCORES.pkl")),"Scoring System not initialized"
+    assert (True == ('VGG_CNN' in newdata.techniques)),"Selection Failed"
+    assert (True == os.path.exists("MODEL.pkl")),"Scoring System not initialized"
+
     
 
 ''' TESTS FOR ANALYSIS FRAMEWORK '''
@@ -98,13 +98,13 @@ newdata = ANALYZE(newdata).train_approaches()
 def test_analysis():
 
     assert (True == (newdata.prediction_results is not None)),"Prediction was not completed"
-    assert(True == ('svm' in newdata.current_models[0][1])),"Models not updated"
-    assert(True == ('svm' in newdata.feature_importances[0][1])),"Invalid Feature Importances"
-    assert(True == (isinstance(newdata.current_models[0][0],MLTechniques.SVM))),"Incorrect model used"
+    assert(True == (newdata.feature_importances[0] is None)),"Invalid Feature Importances"
 
 newdata = INTERPRET(newdata,0.75).interpret()
-print(newdata.interpreted_results['SVM']['F1 Score'])
+
+print(newdata.interpreted_results)
+
 def test_interpretation():
     
-    assert(True == (['Accuracy','AUC','F1 Score','Confusion Matrix'] == list(newdata.interpreted_results['svm'].keys()))),"Intepretation Incomplete"
-    assert(True == (newdata.interpreted_results['svm']['F1 Score'] > 0.75)),"Model performance Failed"
+    assert(True == (['samples','results','Feature Importances','Accuracy','F1 Score','Confusion Matrix'] == list(newdata.interpreted_results['SVM'].keys()))),"Intepretation Incomplete"
+    assert(True == (newdata.interpreted_results['SVM']['F1 Score'] > 0.75)),"Model performance Failed"
