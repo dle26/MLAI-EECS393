@@ -174,7 +174,7 @@ class INTERPRET:
                     best_technique = technique
                     bt_index = n
                         
-              elif class_results[technique]["CH Score"] == class_results['techniques']["ch_score"][bt_index]:
+              elif class_results[technique]["ch_score"] == class_results['techniques']["ch_score"][bt_index]:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
                        bt_index = n
