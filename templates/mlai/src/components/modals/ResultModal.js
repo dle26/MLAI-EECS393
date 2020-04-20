@@ -202,7 +202,7 @@ class ResultModal extends Component {
         visible={this.props.modalVisible}
         onOk={this.closeModal.bind(this)}
         onCancel={this.closeModal.bind(this)}
-        width={1200}
+        width={800}
       >
         <List
           component="nav"
