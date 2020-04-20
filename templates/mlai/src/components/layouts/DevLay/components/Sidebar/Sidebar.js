@@ -53,7 +53,7 @@ class Sidebar extends Component {
         icon: <DashboardIcon />
       },
       {
-        title: 'Rules of Uploading Data',
+        title: 'Technique Rules',
         href: '/developer/rules',
         icon: <ImageIcon />
       }

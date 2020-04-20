@@ -52,7 +52,7 @@ class Profile extends Component {
     const {classes, className, ...rest } = this.props;
 
     const user = {
-      name: this.state.firstname + " " + this.state.lastname,
+      name: sessionStorage.getItem("Devname"),
       avatar: '/images/avatars/avatar_11.png',
     };
 

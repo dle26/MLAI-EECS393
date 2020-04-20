@@ -13,7 +13,7 @@ import { Redirect } from "react-router-dom";
 const styles = (theme) => ({
   root: {
     boxShadow: "none",
-    backgroundColor: "#61646b" 
+    backgroundColor: "#61646b"
   },
   flexGrow: {
     flexGrow: 1,
@@ -33,7 +33,7 @@ class Topbar extends Component {
     return (
       <AppBar {...rest} className={clsx(classes.root, className)}>
         <Toolbar>
-          <RouterLink to="/">
+          <RouterLink to="/developer">
             <img alt="Logo" src="/images/logos/logo--white.svg" />
           </RouterLink>
           <div className={classes.flexGrow} />
