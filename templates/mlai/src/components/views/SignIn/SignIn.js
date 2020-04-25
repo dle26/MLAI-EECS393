@@ -63,7 +63,7 @@ class SignIn extends Component {
 
   login() {
     axios
-      .post("http://localhost:5000/login", {
+      .post("http://34.67.45.99:5000/login", {
         username: this.state.username,
         password: this.state.password,
       })

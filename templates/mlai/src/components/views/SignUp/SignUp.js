@@ -65,7 +65,7 @@ class SignUp extends Component {
 
   signUp() {
     axios
-      .post("http://localhost:5000/register", {
+      .post("http://34.67.45.99:5000/register", {
         username: this.state.username,
         password: this.state.password,
         firstname: this.state.firstname,

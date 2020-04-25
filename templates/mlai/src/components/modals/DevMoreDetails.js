@@ -34,7 +34,7 @@ export default class DevMoreDetails extends Component {
   }
 
   upload() {
-    const url = "http://localhost:5000/developerfeedback";
+    const url = "http://34.67.45.99:5000/developerfeedback";
     const formData = new FormData();
     console.log("more detail files");
     console.log(this.props.files);
