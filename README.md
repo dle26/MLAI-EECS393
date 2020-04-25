@@ -14,7 +14,7 @@ Instructions for running MLAI on a personal device
 #### Python flask dependencies:
   To Install all python dependencies navigate to the main project folder and run:
 
-      pip3 install -r requirements.txt
+      pip3 install --no-cache-dir -r requirements.txt 
 
 Please note that the server and website need to be run on two seperate terminals (labeled inside this readme): 
 
