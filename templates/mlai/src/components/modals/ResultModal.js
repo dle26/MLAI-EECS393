@@ -60,7 +60,7 @@ class ResultModal extends Component {
   render() {
     if (!this.props.modalVisible) return <React.Fragment> </React.Fragment>;
     if( !this.props.result) return <React.Fragment></React.Fragment>;
-    
+    if (!this.props.result.techniques) return <React.Fragment></React.Fragment>
     const {labels} = this.props.result
     const { classes } = this.props;
     const {
