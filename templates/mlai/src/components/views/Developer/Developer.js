@@ -1,22 +1,15 @@
 import React, { Component, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { Grid, Typography } from "@material-ui/core";
-import { DropzoneArea } from "material-ui-dropzone";
+//import { DropzoneArea } from "material-ui-dropzone";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-import axios, { post } from "axios";
+//import axios, { post } from "axios";
 import { Upload, message, Button } from "antd";
-import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
-import clsx from 'clsx';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { useMediaQuery } from '@material-ui/core';
+import { InboxOutlined} from "@ant-design/icons";
 
-// import { Button } from "@material-ui/core";
-
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import ArrowRightIcon from "@material-ui/icons/ArrowRight";
+//import { Button } from "@material-ui/core";
 import DevMoreDetails from "../../modals/DevMoreDetails";
-import { Topbar } from "../../layouts/Main/components/Sidebar";
 
 const styles = theme => ({
   root: {},
@@ -69,6 +62,15 @@ class Developer extends Component {
     if (status !== "uploading") {
       console.log(info.file.originFileObj);
     }
+    if (status === "removed") {
+      console.log("file removed");
+
+      for (var i = 0; i < this.state.files.length; i++) {
+        if(this.state.files[i] === info.file.originFileObj)
+          delete this.state.files[i];
+      }
+      //this.removeFile([...this.state.files, info.file.originFileObj]);
+    }
     if (status === "done") {
       message.success(`${info.file.name} file uploaded successfully.`);
 
@@ -102,11 +104,12 @@ class Developer extends Component {
 
     return (
       <Grid container spacing={6}>
-        <Grid item lg={12} md={12} xl={9} xs={12} alignItems={'stretch'}>
+        <Grid item lg={12} md={12} xl={9} xs={12}>
           <Dragger
             customRequest={dummyRequest}
             multiple={true}
             name={"file"}
+            accept={".py"}
             onChange={this.onChange.bind(this)}
           >
             <p className="ant-upload-drag-icon">
@@ -119,34 +122,26 @@ class Developer extends Component {
               Please upload your .py files here.
             </p>
           </Dragger>
-        </Grid>
+          <Grid item lg={8} md={12} xl={9} xs={12}>
+            <Button
+              type="primary"
+              onClick={this.upload.bind(this)}
+              disabled={this.state.files.length === 0}
+              loading={this.state.uploading}
+              style={{ marginTop: 16 }}
+            >
+              {this.state.uploading ? "Uploading" : "Start Upload"}
+            </Button>
 
-        <Grid item lg={8} md={12} xl={9} xs={12} alignItems={'stretch'}>
-          <Typography variant="h4" gutterBottom>
-               Upload your Machine Learning Techniques
-          </Typography>
-        </Grid>
-
-
-        <Grid item lg={8} md={12} xl={9} xs={12}>
-          <Button
-            type="primary"
-            onClick={this.upload.bind(this)}
-            disabled={this.state.files.length === 0}
-            loading={this.state.uploading}
-            style={{ marginTop: 16 }}
-          >
-            {this.state.uploading ? "Uploading" : "Start Upload"}
-          </Button>
-
-          <DevMoreDetails
-            modalVisible={this.state.moreDetailsVisible}
-            moreDetailsVisible={this.moreDetailsVisible.bind(this)}
-            uploadingToggle={this.uploadingToggle.bind(this)}
-            addFile={this.addFile.bind(this)}
-            files={this.state.files}
-            step={1}
-          />
+            <DevMoreDetails
+              modalVisible={this.state.moreDetailsVisible}
+              moreDetailsVisible={this.moreDetailsVisible.bind(this)}
+              uploadingToggle={this.uploadingToggle.bind(this)}
+              addFile={this.addFile.bind(this)}
+              files={this.state.files}
+              step={1}
+            />
+          </Grid>
         </Grid>
       </Grid>
     );

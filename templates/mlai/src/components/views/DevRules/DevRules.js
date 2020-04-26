@@ -1,22 +1,22 @@
 import React, { Component, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { Grid, Typography } from "@material-ui/core";
-import { DropzoneArea } from "material-ui-dropzone";
+//import { DropzoneArea } from "material-ui-dropzone";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-import axios, { post } from "axios";
+//import axios, { post } from "axios";
 import { Upload, message, Button } from "antd";
-import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
-import clsx from 'clsx';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { useMediaQuery } from '@material-ui/core';
+//import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
+//import clsx from 'clsx';
+//import { makeStyles, useTheme } from '@material-ui/core/styles';
+//import { useMediaQuery } from '@material-ui/core';
 
 // import { Button } from "@material-ui/core";
 
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import ArrowRightIcon from "@material-ui/icons/ArrowRight";
+//import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+//import ArrowRightIcon from "@material-ui/icons/ArrowRight";
 import DevMoreDetails from "../../modals/DevMoreDetails";
-import { Topbar } from "../../layouts/Main/components/Sidebar";
+//import { Topbar } from "../../layouts/Main/components/Sidebar";
 
 const styles = theme => ({
   root: {},
@@ -41,51 +41,6 @@ class Developer extends Component {
     };
   }
 
-  moreDetailsVisible() {
-    this.setState({
-      moreDetailsVisible: ! this.state.moreDetailsVisible
-    });
-  }
-
-  uploadingToggle() {
-    this.setState({
-      uploading: ! this.state.uploading
-    });
-  }
-
-  componentDidMount() {
-    console.log("token: " + this.state.token);
-  }
-
-  addFile(file) {
-    this.setState({
-      files: file
-    });
-  }
-
-  onChange(info) {
-    const { status } = info.file;
-
-    if (status !== "uploading") {
-      console.log(info.file.originFileObj);
-    }
-    if (status === "done") {
-      message.success(`${info.file.name} file uploaded successfully.`);
-
-      this.addFile([...this.state.files, info.file.originFileObj]);
-
-    } else if (status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  }
-
-  upload() {
-    this.uploadingToggle();
-
-    this.moreDetailsVisible();
-
-    this.uploadingToggle();
-  }
 
   render() {
     const { Dragger } = Upload;

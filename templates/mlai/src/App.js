@@ -24,9 +24,9 @@ export default class App extends Component {
             <Route key="signUp" path="/signUp" exact component={SignUpView} />
             <Route key="signIn" path="/signIn" exact component={SignInView} />
             <Route key="devSignIn" path="/devSignIn" exact component={DevSignInView} />
-            <RouteWithLayout key ="developer" path="/developer" exact layout = {DevLayout} strict component={DeveloperView} />
-            <RouteWithLayout key ="devRules" path="/developer/rules" exact layout = {DevLayout} strict component={DevRulesView} />
-            <Route key ="devSignUp" path="/devSignUp" exact component={DevSignUpView} />
+            <RouteWithLayout key="developer" path="/developer" exact layout={DevLayout} strict component={DeveloperView} />
+            <RouteWithLayout key="devRules" path="/developer/rules" exact layout={DevLayout} strict component={DevRulesView} />
+            <Route key="devSignUp" path="/devSignUp" exact component={DevSignUpView} />
           </Switch>
         </div>
       </Router>
