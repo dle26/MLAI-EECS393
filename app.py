@@ -155,7 +155,7 @@ def developer_feedback():
         return resp
     files = request.files.getlist('files[]')
     details = request.form.get('details')
-    devname = request.form.get('Devname');
+    devname = request.form.get('Devname')
     print("request.files: " + str(request.files))
     print("request.form: " + str(request.form))
     try:
@@ -252,25 +252,11 @@ def test():
     print(result)
     return jsonify(result)
 
-
-def save_upload(f):
-    mongodb.save_file(f.filename, f, 'data')
-    return get_upload(f.filename)
-
-def get_upload(filename):
-    return mongodb.send_file(filename)
-
 @app.route('/protected', methods=['POST'])
 @token_required
 def protected():
     return jsonify({'message': 'with token'})
 
-#was only used to test send_json_to_database, will be deleted in a future commit
-# @app.route("/pythonobject", methods=['POST'])
-# def python_object():
-#     username = request.get_json(force = True)['username']
-#
-#     return send_json_to_database(username, {"a": 3})
 
 if __name__ == '__main__':
     app.run(debug=True)
