@@ -34,7 +34,7 @@ class Developer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token: sessionStorage.getItem("Token"),
+      devtoken: sessionStorage.getItem("devtoken"),
       files: [],
       uploading: false,
       moreDetailsVisible: false
@@ -54,7 +54,7 @@ class Developer extends Component {
   }
 
   componentDidMount() {
-    console.log("token: " + this.state.token);
+    console.log("devtoken: " + this.state.devtoken);
   }
 
   addFile(file) {
@@ -97,7 +97,7 @@ class Developer extends Component {
     };
 
 
-    if (sessionStorage.getItem("Token") == null) return <Redirect to="/devSignIn" />;
+    if (sessionStorage.getItem("devtoken") == null) return <Redirect to="/devSignIn" />;
 
 
     return (
@@ -116,8 +116,7 @@ class Developer extends Component {
               Click or drag file to this area to upload
             </p>
             <p className="ant-upload-hint">
-              Support for a single or bulk upload. Strictly prohibited from
-              uploading company data or other banned files
+              Please upload your .py files here.
             </p>
           </Dragger>
         </Grid>

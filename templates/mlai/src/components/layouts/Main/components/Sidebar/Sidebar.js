@@ -51,7 +51,7 @@ class Sidebar extends Component {
         title: 'Upload New Data',
         href: '',
         icon: <DashboardIcon />
-      },
+      }/*,
       {
         title: 'Previous Models',
         href: '/prevmodels',
@@ -66,7 +66,7 @@ class Sidebar extends Component {
         title: 'Settings',
         href: '/setting',
         icon: <SettingsIcon />
-      }
+      }*/
     ];
 
     return (

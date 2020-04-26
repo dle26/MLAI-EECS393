@@ -34,7 +34,7 @@ class Developer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token: sessionStorage.getItem("Token"),
+      token: sessionStorage.getItem("devtoken"),
       files: [],
       uploading: false,
       moreDetailsVisible: false
@@ -97,7 +97,7 @@ class Developer extends Component {
     };
 
 
-    if (sessionStorage.getItem("Token") == null) return <Redirect to="/devSignIn" />;
+    if (sessionStorage.getItem("devtoken") == null) return <Redirect to="/devSignIn" />;
 
 
     return (

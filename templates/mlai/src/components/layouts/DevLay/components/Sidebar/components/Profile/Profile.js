@@ -36,7 +36,7 @@ class Profile extends Component {
     if(this.state.devname != null) {
       axios
       .post("http://localhost:5000/devuserinfo", {
-        "Devname": this.state.devname
+        "devname": this.state.devname
       })
       .then(response => {
         this.setState({firstname: response.data.firstname, lastname: response.data.lastname})
@@ -52,7 +52,7 @@ class Profile extends Component {
     const {classes, className, ...rest } = this.props;
 
     const user = {
-      name: sessionStorage.getItem("Devname"),
+      name: this.state.firstname + " " + this.state.lastname,
       avatar: '/images/avatars/avatar_11.png',
     };
 

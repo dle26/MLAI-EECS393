@@ -96,13 +96,13 @@ def user():
 
 @app.route("/devuserinfo", methods=['POST'])
 def devuser():
-    devname = request.get_json(force = true)('Devname');
+    devname = request.get_json(force = True)['devname']
 
     devs = mongodb.db.devs
-    devs = devs.find_one({'devname': devname})
+    dev = devs.find_one({'devname': devname})
     return jsonify({
-        'firstname': devs['firstname'],
-        'lastname': devs['lastname'],
+        'firstname': dev['firstname'],
+        'lastname': dev['lastname'],
     })
 
 ALLOWED_EXTENSIONS = set(['xlsx', 'pdf', 'png', 'jpg', 'csv'])
@@ -159,7 +159,7 @@ def developer_feedback():
     print("request.files: " + str(request.files))
     print("request.form: " + str(request.form))
     try:
-        path = "./ml_backend/devUpload/"
+        path = "./dev_added_techniques/"
 
         UPLOAD_FOLDER = path + devname
         os.mkdir(UPLOAD_FOLDER)
@@ -184,31 +184,13 @@ def developer_feedback():
     resp = jsonify({"message": "Files successfully uploaded"})
     resp.status_code = 201
     return resp
-    # #
-    # path = "./ml_backend/devUpload/" + devname
-    # #
-    # ## @Daniel still need to add details to this save
-    # try:
-    #     os.mkdir(path)
-    # except OSError:
-    #     print ("Creation of the directory %s failed (likely already created)" % path)
-    # else:
-    #     print ("Successfully created the directory %s " % path)
-    # #
-    # for file in files:
-    #     if file and dev_allowed_file(file.filename):
-    #         filename = file.filename
-    #         os.path.join(path,filename)
-    # resp = jsonify({'message' : 'File successfully uploaded'})
-    # resp.status_code = 201
-    # return resp
 
 @app.route("/dev/register", methods=['POST'])
 def developer_register():
     if request.method == 'POST':
         devs = mongodb.db.devs
 
-        devname = request.get_json(force=True)['devname']
+        devname = request.get_json(force = True)['devname']
         password = request.get_json(force = True)['password']
         firstname = request.get_json(force = True)['firstname']
         lastname = request.get_json(force = True)['lastname']
@@ -240,7 +222,7 @@ def dev_login():
         # generate token
         token = jwt.encode({'dev': devname, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, Config.TOKEN_SECRET_KEY)
 
-        return jsonify({'token': token.decode('UTF-8')})
+        return jsonify({'devtoken': token.decode('UTF-8')})
 
     return jsonify({'error':'Could not verify!', 'WWW-Authenticate': 'Basic realm="Login Required"'}), 401
 
@@ -264,7 +246,7 @@ def test():
        [  0,   1,   7,   0,   1,   1, 339,   0,   0,   0],
        [  0,   2,  11,   2,   2,   1,   0, 366,   2,   5],
        [  0,   1,   4,   1,   1,   6,   1,   1, 312,   2],
-       [  0,   0,   7,   4,   3,   1,   0,   6,   1, 329]]]}, 'best': 'SVM', 'analysis_type': 'supervised', 'education': ['https://scikit-learn.org/stable/modules/svm.html#classification', 'https://www.google.com'], 
+       [  0,   0,   7,   4,   3,   1,   0,   6,   1, 329]]]}, 'best': 'SVM', 'analysis_type': 'supervised', 'education': ['https://scikit-learn.org/stable/modules/svm.html#classification', 'https://www.google.com'],
        'labels': ['cat', 'dog','whale', 'snake', 'giraffe', 'hieu', 'mouse', 'bird', 'eagle', 'dolphin']}
 
     print(result)
