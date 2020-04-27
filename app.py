@@ -119,10 +119,9 @@ def upload_file():
         print(request.files)
         return resp
     files = request.files.getlist('files[]')
+    labelFile = request.files.get('labelFile')
     details = request.form.get('details')
     time = request.form.get('time')
-    print("request.files: " + str(request.files))
-    print("request.form: " + str(request.form))
 
     names = []
     sizes = []
@@ -132,9 +131,15 @@ def upload_file():
             names.append(filename)
             size = len(file.read())
             sizes.append(size)
-    result = Pipeline.run_MLAI(files, names, sizes, None, None, None, {'time': time, 'userid': '111111', 'user_input': details})
-    print(result)
+    if labelFile:
+        labelFileName = secure_filename(labelFile.filename)
+        labelFileSize = len(labelFile.read())
+    else:
+        labelFileName = None
+        labelFileSize = None
 
+    result = Pipeline.run_MLAI(files, names, sizes, labelFile, labelFileName, labelFileSize, {'time': time, 'userid': '111111', 'user_input': details})
+    print(result)
     resp = jsonify({'message' : 'File successfully uploaded'})
     resp.status_code = 201
     return resp
