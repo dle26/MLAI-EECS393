@@ -107,7 +107,7 @@ class MLP(Technique):
         if time_constraint == 3:
             model = MLP.Perceptron(len(data.data[0]),100,len(set(data.labels)))
             loss_function = nn.CrossEntropyLoss()
-            optimizer = optim.ADAM(model.parameters())
+            optimizer = optim.Adam(model.parameters())
             n_epochs = 10
             model = train_net(train_data, train_labels,model,optimizer,loss_function,n_epochs)
             results = validate(model,test_data)
@@ -115,7 +115,7 @@ class MLP(Technique):
         if time_constraint == 4:
             model = MLP.Perceptron(len(data.data[0]),100,len(set(data.labels)))
             loss_function = nn.CrossEntropyLoss()
-            optimizer = optim.ADAM(model.parameters())
+            optimizer = optim.Adam(model.parameters())
             n_epochs = 20
             model = train_net(train_data, train_labels,model,optimizer,loss_function,n_epochs)
             results = validate(model,test_data)
@@ -123,7 +123,7 @@ class MLP(Technique):
         if time_constraint == 5:
              model = MLP.Perceptron(len(data.data[0]),100,len(set(data.labels)),extratime=True)
              loss_function = nn.CrossEntropyLoss()
-             optimizer = optim.ADAM(model.parameters())
+             optimizer = optim.Adam(model.parameters())
              n_epochs = 50
              model = train_net(train_data, train_labels,model,optimizer,loss_function,n_epochs)
              results = validate(model,test_data)
