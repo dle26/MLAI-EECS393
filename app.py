@@ -99,7 +99,7 @@ def user():
 
 @app.route("/devuserinfo", methods=['POST'])
 def devuser():
-    devname = request.get_json(force = True)['Devname']
+    devname = request.get_json(force = True)['devname']
 
     devs = mongodb.db.devs
     dev = devs.find_one({'devname': devname})
