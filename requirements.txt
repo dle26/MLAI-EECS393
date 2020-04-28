@@ -11,3 +11,4 @@ nltk
 elsapy
 sklearn
 torch
+spacy
