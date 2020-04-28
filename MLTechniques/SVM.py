@@ -18,10 +18,8 @@ from sklearn.preprocessing import StandardScaler
 
 class SVM(Technique):
      
-  
-    GENERAL_USE = True
-    
     TECHNIQUE_TYPE = "supervised"
+    ISDEEP = False
     
     def get_website():
         return 'https://scikit-learn.org/stable/modules/svm.html#classification'
@@ -30,7 +28,7 @@ class SVM(Technique):
         return 'SVM'
     
     def get_name():
-        return 'support vector machine'
+        return 'svm'
 
     def get_category():
         return 'svm'
@@ -40,14 +38,14 @@ class SVM(Technique):
         if data.data_type == 'image':
             features = StandardScaler().fit_transform(data.data)
             if data.prior_test_data is not None:
-                test_features = StandardScaler().fit_transform(data.data)
+                test_features = StandardScaler().fit_transform(data.prior_test_data)
                 return features,test_features
             return features,None
         
         if data.data_type == 'numeric':
             features = StandardScaler().fit_transform(data.data)
             if data.prior_test_data is not None:
-                test_features = StandardScaler().fit_transform(data.data)
+                test_features = StandardScaler().fit_transform(data.prior_test_data)
                 return features,test_features
             return features,None
         
@@ -60,14 +58,14 @@ class SVM(Technique):
         test_data = []
         time_constraint = data.time_constraint
         blind_results = None
+        results = []
         
         if data.prior_test_data is not None:
             model = SVC(gamma = 'auto')
             model.fit(X,y)
             blind_results = model.predict(Xtest)
  
-    
-    
+
         if time_constraint == 1:
             model = SVC(gamma = 'auto')
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
@@ -82,7 +80,7 @@ class SVM(Technique):
                 model = SVC(gamma = 'auto')
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
                 model.fit(X_train,y_train)
-                results = model.predict(X_test)
+                results.extend(model.predict(X_test))
                 test_data.extend(X_test)
                 test_labels.extend(y_test)
                 
@@ -124,6 +122,12 @@ class SVM(Technique):
                  results.extend(clf.predict(X[test]))
                  test_labels.extend(y[test])
                  test_data.extend(X[test])
-                 
         
+        
+        if data.prior_test_data is not None:
+            model.fit(X,y)
+            blind_results = model.predict(Xtest)
+
+
+
         return test_data,test_labels,results,None, blind_results

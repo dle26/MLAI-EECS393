@@ -18,7 +18,7 @@ from sklearn.preprocessing import RobustScaler
 
 class DecisionTree(Technique):
     
-    GENERAL_USE = True
+    ISDEEP = False
     
     TECHNIQUE_TYPE = "supervised"
     
@@ -48,6 +48,7 @@ class DecisionTree(Technique):
         test_data = []
         time_constraint = data.time_constraint
         blind_results = None
+        results = []
         
         if data.prior_test_data is not None:
             model = DecisionTreeClassifier()
@@ -73,7 +74,7 @@ class DecisionTree(Technique):
                 model = DecisionTreeClassifier()
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
                 model.fit(X_train,y_train)
-                results = model.predict(X_test)
+                results.extend(model.predict(X_test))
                 test_data.extend(X_test)
                 test_labels.extend(y_test)
             feature_importances = list(model.feature_importances_)

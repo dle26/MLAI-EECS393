@@ -18,8 +18,7 @@ from sklearn.preprocessing import StandardScaler
 class GradientBoost(Technique):
      
   
-    GENERAL_USE = True
-    
+    ISDEEP = False
     TECHNIQUE_TYPE = "supervised"
     
     def get_website():
@@ -57,6 +56,7 @@ class GradientBoost(Technique):
         y = np.asarray(data.labels)
         test_labels = []
         test_data = []
+        results = []
         time_constraint = data.time_constraint
         blind_results = None
         
@@ -81,7 +81,7 @@ class GradientBoost(Technique):
             for i in range(2):
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
                 model.fit(X_train,y_train)
-                results = model.predict(X_test)
+                results.extend(model.predict(X_test))
                 test_data.extend(X_test)
                 test_labels.extend(y_test)
             feature_importances = list(model.feature_importances_)
@@ -128,6 +128,5 @@ class GradientBoost(Technique):
                  test_labels.extend(y[test])
                  test_data.extend(X[test])
             feature_importances = list(clf.best_estimator_.feature_importances_)
-                 
-        
+
         return test_data,test_labels,results,feature_importances,blind_results

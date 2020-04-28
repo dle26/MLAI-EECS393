@@ -15,6 +15,5 @@ from .NaiveBayes import NaiveBayes
 from .RandomForest import RandomForest
 from .KMeans import KMeans
 from .MeanShift import MeanShift
-from .DBSCAN import DBSCAN
-from .AutoEncoder import Autoencoder
+#from .DBSCAN import DBSCAN
 from .HAC import HAC

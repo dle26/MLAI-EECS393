@@ -53,15 +53,17 @@ class UniversalScores:
     
     def initialize():
         
-        if os.path.exists('MODEL.pkl'):
+        if os.path.exists(os.getcwd() + '/MODEL.pkl'):
             model = pickle.load(open('MODEL.pkl','rb'))
         else:
             model = {"BOOST":{},"TECHNIQUES":{}}
         
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
-               if (obj.get_class_name() not in model['BOOST'] and obj.get_name() not in model['TECHNIQUES']):
+          
+               if obj.get_class_name() not in list(model['BOOST'].keys()) and obj.get_name() not in list(model['TECHNIQUES'].keys()):
                      model['BOOST'][obj.get_class_name()] = []
+
         
         pickle.dump(model,open("MODEL.pkl","wb"))
 
@@ -126,7 +128,6 @@ class UniversalScores:
         techniques = []
         
         if os.path.exists('MODEL.pkl'):
-
             model= pickle.load(open('MODEL.pkl','rb'))
         else:
             model = {}
@@ -142,8 +143,6 @@ class UniversalScores:
                    name_uses.append(tup[2])
             if len(name_score) > 0:
                 ### WEIGHTS scores based on num uses + presence in boost
-                #### ADD IN "GENERAL" facet to scoring??
-                
                 all_scores.append((np.median(name_score)+np.median(np.array(name_uses)/np.sum(name_uses))*1)+0.1) ###adjust the weights (currently 1/0.1) as needed 
                 found = True
             name_score = []

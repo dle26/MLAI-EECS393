@@ -11,7 +11,11 @@ import abc
 class Technique(abc.ABC):
 
     TECHNIQUE_TYPE = None
-    GENERAL_USE = None 
+    ISDEEP = None
+    
+    @abc.abstractmethod
+    def get_website():
+        pass
     
     @abc.abstractmethod
     def preprocess(data):
@@ -30,13 +34,5 @@ class Technique(abc.ABC):
         pass
     
     @abc.abstractmethod
-    def train(self):
-        pass
-    
-    @abc.abstractmethod
-    def set_model(self):
-        pass
-    
-    @abc.abstractmethod
-    def get_model(self):
+    def train(data):
         pass

@@ -9,6 +9,11 @@
 
 
 from .Technique import Technique
+from sklearn.decomposition import PCA
+from sklearn.cluster import MeanShift as ms
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
 
 class MeanShift(Technique):
     
@@ -17,9 +22,6 @@ class MeanShift(Technique):
     
     TECHNIQUE_TYPE = "unsupervised"
     
-    def __init__(self):
-        self.model = None
- 
     def get_class_name():
         return 'MeanShift'
     
@@ -29,18 +31,31 @@ class MeanShift(Technique):
     def get_category():
         return 'density'
 
-    def preprocess(self,data):
-        pass
+    def get_wesbite():
+        return 'https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MeanShift.html'
+    
+    
+    def preprocess(data):
+                
+        features = StandardScaler().fit_transform(data.data)
+        features = PCA().fit_transform(data.data)
+            
+        return features,None
+    
         
-    def train(self,data,time_constraint):
-        pass
+    def train(data):
+        
+                
+        X,_ = MeanShift.preprocess(data)
+        test_data = X
+        time_constraint = data.time_constraint
 
-    def predict(self,data,labels,model):
-        pass
+        results = ms().fit_predict(test_data)
+
+        return test_data,None,results,None,None
     
-    def set_model(self,model):
-        self.model = model
+
+
     
     
-    def get_model(self):
-        return self.model
+    

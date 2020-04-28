@@ -13,6 +13,8 @@ import pandas as pd
 import itertools
 import os 
 import string
+import spacy
+
 
 class DATA:
     
@@ -67,6 +69,8 @@ class DATA:
         self.educational_info = []
         
         self.label_names = {}
+        
+        self.search_queries = None
 
         
         
@@ -102,8 +106,7 @@ class DATAPREP:
             data_files = self.consolidate_data(data_files)
         else:
             self.data.data = data_files[0][0]
-        
-    
+
         if self.labelfile is not None:
              self.data.labels = self.process_labels()
              self.data.analysis_type = 'supervised'
@@ -115,12 +118,18 @@ class DATAPREP:
             self.data.labels = None
             self.data.analysis_type = 'unsupervised'
         
-        
         if self.data.labels is not None:
             self.data.labels,self.data.label_names = map_labels(self.data.labels)
-
+        
+        if len(list(set(self.data.label_names))) < 2:
+            self.data.analysis_type = 'unsupervised'
+        
+        self.data.original_features = list(self.data.data.columns)
+        self.data.data = self.data.data.values
+        
         self.data.time_constraint = int(self.info_dict["time"])
-        self.data.descriptive_info = self.process_user_info(str(self.info_dict["user_input"]))
+        self.data.search_queries = self.process_user_info(str(self.info_dict["user_input"]),False)
+        self.data.descriptive_info = self.process_user_info(str(self.info_dict["user_input"]),True)
         self.data.userid = str(self.info_dict["userid"])
         
         return self.data
@@ -128,14 +137,13 @@ class DATAPREP:
     
     
     def process_data(self,file,filename,filesize):
-        
-        
+
         if str(filename).find('.jpg') > -1 or str(filename).find('.png') > -1:
             self.data.data_type = "image"
             file.stream.seek(0)
             file.save(str(self.info_dict['userid']) + filename,filesize)
             output = np.asarray(cv2.imread(str(self.info_dict['userid']) + filename,cv2.IMREAD_GRAYSCALE))
-            self.data.dimension = output.shape
+            self.data.dimensions = output.shape
             os.remove(str(self.info_dict['userid']) + filename)
             return (output,filename)
 
@@ -159,100 +167,119 @@ class DATAPREP:
   
   
     
-    def process_user_info(self,userinput):
+    def process_user_info(self,userinput,synonyms=False):
         
-        words =  nltk.word_tokenize(userinput) 
-        words = [word.lower() for word in words if word not in string.punctuation or word == '.']
-        tagged_words = nltk.pos_tag(words)
+        nlp = spacy.load('en_core_web_lg')
+        doc = nlp(userinput.lower())
+        tagged_words = []
+        for token in doc:
+            tagged_words.append((token.text,token.pos_))
+        
         search_words = []
         bigram = False
+        bigram_tags = ["PROPN","NOUN","ADJ"]
+        word_tags = bigram_tags[0:-1]
+
         for n,word in enumerate(tagged_words):
  
             if n < len(tagged_words)-1:
-                if (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'J') or (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'N'):
-                    if word[0] + " " + tagged_words[n+1][0] not in search_words:
+                if (word[1] in bigram_tags and tagged_words[n+1][1] in bigram_tags):
+                  if (word[0].find('data') == -1 and tagged_words[n+1][0].find('data') == -1):
+                    if str(search_words).find(word[0]) == -1 and str(search_words).find(tagged_words[n+1][0]) == -1:
                         search_words.append(word[0] + " " + tagged_words[n+1][0])
+                        if synonyms:
+                            search_words = create_bigram_synonyms(word[0] + " " + tagged_words[n+1][0], search_words,nlp,bigram_tags)
                     bigram = True
 
-            if (word[1][0] == 'N') and word[0].find('data') == -1 and not bigram:
-                    if word[0] not in search_words:
+            if (word[1] in word_tags and not bigram and word[0].find('data') == -1):
+                if str(search_words).find(word[0]) == -1:
                         search_words.append(word[0])
+                        if synonyms:
+                            search_words = create_word_synonyms(word[0], search_words,nlp,word_tags)
         
             bigram = False
-        
+            
         return search_words
   
         
 
     def process_labels(self):
         
-        
+        self.labelfile.stream.seek(0)
         self.labelfile.save(str(self.info_dict['userid']) + self.labelfilename,self.labelfilesize)
+
         
         if str(self.labelfilename).find('.csv') > -1:
-            output = pd.read_csv(self.labelfilename)
+            output = pd.read_csv(str(self.info_dict['userid']) + self.labelfilename)
         else:
-            output = pd.read_excel(self.labelfilename)
+            output = pd.read_excel(str(self.info_dict['userid']) + self.labelfilename)
             
         os.remove(str(self.info_dict['userid']) + self.labelfilename)
-        names = output.columns[0] 
+        names = output.columns 
         
         labels = []
-        for name in self.datafilenames:
-            labels.append(names.index(name))
-        
+        for name in names:
+            if name.lower().find('label') > -1:
+                for lb in output[name]:
+                    labels.append(lb)
+    
         return np.asarray(labels)
             
 
     
     def consolidate_data(self,datafiles):
         
-        data = pd.DataFrame()
-        testdata = pd.DataFrame()
+        newdata = pd.DataFrame()
+        testdata = None
         
         for n,entry in enumerate(datafiles):
           if entry[1].find('test') == -1:
               if self.data.data_type == 'image':
-                  data.loc[entry[1]] = np.reshape(entry,data.dimensions[0]*data.dimensions[1])
+                  if n == 0:
+                    newdata = pd.DataFrame(np.reshape(entry[0],self.data.dimensions[0]*self.data.dimensions[1])).T
+                    newdata.index=[entry[1]]
+                  else:
+                      newdata.loc[entry[1]] = np.reshape(entry[0],self.data.dimensions[0]*self.data.dimensions[1])
               if self.data.data_type == 'numeric':
                    if n == 0:
-                       data = entry[0]
+                       newdata = entry[0]
                    else:
-                       data = pd.concat([data,entry[0]],0)
+                       newdata = pd.concat([data,entry[0]],0)
           else:
              if self.data.data_type == 'image':
-                  testdata.loc[entry[1]] = np.reshape(entry,data.dimensions)
+                 if n == 0:
+                     testdata = pd.DataFrame(np.reshape(entry[0],self.data.dimensions[0]*self.data.dimensions[1])).T
+                     testdata.index = index=[entry[1]]
+                 else:
+                    testdata.loc[entry[1]] = np.reshape(entry[0],self.data.dimensions[0]*self.data.dimensions[1])
+                  
              if self.data.data_type == 'numeric':
                 if n == 0:
                     testdata = entry[0]
                 else:
                     testdata = pd.concat([data,entry[0]],0)
 
-        self.data.data = data
-        self.data.prior_test_data = testdata.values
-        self.data.prior_test_indicies = list(testdata.index)
-        self.data.original_features = list(data.columns)
+        self.data.data = newdata
+        if testdata is not None:
+            self.data.prior_test_data = testdata.values
+            self.data.prior_test_indicies = list(testdata.index)
+
         
-        
-    
+
     def extract_labels(self):
-
-        self.data.original_features = list(self.data.data.columns)
-
+        
         for n,col in enumerate(self.data.data.columns):
             if str(col).lower().find('label') > -1:
                 self.data.labels = self.data.data[col].values
                 self.data.data = self.data.data.drop([col],1)
                 self.data.analysis_type = 'supervised'
-                self.data.data = self.data.data.values
                 return
-        
-        self.data.data = self.data.data.values
+    
+    
         self.data.analysis_type = 'unsupervised'
     
     
     def eval_data(self):
-        
         score = 1
 
         if self.data.descriptive_info == None:  ###or in list form??
@@ -272,6 +299,7 @@ class DATAPREP:
              
         if oratio > 0.1:
                 score -= 0.1
+        print(self.data.labels)
         
         if self.data.labels is not None:
             if self.get_label_ratios() > (1/len(set(self.data.labels)))/2:
@@ -280,8 +308,10 @@ class DATAPREP:
         
         if len(self.data.descriptive_info) > 1:
             self.data.descriptive_info = separate_bigrams(list(itertools.combinations(self.data.descriptive_info,2)))
-        elif len(self.data.descriptive_info) == 1:
-            self.data.descriptive_info = [(self.data.descriptive_info[0],)]
+        if len(self.data.search_queries) == 1:
+            self.data.search_queries = [(self.data.search_queries[0],)]
+        else:
+            self.data.search_queries = separate_bigrams(list(itertools.combinations(self.data.search_queries,2)))
             
         self.data.eval_score = score
         
@@ -342,15 +372,27 @@ def separate_bigrams(lst):
     
     lst2 = []
     for tup in lst:
+        first = False
+        second = False
         if len(tup[0].split()) > 1:
             if (tup[0],"") not in lst2:
                 lst2.append((tup[0],""))
-            if len(tup[1].split()) > 1:
-                if (tup[1],"") not in lst2:
-                    lst2.append((tup[1],""))
-                continue
+            first = True
+        if len(tup[1].split()) > 1:
+            if (tup[1],"") not in lst2:
+                lst2.append((tup[1],""))
+            second = True
+    
+        if first and not second:
+            lst2.append(tup)
+            lst2.append((tup[1],""))
             continue
-        lst2.append(tup)
+        if not first and second:
+            lst2.append(tup)
+            lst2.append((tup[0],""))
+            continue
+        if not first and not second:
+            lst2.append(tup)
             
     return lst2
       
@@ -362,17 +404,45 @@ def map_labels(labels):
     label_dict = {}
     
     for n,label in enumerate(label_set):
-        label_dict[n] = label
+        label_dict[int(n)] = label
         
     
     new_labels = []
     for label in labels:
         new_labels.append(label_set.index(label))
     
-    return new_labels,label_dict
-        
-        
+    return new_labels,list(label_dict.values())
 
 
-
+def most_similar(word):
     
+    synonyms = [w for w in word.vocab if w.is_lower == word.is_lower and w.prob >= -15]
+    synonyms = sorted(synonyms, key=lambda w: word.similarity(w), reverse=True)
+    return [w.lower_ for w in synonyms[:3]]
+
+
+def create_bigram_synonyms(bigram,current_words,model,tags):
+    
+    for n,word in enumerate(bigram.split()):
+        synonyms = most_similar(model.vocab[word])
+        for syn in synonyms:
+            for tok in model(syn):
+                if tok.pos_ in tags and str(current_words).find(syn) == -1:
+                    if n == 0:
+                        current_words.append(syn + " " + bigram.split()[1])
+                    else:
+                        current_words.append(bigram.split()[0] + " " + syn)
+    return current_words
+
+
+
+def create_word_synonyms(word,current_words,model,tags):
+
+    synonyms = most_similar(model.vocab[word])
+
+    for syn in synonyms:
+        for tok in model(syn):
+            if tok.pos_ in tags and str(current_words).find(syn) == -1:
+                current_words.append(syn)
+
+    return current_words

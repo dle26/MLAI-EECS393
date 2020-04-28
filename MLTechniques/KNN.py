@@ -20,8 +20,7 @@ from sklearn.preprocessing import StandardScaler
 
 class KNN(Technique):
     
-    GENERAL_USE = True
-    
+    ISDEEP = False
     TECHNIQUE_TYPE = "supervised"
     
         
@@ -32,10 +31,10 @@ class KNN(Technique):
         return 'KNN'
     
     def get_name():
-        return 'knn'
+        return 'k-nearest neighbour'
 
     def get_category():
-        return 'nearest neighbours'
+        return 'knn'
         
     
     def preprocess(data):
@@ -119,8 +118,12 @@ class KNN(Technique):
                  results.extend(clf.predict(X[test]))
                  test_labels.extend(y[test])
                  test_data.extend(X[test])
-                 
-        
-        return test_data,test_labels,results,None
+    
+        blind_results = None
+        if data.prior_test_data is not None:
+            model.fit(X,y)
+            blind_results = model.predict(Xtest)
+
+        return test_data,test_labels,results,None,blind_results
     
     
