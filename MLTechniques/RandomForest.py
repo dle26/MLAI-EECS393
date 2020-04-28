@@ -19,8 +19,7 @@ from sklearn.preprocessing import StandardScaler
 
 class RandomForest(Technique):
     
-    GENERAL_USE = True
-    
+    ISDEEP = False
     TECHNIQUE_TYPE = "supervised"
     
     
@@ -38,9 +37,9 @@ class RandomForest(Technique):
         
         
     def preprocess(data):
-        return data.data,data.prior_test_data
+        newdata = np.arcsinh(data.data)
+        return newdata,data.prior_test_data
 
-        
     
     def train(data):
  
@@ -50,15 +49,18 @@ class RandomForest(Technique):
         test_data = []
         time_constraint = data.time_constraint
         blind_results = None
-        
+        results = []
         if data.prior_test_data is not None:
-            model = RandomForest(n_estimators=50)
+            print('here')
+            fdks
+            model = RandomForestClassifier(n_estimators=50)
             model.fit(X,y)
             blind_results = model.predict(Xtest)
             
         if time_constraint == 1:
             
             model = RandomForestClassifier(n_estimators=50)
+            
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
             model.fit(X_train,y_train)
             results = model.predict(X_test)
@@ -73,7 +75,7 @@ class RandomForest(Technique):
             for i in range(2):
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
                 model.fit(X_train,y_train)
-                results = model.predict(X_test)
+                results.extend(model.predict(X_test))
                 test_data.extend(X_test)
                 test_labels.extend(y_test)
                 

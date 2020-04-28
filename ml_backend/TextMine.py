@@ -20,21 +20,22 @@ import copy
 
 class TEXTMINE:
     
-    def __init__(self,user_keywords,user_id,analysis_type):
+    def __init__(self,queries,user_keywords,user_id,analysis_type):
         
+        self.queries = queries
         self.user_keywords = user_keywords
         self.user_id = user_id
         self.analysis_type = analysis_type
 
         
-    def from_database(self):
+    def from_database(self,time_constraint):
  
         con_file = open("config.json")
         config = json.load(con_file)
         con_file.close()
         client = ElsClient(config['apikey'])
         ###TODO: add year back in??
-        searchwords = {'specific':[],'names':[]}
+        searchwords = {'category':[],'specific':[]}
         
         if self.analysis_type == 'supervised':
             tech_words = ["machine learning"]
@@ -45,10 +46,11 @@ class TEXTMINE:
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
                 if obj.TECHNIQUE_TYPE == self.analysis_type:
-                        searchwords['names'].append(obj.get_name())
-                        searchwords['specific'].append(obj.get_category())
+                    if not obj.ISDEEP or time_constraint > 1:
+                        searchwords['specific'].append(obj.get_name())
+                        searchwords['category'].append(obj.get_category())
 
-        print(searchwords['specific'])
+        print(searchwords['category'])
         textmine_results = {'words':[],'scores':[],'allwords':[]}
 
 
@@ -56,11 +58,11 @@ class TEXTMINE:
         print()
         allurls = []
         
-        combos = self.generate_combinations(self.user_keywords,tech_words)
+        combos = self.generate_combinations(self.queries,tech_words)
         print(combos)
-        query_size = set_query_number(combos,1000)
-
-        for n,combo in enumerate(combos):
+        query_size = set_query_number(combos,250)
+        i = 0
+        for n,combo in enumerate(combos[0:5]):
              print("SEARCH QUERY " + str(n+1) + ":")
              print(combo)
              print()
@@ -79,6 +81,7 @@ class TEXTMINE:
                  DOI = res['prism:doi']
                  URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?APIkey=" + str(config['apikey'])
                  if URL not in allurls:
+                 
                      r = requests.get(URL)
                      allurls.append(URL)
                         
@@ -86,16 +89,18 @@ class TEXTMINE:
                         f.write(r.text)
                      f.close()
                  
-                     foundwords,allwords,numlines = TEXTPROCESS.findkeywords(str(self.user_id),searchwords,self.user_keywords)
+                     foundwords,allwords = TEXTPROCESS.findkeywords(str(self.user_id),searchwords,self.user_keywords)
+                     if len(list(foundwords.keys())):
+                        i += 1
+                        print(i)
                      textmine_results['words'].extend(list(foundwords.keys()))
                      textmine_results['scores'].extend(list(foundwords.values()))
                      textmine_results['allwords'].extend(allwords)
                      os.remove(str(self.user_id))
-                 
+
         print("------MINING COMPLETE: SEARCHING FOR KEYWORDS-----")
         keywords,keyword_scores = self.adjust_output(textmine_results)
-        
-        return self.two_list_sort(keywords,keyword_scores),keyword_scores,searchwords
+        return keywords,keyword_scores,searchwords
         
  
     ### TODO: CITE ELSAPY - I MODIFIED THE SRC FOR MLAI 
@@ -135,7 +140,7 @@ class TEXTMINE:
         basis[j+1] = key 
         tosort[j+1] = key2
         
-      return tosort
+      return tosort,basis
     
     
     def generate_combinations(self,l1,l2):
@@ -156,9 +161,10 @@ class TEXTMINE:
 
       wordkeys = list(set(words['words']))
       
+      ''' adjust for total number of occurrences '''
       for word in wordkeys:
-          score = np.median(np.asarray(words['scores'])[np.where(np.asarray(words['words']) == word)])
-          scores.append(score * (words['allwords'].count(word)/len(words['allwords'])))
+          score = np.sum(np.asarray(words['scores'])[np.where(np.asarray(words['words']) == word)])
+          scores.append(score)
 
       return wordkeys,list(np.asarray(scores)/np.sum(scores))
 

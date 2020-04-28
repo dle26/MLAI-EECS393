@@ -19,7 +19,7 @@ Structure of FeatureDict
 {'BOOST':{'SVM': [('images',0.73,num_uses,num_possibilies,'supervised')]},"TECHNIQUES:"{same as boost}}
 
  
-TODO: ENSURE NO DUPLICATE KEYWORD WITH ADASKIPGRAM - DO NOT WANT AN EXCESS OF KEYWORDS
+TODO: ENSURE NO DUPLICATE KEYWORD WITH SpaCY - DO NOT WANT AN EXCESS OF KEYWORDS
 
 '''
 
@@ -28,10 +28,10 @@ TODO: ENSURE NO DUPLICATE KEYWORD WITH ADASKIPGRAM - DO NOT WANT AN EXCESS OF KE
 class UpdateAgent:
 
  
-    def update(technique_score_tups):
+    def update(technique_score_tups,eval_score):
         
-        UpdateAgent.update_boost(technique_score_tups)
-        UpdateAgent.update_score_dict(technique_score_tups)
+        UpdateAgent.update_boost(technique_score_tups,eval_score)
+    #UpdateAgent.update_score_dict(technique_score_tups)
     
         
     def update_boost(technique_score_tups,data_score):
@@ -42,37 +42,49 @@ class UpdateAgent:
             
         TODO: EXPLICTLY DEFINE THE SCORING FUNCTION
         '''
-
-        model = pickle.load('MODEL.pkl')
+        model = pickle.load(open('MODEL.pkl','rb'))
 
         boost = model['BOOST']
-
+        allword_lists = []
         for tup in technique_score_tups:
-            total_uses = []
+            allwords = []
+            for words in tup[2]:
+                for ww in words:
+                  for w in ww.split():
+                    if w != "" and w not in allwords:
+                        allwords.append(w)
+            allword_lists.append(allwords)
+
+        for n,tup in enumerate(technique_score_tups):
+           # total_uses = []
             words = tup[2]
-            for w in words:
-                for entry in boost[tup[0]]:
-                    if w in entry:
-                        if tup[0] < boost[tup[0]][w][0]:
-                            adj_score = min(tup[0]+data_score,boost[tup[0]][w][0])
-                        else:
-                            adj_score = max(tup[0]-data_score,boost[tup[0]][w][0])
-                            
-                        newscore = ((entry[1] * entry[2]+1)+adj_score)/(entry[1]+1)
-                        newtup = (w,newscore,entry[2]+1,entry[3]+1)
+            for w in allword_lists[n]:
+                for entry in boost.keys():
+                  if entry == tup[0]:
+                    for wordtup in boost[entry]:
+                        if w in wordtup:
+                            if tup[1] < wordtup[1]:
+                                adj_score = min(tup[1]+data_score,wordtup[1])
+                            else:
+                                adj_score = max(tup[1]-data_score,wordtup[1])
+                            newscore = ((wordtup[1] * wordtup[2]+1)+adj_score)/(wordtup[1]+1)
+                            newtup = (w,newscore,wordtup[2]+1)
+                            boost[tup[0]].append(newtup)
                         
                     else:
-                        newtup = (w,entry[1],entry[2],entry[3]+1)
-                    total_uses.append(newtup[2])
+                        newtup = (w,tup[1],1)
+                        boost[tup[0]].append(newtup)
+                   # total_uses.append(newtup[2])
                         
-                        
-                      
-                  ### rando_threshold for now
+            '''
+            ### rando_threshold for now
             if np.median(total_uses) == 20:
                 
                 model["TECHNIQUES"][tup[0]] = boost[tup[0]]
                 del boost[tup[0]]
-
+            '''
+            print(boost)
+            fveejnid
             model["BOOST"] = boost
           
         pickle.dump(model,open('MODEL.pkl',"wb"))

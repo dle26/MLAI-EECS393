@@ -69,7 +69,7 @@ class DevSignIn extends Component {
         password: this.state.password,
       })
       .then((response) => {
-        sessionStorage.setItem("Token", response.data.token);
+        sessionStorage.setItem("devtoken", response.data.devtoken);
         sessionStorage.setItem("Devname", this.state.devname);
         this.setState({ routeToHome: true });
       })

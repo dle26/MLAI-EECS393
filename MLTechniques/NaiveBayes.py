@@ -18,20 +18,23 @@ from sklearn.preprocessing import StandardScaler
 
 class NaiveBayes(Technique):
     
-    GENERAL_USE = True
-    
     TECHNIQUE_TYPE = "supervised"
-    
-    
-    def get_class_name():
-        return 'NaiveBayes'
+    ISDEEP = False
     
     def get_name():
         return 'naive bayes'
 
     def get_category():
         return 'bayes'
-        
+    
+    
+    def get_website():
+        return 'https://scikit-learn.org/stable/modules/svm.html#classification'
+    
+    
+    def get_class_name():
+        return 'NaiveBayes'
+    
     
     def preprocess(data):
         
@@ -57,6 +60,7 @@ class NaiveBayes(Technique):
         test_labels = []
         test_data = []
         time_constraint = data.time_constraint
+        results = []
         
         blind_results = None
         
@@ -81,7 +85,7 @@ class NaiveBayes(Technique):
                 model = GNB()
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
                 model.fit(X_train,y_train)
-                results = model.predict(X_test)
+                results.extend(model.predict(X_test))
                 test_data.extend(X_test)
                 test_labels.extend(y_test)
                 

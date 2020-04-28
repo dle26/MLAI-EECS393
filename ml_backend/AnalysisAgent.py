@@ -33,8 +33,8 @@ class ANALYZE:
             self.data.blind_prediction_results.append(blind_results)
             self.data.feature_importances.append(feature_importances)
             
-            if self.data.analysis_type == 'unsupervised':
-                self.data.test_labels = None
+        if self.data.analysis_type == 'unsupervised':
+            self.data.test_labels = None
             
         print("-----ANALYSIS COMPLETE: INTERPRETING RESULTS NOW-----")
         print()

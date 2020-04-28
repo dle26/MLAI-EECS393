@@ -29,12 +29,23 @@ class SELECT:
         print()
 
         user_input = self.data.descriptive_info
+        
+        ''' general approaches - if the user screws up '''
+        if len(user_input) == 0:
+
+            if self.data.analysis_type == 'supervised':
+                self.data.techniques = ['SVM','GradientBoost']
+            else:
+                 self.data.techniques = ['KMeans','HAC']
+                 
+            return self.data
+        
         top2_approaches,matches = UniversalScores.reference(user_input)
         
 
         if (len(np.ravel(matches))/len(self.data.descriptive_info)) < self.mining_threshold:
         
-            keywords,keyword_scores,searchwords = TEXTMINE(self.data.descriptive_info,self.data.userid,self.data.analysis_type).from_database()
+            keywords,keyword_scores,searchwords = TEXTMINE(self.data.search_queries,self.data.descriptive_info,self.data.userid,self.data.analysis_type).from_database(self.data.time_constraint)
             top2_approaches = self.select_from_textmine(keywords,keyword_scores,searchwords,self.data.analysis_type)
             
     
@@ -53,27 +64,52 @@ class SELECT:
     
     def select_from_textmine(self,keywords,keywordscores,searchwords,analysis_type):
         
-        #### 2 tiered approach here - need adaskipgram here
         names = []
         scores = []
-
-        for n,word in enumerate(list(set(searchwords['specific']))):
+        allwords =  list(searchwords['category'])
+        allwords.extend(list(searchwords['specific']))
+        
+        for n,word in enumerate(list(set(allwords))):
             if word in keywords:
                 names.append(word)
                 scores.append(keywordscores[keywords.index(word)])
-                
-        approaches,scores = two_list_sort(names,scores)
         
-        approaches = approaches[[-2,-1]]
-        scores = scores[[-2,-1]]
+        scores = np.asarray(scores)
+        top_vals = np.where(scores > np.percentile(scores,75))
+   
+
+        if len(top_vals[0]) == 1:
+            approaches,scores = two_list_sort(names,scores)
+            approaches = list(approaches[[-2,-1]])
+            scores = scores[[-2,-1]]
+        else:
+            approaches = np.asarray(names)[top_vals[0]]
+            scores = scores[top_vals[0]]
+            approaches = list(approaches)
         
-        technique_names = np.random.choice(approaches,2,replace=False,p=np.asarray(scores)/np.sum(scores))
+   
+        technique_names = []
+        scores = list(scores)
         
+        for n,app in enumerate(approaches):
+            if app in searchwords['specific']:
+                technique_names.append(app)
+                approaches.remove(app)
+                scores.remove(scores[n])
+   
+        if len(technique_names) == 0:
+            technique_names.extend(np.random.choice(approaches,2,replace=False,p=np.asarray(scores)/np.sum(scores)))
+        elif len(technique_names) == 1:
+             technique_names.append(np.random.choice(approaches,1,replace=False,p=np.asarray(scores)/np.sum(scores)))
+        
+
         specific_names = []
         classes = []
 
         for app in technique_names:
-             specific_names,class_names = select_approach(app,"specific",analysis_type)
+             print(app)
+             specific_names,class_names = select_approach(app,analysis_type)
+             print(class_names)
              classes.append(UniversalScores.select_from_usage(class_names,1))
 
         return classes
@@ -97,9 +133,8 @@ def two_list_sort(tosort,basis):
       return np.array(tosort),np.asarray(basis)
               
             
-  
-#### TODO: UPDATE w/more elegant code          
-def select_approach(app_name,select,analysis_type):
+   
+def select_approach(app_name,analysis_type):
 
         approaches_to_select = []
         class_names = []
@@ -107,12 +142,7 @@ def select_approach(app_name,select,analysis_type):
         for name, obj in inspect.getmembers(MLTechniques):
             if inspect.isclass(obj):
                 if obj.TECHNIQUE_TYPE == analysis_type:
-                    if select =='specific':
-                        if obj.get_category() == app_name:
-                            approaches_to_select.append(obj.get_name())
-                            class_names.append(obj.get_class_name())
-                    else:
-                         if obj.get_general_category() == name:
+                    if obj.get_name() == app_name or obj.get_category() == app_name:
                             approaches_to_select.append(obj.get_name())
                             class_names.append(obj.get_class_name())
 

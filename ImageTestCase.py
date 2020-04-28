@@ -22,6 +22,27 @@ from ml_backend.AnalysisAgent import ANALYZE
 from ml_backend.Interpret import INTERPRET
 import os
 import MLTechniques
+import warnings
+warnings.filterwarnings("ignore")
+import itertools
+
+
+
+def separate_bigrams(lst):
+    
+    lst2 = []
+    for tup in lst:
+        if len(tup[0].split()) > 1:
+            if (tup[0],"") not in lst2:
+                lst2.append((tup[0],""))
+            if len(tup[1].split()) > 1:
+                if (tup[1],"") not in lst2:
+                    lst2.append((tup[1],""))
+                continue
+            continue
+        lst2.append(tup)
+    
+    return lst2
 
 
 
@@ -33,38 +54,19 @@ time = datetime.now()
 raw_data = pd.read_csv('training.csv')
 train_data = raw_data[[col for col in raw_data if col != 'label']].values
 labels = raw_data['label'].values
-description = "This dataset contains 21,000 images corresponding to handwritten digits. These digits range from zero to nine."
-words =  word_tokenize(description) 
-words = [word.lower() for word in words if word not in string.punctuation or word == '.']
-tagged_words = nltk.pos_tag(words)
-
-
-search_words = []
-print(tagged_words)
-for n,word in enumerate(tagged_words):
-    
-    if n < len(tagged_words)-1:
-        if (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'J') or (word[1][0] == 'J' and tagged_words[n+1][1][0] == 'N') or (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'N'):
-            if word[0] + " " + tagged_words[n+1][0] not in search_words:
-                search_words.append(word[0] + " " + tagged_words[n+1][0])
-
-
-    if (word[1][0] == 'N') and word[0].find('data') == -1:
-        if str(search_words).find(word[0]) == -1:
-            search_words.append(word[0])
-
-
-print(search_words)
+description = "This dataset contains pitching statistics from the 2016 major league baseball season"
 
 bigram = False
 
 dp = DATAPREP(None,None,None,None,None,None,None)
+search_words = dp.process_user_info(description,True)
+dp.data.search_queries = dp.process_user_info(description,False)
 dp.data.data = train_data
 dp.data.data_type = 'image'
 dp.data.analysis_type = 'supervised'
 dp.data.dimensions = (28,28)
 dp.data.labels = labels
-dp.data.time_constraint = 1
+dp.data.time_constraint = 2
 dp.data.descriptive_info = search_words
 dp.data.userinfo = "jta54"
 newdata = dp.eval_data()

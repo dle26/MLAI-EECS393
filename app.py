@@ -10,6 +10,9 @@ import pymongo
 import os
 from werkzeug.utils import secure_filename
 from ml_backend.Pipeline import Pipeline
+import warnings
+warnings.filterwarnings("ignore")
+
 
 
 app = Flask(__name__)
@@ -96,13 +99,13 @@ def user():
 
 @app.route("/devuserinfo", methods=['POST'])
 def devuser():
-    devname = request.get_json(force = true)('Devname');
+    devname = request.get_json(force = True)['devname']
 
     devs = mongodb.db.devs
-    devs = devs.find_one({'devname': devname})
+    dev = devs.find_one({'devname': devname})
     return jsonify({
-        'firstname': devs['firstname'],
-        'lastname': devs['lastname'],
+        'firstname': dev['firstname'],
+        'lastname': dev['lastname'],
     })
 
 ALLOWED_EXTENSIONS = set(['xlsx', 'pdf', 'png', 'jpg', 'csv'])
@@ -119,10 +122,9 @@ def upload_file():
         print(request.files)
         return resp
     files = request.files.getlist('files[]')
+    labelFile = request.files.get('labelFile')
     details = request.form.get('details')
     time = request.form.get('time')
-    print("request.files: " + str(request.files))
-    print("request.form: " + str(request.form))
 
     names = []
     sizes = []
@@ -132,12 +134,18 @@ def upload_file():
             names.append(filename)
             size = len(file.read())
             sizes.append(size)
-    result = Pipeline.run_MLAI(files, names, sizes, None, None, None, {'time': time, 'userid': '111111', 'user_input': details})
-    print(result)
+    if labelFile:
+        labelFileName = secure_filename(labelFile.filename)
+        labelFileSize = len(labelFile.read())
+    else:
+        labelFileName = None
+        labelFileSize = None
 
+    result = Pipeline.run_MLAI(files, names, sizes, labelFile, labelFileName, labelFileSize, {'time': time, 'userid': '111111', 'user_input': details})
+    print(result)
     resp = jsonify({'message' : 'File successfully uploaded'})
     resp.status_code = 201
-    return resp
+    return result
 
 
 DEV_ALLOWED_EXTENSIONS = set(['py'])
@@ -155,11 +163,11 @@ def developer_feedback():
         return resp
     files = request.files.getlist('files[]')
     details = request.form.get('details')
-    devname = request.form.get('Devname');
+    devname = request.form.get('Devname')
     print("request.files: " + str(request.files))
     print("request.form: " + str(request.form))
     try:
-        path = "./ml_backend/devUpload/"
+        path = "./dev_added_techniques/"
 
         UPLOAD_FOLDER = path + devname
         os.mkdir(UPLOAD_FOLDER)
@@ -184,31 +192,13 @@ def developer_feedback():
     resp = jsonify({"message": "Files successfully uploaded"})
     resp.status_code = 201
     return resp
-    # #
-    # path = "./ml_backend/devUpload/" + devname
-    # #
-    # ## @Daniel still need to add details to this save
-    # try:
-    #     os.mkdir(path)
-    # except OSError:
-    #     print ("Creation of the directory %s failed (likely already created)" % path)
-    # else:
-    #     print ("Successfully created the directory %s " % path)
-    # #
-    # for file in files:
-    #     if file and dev_allowed_file(file.filename):
-    #         filename = file.filename
-    #         os.path.join(path,filename)
-    # resp = jsonify({'message' : 'File successfully uploaded'})
-    # resp.status_code = 201
-    # return resp
 
 @app.route("/dev/register", methods=['POST'])
 def developer_register():
     if request.method == 'POST':
         devs = mongodb.db.devs
 
-        devname = request.get_json(force=True)['devname']
+        devname = request.get_json(force = True)['devname']
         password = request.get_json(force = True)['password']
         firstname = request.get_json(force = True)['firstname']
         lastname = request.get_json(force = True)['lastname']
@@ -240,7 +230,7 @@ def dev_login():
         # generate token
         token = jwt.encode({'dev': devname, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, Config.TOKEN_SECRET_KEY)
 
-        return jsonify({'token': token.decode('UTF-8')})
+        return jsonify({'devtoken': token.decode('UTF-8')})
 
     return jsonify({'error':'Could not verify!', 'WWW-Authenticate': 'Basic realm="Login Required"'}), 401
 
@@ -264,31 +254,17 @@ def test():
        [  0,   1,   7,   0,   1,   1, 339,   0,   0,   0],
        [  0,   2,  11,   2,   2,   1,   0, 366,   2,   5],
        [  0,   1,   4,   1,   1,   6,   1,   1, 312,   2],
-       [  0,   0,   7,   4,   3,   1,   0,   6,   1, 329]]]}, 'best': 'SVM', 'analysis_type': 'supervised', 'education': ['https://scikit-learn.org/stable/modules/svm.html#classification', 'https://www.google.com'], 
+       [  0,   0,   7,   4,   3,   1,   0,   6,   1, 329]]]}, 'best': 'SVM', 'analysis_type': 'supervised', 'education': ['https://scikit-learn.org/stable/modules/svm.html#classification', 'https://www.google.com'],
        'labels': ['cat', 'dog','whale', 'snake', 'giraffe', 'hieu', 'mouse', 'bird', 'eagle', 'dolphin']}
 
     print(result)
     return jsonify(result)
-
-
-def save_upload(f):
-    mongodb.save_file(f.filename, f, 'data')
-    return get_upload(f.filename)
-
-def get_upload(filename):
-    return mongodb.send_file(filename)
 
 @app.route('/protected', methods=['POST'])
 @token_required
 def protected():
     return jsonify({'message': 'with token'})
 
-#was only used to test send_json_to_database, will be deleted in a future commit
-# @app.route("/pythonobject", methods=['POST'])
-# def python_object():
-#     username = request.get_json(force = True)['username']
-#
-#     return send_json_to_database(username, {"a": 3})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

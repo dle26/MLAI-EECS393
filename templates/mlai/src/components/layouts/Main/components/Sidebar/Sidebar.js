@@ -3,16 +3,16 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { Divider, Drawer } from '@material-ui/core';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import PeopleIcon from '@material-ui/icons/People';
-import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
-import TextFieldsIcon from '@material-ui/icons/TextFields';
-import ImageIcon from '@material-ui/icons/Image';
-import AccountBoxIcon from '@material-ui/icons/AccountBox';
-import SettingsIcon from '@material-ui/icons/Settings';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
+//import PeopleIcon from '@material-ui/icons/People';
+//import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
+//import TextFieldsIcon from '@material-ui/icons/TextFields';
+//import ImageIcon from '@material-ui/icons/Image';
+//import AccountBoxIcon from '@material-ui/icons/AccountBox';
+//import SettingsIcon from '@material-ui/icons/Settings';
+//import LockOpenIcon from '@material-ui/icons/LockOpen';
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 
-import { Profile, SidebarNav, UpgradePlan } from './components';
+import { Profile, SidebarNav } from './components';
 
 const styles = theme => ({
   drawer: {
@@ -51,7 +51,7 @@ class Sidebar extends Component {
         title: 'Upload New Data',
         href: '',
         icon: <DashboardIcon />
-      },
+      }/*,
       {
         title: 'Previous Models',
         href: '/prevmodels',
@@ -66,7 +66,7 @@ class Sidebar extends Component {
         title: 'Settings',
         href: '/setting',
         icon: <SettingsIcon />
-      }
+      }*/
     ];
 
     return (

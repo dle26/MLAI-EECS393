@@ -10,6 +10,7 @@ Standardization class for Results collection/model eval
 
 from sklearn import metrics
 import copy 
+from ml_backend.UpdateAgent import UpdateAgent as UA
 import numpy as np
 
 
@@ -20,14 +21,21 @@ class INTERPRET:
         
         self.data = copy.deepcopy(data)
         self.performance_threshold = performance_threshold
-
+     
         
     def interpret(self):
         
         if self.data.analysis_type == 'supervised':
-            return self.supervised_accuracy_metrics()
-        
-        return self.uns_accuracy_metrics()
+           interp =  self.supervised_accuracy_metrics()
+          # if len(self.data.descriptive_info) > 0:
+               #UA.update(self.data.data_for_update,self.data.evalscore)
+           return interp
+           
+        interp = self.uns_accuracy_metrics()
+        #if len(self.data.descriptive_info) > 0:
+          # UA.update(self.data.data_for_update,self.data.evalscore)
+
+        return interp
         
 
     
@@ -35,10 +43,11 @@ class INTERPRET:
         
         techniques = self.data.techniques
         all_results = {"techniques":{"names":[],"samples":[],"results":[],"accuracy":[],
-                                     "f1_score":[],"silhouette":[],"ch_score":[],"feature_importances":[]}}
+                                     "f1_score":[],"silhouette":[],"ch_score":[],"feature_importances":[],'confusion_matrix':[]}}
         
         ## TODO: run for all techniques - currently just 1
         for n,tech in enumerate(techniques):
+            print(tech)
             all_results['techniques']['names'].append(tech)
             if self.data.prior_test_data is not None:
                 all_results['techniques']['samples'].append(self.data.prior_test_indicies)
@@ -55,16 +64,29 @@ class INTERPRET:
             else:
                  all_results['techniques']["feature_importances"].append([])
             
-            all_results['techniques']["accuracy"].append(metrics.accuracy_score(true_labels,preds))
-            all_results['techniques']['f1_score'].append(metrics.f1_score(true_labels,preds,average='macro'))
+            all_results['techniques']["accuracy"].append(float(metrics.accuracy_score(true_labels,preds)))
+            all_results['techniques']['f1_score'].append(float(metrics.f1_score(true_labels,preds,average='macro')))
             all_results['techniques']['silhouette'] = None
             all_results['techniques']['ch_score'] = None
-            all_results['techniques']["confusion_matrix"] = metrics.confusion_matrix(true_labels, preds)
+            
+            cm_list = []
+            cm = metrics.confusion_matrix(true_labels, preds)
+            for element in cm:
+                newelement = []
+                for number in element:
+                    newelement.append(int(number))
+                cm_list.append(newelement)
+            
+            all_results['techniques']["confusion_matrix"].append(cm_list)
             # int_results["NL Results"] = self.NLResults()
 
         all_results['best'] = self.assign_top_model_sup(all_results)
         all_results['analysis type'] = 'supervised'
-        all_results['labels'] = self.data.label_names
+        lbls = []
+        for i in self.data.label_names:
+            lbls.append(str(i))
+        
+        all_results['labels'] = lbls
         all_results['education'] = self.data.educational_info
         
         self.data.interpreted_results = all_results
@@ -94,13 +116,13 @@ class INTERPRET:
                  all_results['techniques']['results'].append([]) 
             preds = np.asarray(self.data.prediction_results[n])
 
-            all_results['techniques']["Silhouette"].append(metrics.silhouette_score(self.data.test_data,preds))
-            all_results['techniques']['ch_score'].append(metrics.calinski_harabasz_score(self.data.test_data,preds))
+            all_results['techniques']["silhouette"].append(float(metrics.silhouette_score(self.data.test_data[n],preds)))
+            all_results['techniques']['ch_score'].append(float(metrics.calinski_harabasz_score(self.data.test_data[n],preds)))
             all_results['techniques']['accuracy'] = None
             all_results['techniques']['f1_score'] = None
             all_results['techniques']["confusion_matrix"] = None
             
-            if self.data.feature_importances[n] == None:
+            if self.data.feature_importances[n] is not None:
                 all_results['techniques']["feature_importances"].append(self.fi_interpret())
             else:
                 all_results['techniques']["feature_importances"].append([])
@@ -125,23 +147,23 @@ class INTERPRET:
         feature_ranking,feats = two_list_sort(self.data.original_features,feat_imp)
         feature_ranking.reverse()
         feature_ranking = np.asarray(feature_ranking)[[f for f in range(len(feats)) if feats[f] > 0]]
-        return list(feature_ranking)
+        return list(feature_ranking)[0:3]
         
 
     def assign_top_model_sup(self,class_results):
         
         best_technique = None
         highest_F1 = 0
-        
+        print(list(class_results.keys()))
         for n,technique in enumerate(class_results.keys()):
             
             # self.update_result_tup(technique,class_results[technique]["F1 Score"])
-          
+          print(technique)
           if class_results['techniques']["f1_score"][n] > highest_F1:
                 highest_F1 = class_results[technique]["f1_score"][n]
                 best_technique = technique
                 bt_index = n
-                
+          
           if class_results[technique]["f1_score"][n] == highest_F1:
               if class_results[technique]["accuracy"][n] > class_results['techniques']["accuracy"][bt_index]:
                     best_technique = technique
@@ -151,7 +173,7 @@ class INTERPRET:
                   if np.random.randint(0,2) > 0:
                        best_technique = technique
                        bt_index = n
-          self.data.data_for_update.append((technique,class_results[technique]["f1_score"],self.data.descriptive_info))
+          self.data.data_for_update.append((class_results[technique]["names"][n],class_results[technique]["f1_score"][n],self.data.descriptive_info))
 
         return best_technique
     
@@ -181,7 +203,7 @@ class INTERPRET:
                        bt_index = n
 
         
-          self.data.data_for_update.append((technique,class_results['techniques']["silhouette"][n],self.data.descriptive_info))
+          self.data.data_for_update.append((class_results[technique]["names"][n],class_results[technique]["silhouette"][n],self.data.descriptive_info))
         return best_technique
 
 

@@ -14,7 +14,7 @@ Instructions for running MLAI on a personal device
 #### Python flask dependencies:
   To Install all python dependencies navigate to the main project folder and run:
 
-      pip3 install -r requirements.txt
+      pip3 install --no-cache-dir -r requirements.txt 
 
 Please note that the server and website need to be run on two seperate terminals (labeled inside this readme): 
 
@@ -61,9 +61,11 @@ Please note that the server and website need to be run on two seperate terminals
 
      password: 123 
 
-  ### Main Dashboard after log in sucessfully (Updated 3/20/2020)
+  ### Main Dashboard after log in sucessfully (as a user) (Updated 3/20/2020)
 
   ![image](https://user-images.githubusercontent.com/44376091/77140059-aebf7e00-6a4e-11ea-822c-76951a385a5d.png)
+  
+  If you want to log on as a developer, create a developer account and follow the rules there (click the sidebar to see them) and then you can upload a .py to be added to our techniques. However, as this is on a personal device, we will not be recieving the python so it's best to use our server if you can.
   
   Once you are done running the program, press Ctrl + C in both the server terminal (where you ran python3 app.py) and the website terminal (where you ran npm start). Don't forget to go back to the start and go to the docker folder and do: 
   

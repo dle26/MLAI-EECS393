@@ -8,6 +8,7 @@ from .Prep import DATAPREP
 from .SelectionAgent import SELECT
 from .AnalysisAgent import ANALYZE
 from .Interpret import INTERPRET
+import json
 
 class Pipeline:
     
@@ -43,13 +44,8 @@ class Pipeline:
         
         interpreted_results
         
-        nested dictionary containing, for each technique:
-            
-            1. The evaluation metrics (int)
-            2. The interpreted natural language results (string)
-        
-        All contains the best model out of the fitted approaches (string)
-        and the type of analysis (supervised or unsupervised)
+        nested dictionary containing results for each technique
+
         
         Example:
             
@@ -66,11 +62,19 @@ class Pipeline:
         data_object = DATAPREP(datafiles,datafilenames,datafilesizes,
                  labelfile,labelfilename,labelfilesize,user_info).run()
         
+        if len(data_object.data) < 10:
+            return {'techniques': {'names': [], 'samples': [], 'ch_score': None, 'silhouette': None, 'results': [], 'accuracy': None, 'f1_score': None, 'feature_importances' : [[],[]], 'confusion_matrix': [[],[]]}, 'best': '', 'analysis_type': 'too few samples', 'education': [],
+                    'labels': []}
+            
+            
         data_object = SELECT(data_object).selectAnalysisApproach()
         
         data_object = ANALYZE(data_object).train_approaches()
         
         data_object = INTERPRET(data_object).interpret()
         
-        print(data_object.interpreted_results)
+        print(type(data_object.interpreted_results))
         return data_object.interpreted_results
+
+
+

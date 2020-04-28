@@ -3,11 +3,11 @@ import Dialog from "@material-ui/core/Dialog";
 import {
   DialogTitle,
   Typography,
-  Grid,
+  //Grid,
   DialogContent,
 } from "@material-ui/core";
 import axios from "axios";
-import { Form, Input, Slider, Button, Upload, message } from "antd";
+import { Form, Input, Button, message } from "antd";
 import { UploadOutlined, InboxOutlined } from "@ant-design/icons";
 
 export default class DevMoreDetails extends Component {
@@ -57,11 +57,15 @@ export default class DevMoreDetails extends Component {
         //handle success
         console.log(response);
         this.props.addFile([]);
+        this.setState({ success: true });
+        alert(".Py file(s) uploaded succesfully");
         this.closeModal();
       })
       .catch((response) => {
         //handle error
         console.log(response);
+        alert("File upload failed. Please try again. If persists, report to admin.");
+        this.closeModal();
       });
 
     this.uploadingToggle();

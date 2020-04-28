@@ -13,3 +13,7 @@ services:
     build: ./mongo-seed
     links:
       - mongodb
+  mongo_seeding2:
+    build: ./mongo-seed2
+    links:
+      - mongodb
