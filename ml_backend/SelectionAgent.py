@@ -46,6 +46,17 @@ class SELECT:
         if (len(np.ravel(matches))/len(self.data.descriptive_info)) < self.mining_threshold:
         
             keywords,keyword_scores,searchwords = TEXTMINE(self.data.search_queries,self.data.descriptive_info,self.data.userid,self.data.analysis_type).from_database(self.data.time_constraint)
+            
+            if len(keywords) == 0:
+                if self.data.analysis_type == 'supervised':
+                    self.data.techniques = ['SVM','GradientBoost']
+                else:
+                    self.data.techniques = ['KMeans','HAC']
+                
+                return self.data
+            
+            
+            
             top2_approaches = self.select_from_textmine(keywords,keyword_scores,searchwords,self.data.analysis_type)
             
     
