@@ -107,7 +107,10 @@ class TEXTMINE:
                      textmine_results['scores'].extend(list(foundwords.values()))
                      textmine_results['allwords'].extend(allwords)
                      os.remove(str(self.user_id))
-
+    
+        if len(textmine_results['words']) == 0:
+            return [],[],[]
+                
         print("------MINING COMPLETE: SEARCHING FOR KEYWORDS-----")
         keywords,keyword_scores = self.adjust_output(textmine_results)
         return keywords,keyword_scores,searchwords
