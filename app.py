@@ -221,7 +221,7 @@ def developer_register():
 
 @app.route("/dev/login", methods=['POST'])
 def dev_login():
-    devname = request.get_json(force = True)['devname']
+    devname = request.get_json(force = True)['Devname']
     password = request.get_json(force = True)['password']
 
     devs = mongodb.db.devs
