@@ -10,6 +10,9 @@ import pymongo
 import os
 from werkzeug.utils import secure_filename
 from ml_backend.Pipeline import Pipeline
+import warnings
+warnings.filterwarnings("ignore")
+
 
 
 app = Flask(__name__)
