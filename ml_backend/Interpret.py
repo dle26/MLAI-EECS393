@@ -82,7 +82,11 @@ class INTERPRET:
 
         all_results['best'] = self.assign_top_model_sup(all_results)
         all_results['analysis type'] = 'supervised'
-        all_results['labels'] = self.data.label_names
+        lbls = []
+        for i in self.data.label_names:
+            lbls.append(str(i))
+        
+        all_results['labels'] = lbls
         all_results['education'] = self.data.educational_info
         
         self.data.interpreted_results = all_results
@@ -112,8 +116,8 @@ class INTERPRET:
                  all_results['techniques']['results'].append([]) 
             preds = np.asarray(self.data.prediction_results[n])
 
-            all_results['techniques']["silhouette"].append(metrics.silhouette_score(self.data.test_data[n],preds))
-            all_results['techniques']['ch_score'].append(metrics.calinski_harabasz_score(self.data.test_data[n],preds))
+            all_results['techniques']["silhouette"].append(float(metrics.silhouette_score(self.data.test_data[n],preds)))
+            all_results['techniques']['ch_score'].append(float(metrics.calinski_harabasz_score(self.data.test_data[n],preds)))
             all_results['techniques']['accuracy'] = None
             all_results['techniques']['f1_score'] = None
             all_results['techniques']["confusion_matrix"] = None
