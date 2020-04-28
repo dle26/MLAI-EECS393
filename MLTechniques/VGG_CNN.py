@@ -120,7 +120,7 @@ class VGG_CNN:
         if time_constraint == 3:
             model =  VGG_CNN.ConvNet(len(train_data[0]),100,len(set(data.labels)))
             loss_function = nn.CrossEntropyLoss()
-            optimizer = optim.ADAM(model.parameters())
+            optimizer = optim.Adam(model.parameters())
             n_epochs = 10
             model = train_net(train_data,train_labels,test_data,test_labels,model,optimizer,loss_function,n_epochs)
             results = validate(model,test_data)
@@ -129,7 +129,7 @@ class VGG_CNN:
         if time_constraint == 4:
             model =  VGG_CNN.ConvNet(len(train_data[0]),100,len(set(data.labels)))
             loss_function = nn.CrossEntropyLoss()
-            optimizer = optim.ADAM(model.parameters())
+            optimizer = optim.Adam(model.parameters())
             n_epochs = 20
             model = train_net(train_data,train_labels,test_data,test_labels,model,optimizer,loss_function,n_epochs)
             results = validate(model,test_data)
@@ -138,7 +138,7 @@ class VGG_CNN:
         if time_constraint == 5:
              model =  VGG_CNN.ConvNet(len(train_data[0]),100,len(set(data.labels)),extratime=True)
              loss_function = nn.CrossEntropyLoss()
-             optimizer = optim.ADAM(model.parameters())
+             optimizer = optim.Adam(model.parameters())
              n_epochs = 50
              model = train_net(train_data,train_labels,test_data,test_labels,model,optimizer,loss_function,n_epochs)
              results = validate(model,test_data)
