@@ -161,17 +161,17 @@ class INTERPRET:
           print(technique)
           if class_results['techniques']["f1_score"][n] > highest_F1:
                 highest_F1 = class_results[technique]["f1_score"][n]
-                best_technique = technique
+                best_technique = class_results[technique]["names"][n]
                 bt_index = n
           
           if class_results[technique]["f1_score"][n] == highest_F1:
               if class_results[technique]["accuracy"][n] > class_results['techniques']["accuracy"][bt_index]:
-                    best_technique = technique
+                    best_technique = class_results[technique]["names"][n]
                     bt_index = n
                         
               elif class_results[technique]["accuracy"][n] == class_results['techniques']["accuracy"][bt_index]:
                   if np.random.randint(0,2) > 0:
-                       best_technique = technique
+                       best_technique = class_results[technique]["names"][n]
                        bt_index = n
           self.data.data_for_update.append((class_results[technique]["names"][n],class_results[technique]["f1_score"][n],self.data.descriptive_info))
 
@@ -189,17 +189,17 @@ class INTERPRET:
           
           if class_results['techniques']["silhouette"][n] > highest_sil:
                 highest_sil = class_results['techniques']["silhouette"][n]
-                best_technique = technique
+                best_technique = class_results[technique]["names"][n]
                 bt_index = n
                 
           if class_results['techniques']["silhouette"][n] == highest_sil:
               if class_results['techniques']["ch_score"][n] > class_results['techniques']["ch_score"][bt_index]:
-                    best_technique = technique
+                    best_technique = class_results[technique]["names"][n]
                     bt_index = n
                         
               elif class_results[technique]["ch_score"][n] == class_results['techniques']["ch_score"][bt_index]:
                   if np.random.randint(0,2) > 0:
-                       best_technique = technique
+                       best_technique = class_results[technique]["names"][n]
                        bt_index = n
 
         
