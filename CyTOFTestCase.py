@@ -22,6 +22,26 @@ from ml_backend.Interpret import INTERPRET
 import os
 import MLTechniques
 import pickle
+import warnings
+warnings.filterwarnings("ignore")
+import itertools
+
+
+def separate_bigrams(lst):
+    
+    lst2 = []
+    for tup in lst:
+        if len(tup[0].split()) > 1:
+            if (tup[0],"") not in lst2:
+                lst2.append((tup[0],""))
+            if len(tup[1].split()) > 1:
+                if (tup[1],"") not in lst2:
+                    lst2.append((tup[1],""))
+                continue
+            continue
+        lst2.append(tup)
+    
+    return lst2
 
 
 
@@ -31,50 +51,36 @@ time = datetime.now()
 ''' DATA PREPARATION/SIMULATION OF FRONT END PROCESSES '''
 
 ### Clinical scores
-raw_data = pd.read_csv('cytof.csv')
-train_data = raw_data[[col for col in raw_data if col != 'labels']]
+raw_data = pd.read_csv('cytof_xmen.csv')
+train_data = raw_data[[col for col in raw_data if col != 'Labels']]
 cols = list(train_data.columns)
 
 train_data = train_data.values
-labels = raw_data['labels'].values
+str_labels = raw_data['Labels'].values
+
+labels = []
+for n,l in enumerate(list(set(str_labels))):
+    for ll in str_labels:
+        if ll == l:
+            labels.append(n)
 
 description = "This dataset contains surface antibody expression values from phenotypes obtained by mass cytometry analysis of samples containing human T-cells"
-words =  word_tokenize(description) 
-words = [word.lower() for word in words if word not in string.punctuation or word == '.']
-tagged_words = nltk.pos_tag(words)
-
-#### this is simulating the user input function
-search_words = []
-print(tagged_words)
-for n,word in enumerate(tagged_words):
-    
-    if n < len(tagged_words)-1:
-        if (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'J') or (word[1][0] == 'J' and tagged_words[n+1][1][0] == 'N') or (word[1][0] == 'N' and tagged_words[n+1][1][0] == 'N'):
-            if word[0] + " " + tagged_words[n+1][0] not in search_words:
-                search_words.append(word[0] + " " + tagged_words[n+1][0])
-
-
-    if (word[1][0] == 'N') and word[0].find('data') == -1:
-            if str(search_words).find(word[0]) == -1:
-                search_words.append(word[0])
-
-
-print(search_words)
 
 bigram = False
 
 dp = DATAPREP(None,None,None,None,None,None,None)
+search_words = dp.process_user_info(description,True)
+dp.data.search_queries = dp.process_user_info(description,False)
 dp.data.data = train_data
 dp.data.data_type = 'numeric'
-dp.data.analysis_type = 'supervised'
-dp.data.labels = labels
-dp.data.time_constraint = 1
+dp.data.analysis_type = 'unsupervised'
+dp.data.labels = None #labels
+dp.data.time_constraint = 2
 dp.data.descriptive_info = search_words
 dp.data.userinfo = "jta54"
-
 newdata = dp.eval_data()
-newdata.original_features = cols
 
+newdata.original_features = cols
 
 ''' TEST FOR DATA PROCESSING'''
 
