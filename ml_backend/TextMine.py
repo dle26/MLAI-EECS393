@@ -59,10 +59,20 @@ class TEXTMINE:
         allurls = []
         
         combos = self.generate_combinations(self.queries,tech_words)
-        print(combos)
-        query_size = set_query_number(combos,250)
+
+        if time_constraint == 1:
+            query_size = set_query_number(combos,100)
+        if time_constraint == 2:
+            query_size = set_query_number(combos,250)
+        if time_constraint == 3:
+            query_size = set_query_number(combos,500)
+        if time_constraint == 4:
+            query_size = set_query_number(combos,750)
+        if time_constraint == 5:
+            query_size = set_query_number(combos,1000)
+    
         i = 0
-        for n,combo in enumerate(combos[0:5]):
+        for n,combo in enumerate(combos):
              print("SEARCH QUERY " + str(n+1) + ":")
              print(combo)
              print()
