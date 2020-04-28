@@ -145,7 +145,7 @@ def upload_file():
     print(result)
     resp = jsonify({'message' : 'File successfully uploaded'})
     resp.status_code = 201
-    return resp
+    return result
 
 
 DEV_ALLOWED_EXTENSIONS = set(['py'])
