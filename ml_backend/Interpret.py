@@ -118,9 +118,9 @@ class INTERPRET:
 
             all_results['techniques']["silhouette"].append(float(metrics.silhouette_score(self.data.test_data[n],preds)))
             all_results['techniques']['ch_score'].append(float(metrics.calinski_harabasz_score(self.data.test_data[n],preds)))
-            all_results['techniques']['accuracy'] = None
-            all_results['techniques']['f1_score'] = None
-            all_results['techniques']["confusion_matrix"] = None
+            all_results['techniques']['accuracy'] = None #.append(float(metrics.silhouette_score(self.data.test_data[n],preds)))
+            all_results['techniques']['f1_score'] = None #.append(float(metrics.calinski_harabasz_score(self.data.test_data[n],preds)))
+            all_results['techniques']["confusion_matrix"] = [[],[]]
             
             if self.data.feature_importances[n] is not None:
                 all_results['techniques']["feature_importances"].append(self.fi_interpret())
@@ -133,7 +133,7 @@ class INTERPRET:
         all_results['best'] = self.assign_top_model_unsup(all_results)
         all_results['education'] = self.data.educational_info
         all_results['analysis type'] = 'unsupervised'
-        all_results['labels'] = {}
+        all_results['labels'] = []
         
         
         self.data.interpreted_results = all_results
