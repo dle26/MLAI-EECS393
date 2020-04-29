@@ -62,9 +62,6 @@ class TEXTPROCESS:
                  for key in searchwords:
                      for word in searchwords[key]:
                         if l.lower().find(word) > -1 and word not in seenwords:
-                            if word == 'cnn':
-                                print('here')
-
                             results[word] = 1
                             seenwords.append(word)
                             
