@@ -16,6 +16,7 @@ import MLTechniques
 from .TextProcess import TEXTPROCESS
 import requests
 import copy
+from collections import OrderedDict
 
 
 class TEXTMINE:
@@ -34,7 +35,6 @@ class TEXTMINE:
         config = json.load(con_file)
         con_file.close()
         client = ElsClient(config['apikey'])
-        ###TODO: add year back in??
         searchwords = {'category':[],'specific':[]}
         
         if self.analysis_type == 'supervised':

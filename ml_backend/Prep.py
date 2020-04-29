@@ -14,6 +14,7 @@ import itertools
 import os 
 import string
 import spacy
+from collections import OrderedDict as OD
 
 
 class DATA:
@@ -68,7 +69,7 @@ class DATA:
 
         self.educational_info = []
         
-        self.label_names = {}
+        self.label_names = OD()
         
         self.search_queries = None
 
@@ -401,7 +402,7 @@ def separate_bigrams(lst):
 def map_labels(labels):
     
     label_set = list(set(labels))
-    label_dict = {}
+    label_dict = OD()
     
     for n,label in enumerate(label_set):
         label_dict[int(n)] = label

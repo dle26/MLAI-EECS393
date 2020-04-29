@@ -12,7 +12,7 @@ from .TextMine import TEXTMINE
 from .UniversalScores import UniversalScores
 import inspect
 import numpy as np
-
+from collections import OrderedDict as OD
 
 class SELECT:
     
