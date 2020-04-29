@@ -244,7 +244,7 @@ class DATAPREP:
                    if n == 0:
                        newdata = entry[0]
                    else:
-                       newdata = pd.concat([data,entry[0]],0)
+                       newdata = pd.concat([newdata,entry[0]],0)
           else:
              if self.data.data_type == 'image':
                  if n == 0:
@@ -257,7 +257,7 @@ class DATAPREP:
                 if n == 0:
                     testdata = entry[0]
                 else:
-                    testdata = pd.concat([data,entry[0]],0)
+                    testdata = pd.concat([testdata,entry[0]],0)
 
         self.data.data = newdata
         if testdata is not None:
