@@ -20,7 +20,8 @@ class VGG_CNN:
         
         super(VGG_CNN.ConvNet, self).__init__()
     
-
+        self.n_classes = n_classes
+        
         self.layer1 = nn.Sequential(
             nn.Conv1d(1, 64, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True),
@@ -37,23 +38,26 @@ class VGG_CNN:
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2))
         
-         
-        self.classifier = nn.Sequential(
-          nn.Linear(feature_len*32,4096),
-          nn.Dropout(),
-          nn.Linear(4096,4096),
-          nn.ReLU(),
-          nn.Dropout(),
-          nn.Linear(4096, n_classes))
+
     
 
       def forward(self, x):
         
+
         x =x.view(len(x), 1, -1)
+
         x = self.layer1(x)
+
         x = x.view(x.size(0), -1)
-        self.feature_dim = len(x[0])
-        x = self.classifier(x)
+        clf = nn.Sequential(nn.Linear(x.shape[1],4096),
+        nn.Dropout(),
+        nn.Linear(4096,4096),
+        nn.ReLU(),
+        nn.Dropout(),
+        nn.Linear(4096, self.n_classes))
+    
+        x = clf(x)
+
         x = F.log_softmax(x)
    
         return x
@@ -109,6 +113,7 @@ class VGG_CNN:
                                
                     
         if time_constraint == 2:
+      
             model =  VGG_CNN.ConvNet(len(train_data[0]),len(data.data[0]),len(set(data.labels)))
             loss_function = nn.CrossEntropyLoss()
             optimizer = optim.SGD(model.parameters(),lr=0.01)
@@ -169,6 +174,7 @@ def train_net(train_data,train_labels,test_data,test_labels,model,optimizer,loss
         for n,batch in enumerate(batches[0:1000]):
    
             cells = batch[0]
+  
             lbls = batch[1]
    
             pred = model(torch.Tensor(cells).view(16,len(train_data[0])))
