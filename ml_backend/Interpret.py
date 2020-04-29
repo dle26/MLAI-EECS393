@@ -70,15 +70,14 @@ class INTERPRET:
             all_results['techniques']['ch_score'] = None
             
             cm_list = []
-            cm = metrics.confusion_matrix(true_labels, preds)
+            cm = metrics.confusion_matrix(true_labels, preds,normalize='true')
             for element in cm:
                 newelement = []
                 for number in element:
-                    newelement.append(int(number))
+                    newelement.append(float(number))
                 cm_list.append(newelement)
             
             all_results['techniques']["confusion_matrix"].append(cm_list)
-            # int_results["NL Results"] = self.NLResults()
 
         all_results['best'] = self.assign_top_model_sup(all_results)
         all_results['analysis type'] = 'supervised'

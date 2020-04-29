@@ -16,6 +16,7 @@ import MLTechniques
 from .TextProcess import TEXTPROCESS
 import requests
 import copy
+from collections import OrderedDict
 
 
 class TEXTMINE:
@@ -34,7 +35,6 @@ class TEXTMINE:
         config = json.load(con_file)
         con_file.close()
         client = ElsClient(config['apikey'])
-        ###TODO: add year back in??
         searchwords = {'category':[],'specific':[]}
         
         if self.analysis_type == 'supervised':
@@ -58,16 +58,16 @@ class TEXTMINE:
         print()
         allurls = []
         
-        combos = self.generate_combinations(self.queries,tech_words)
+        combos = generate_combinations(self.queries,tech_words)
 
         if time_constraint == 1:
-            query_size = set_query_number(combos,100)
+            query_size = set_query_number(combos,200)
         if time_constraint == 2:
-            query_size = set_query_number(combos,250)
+            query_size = set_query_number(combos,400)
         if time_constraint == 3:
-            query_size = set_query_number(combos,500)
+            query_size = set_query_number(combos,600)
         if time_constraint == 4:
-            query_size = set_query_number(combos,750)
+            query_size = set_query_number(combos,800)
         if time_constraint == 5:
             query_size = set_query_number(combos,1000)
     
@@ -82,7 +82,7 @@ class TEXTMINE:
                  string += (word + " ") 
                  
              doc_srch = ElsSearch(string, 'sciencedirect')
-             results = TEXTMINE.execute_modified(doc_srch.uri,client,get_all=True,set_limit=query_size)
+             results = execute_modified(doc_srch.uri,client,get_all=True,set_limit=query_size)
              
              if results != 0:
                print("SUCCESSFUL QUERY")
@@ -91,7 +91,6 @@ class TEXTMINE:
                  DOI = res['prism:doi']
                  URL = 'https://api.elsevier.com/content/article/DOI/' + str(DOI) + "?APIkey=" + str(config['apikey'])
                  if URL not in allurls:
-                 
                      r = requests.get(URL)
                      allurls.append(URL)
                         
@@ -100,9 +99,7 @@ class TEXTMINE:
                      f.close()
                  
                      foundwords,allwords = TEXTPROCESS.findkeywords(str(self.user_id),searchwords,self.user_keywords)
-                     if len(list(foundwords.keys())):
-                        i += 1
-                        print(i)
+                     
                      textmine_results['words'].extend(list(foundwords.keys()))
                      textmine_results['scores'].extend(list(foundwords.values()))
                      textmine_results['allwords'].extend(allwords)
@@ -112,74 +109,60 @@ class TEXTMINE:
             return [],[],[]
                 
         print("------MINING COMPLETE: SEARCHING FOR KEYWORDS-----")
-        keywords,keyword_scores = self.adjust_output(textmine_results)
-        return keywords,keyword_scores,searchwords
-        
- 
-    ### TODO: CITE ELSAPY - I MODIFIED THE SRC FOR MLAI 
-    def execute_modified(uri,els_client = None, get_all = False,set_limit=25):
+        keywords,keyword_scores = adjust_output(textmine_results)
 
+        return keywords,keyword_scores,searchwords
+
+
+
+### TODO: CITE ELSAPY - I MODIFIED THE SRC FOR MLAI
+def execute_modified(uri,els_client = None, get_all = False,set_limit=25):
+        
         api_response = els_client.exec_request(uri)
         
         if api_response['search-results']['opensearch:totalResults'] is None:
-                return 0
+            return 0
         
         results = api_response['search-results']['entry']
         
         if get_all is True:
-           i = 0
-           while i<(int(set_limit/25)-1):
-            for e in api_response['search-results']['link']:
+            i = 0
+            #next_url = None
+            while i<(int(set_limit/25)-1):
+                for e in api_response['search-results']['link']:
                     if e['@ref'] == 'next':
                         next_url = e['@href']
-            api_response = els_client.exec_request(next_url)
-            results += api_response['search-results']['entry']
-            i += 1
-    
-        return results
-    
-               
-                                
-    def two_list_sort(self,tosort,basis):
-      for i in range(1, len(basis)):
-        key = basis[i]
-        key2 = tosort[i]
-        j = i-1
-        while j >=0 and key <basis[j] : 
-                basis[j+1] = basis[j] 
-                tosort[j+1] = tosort[j]
-                j -= 1
-                
-        basis[j+1] = key 
-        tosort[j+1] = key2
-        
-      return tosort,basis
-    
-    
-    def generate_combinations(self,l1,l2):
-        
-        l3 = []
-        for tup in l1:
-           for word in l2:
-               t = copy.deepcopy(tup)
-               t += (word,)
-               l3.append(t)
-        return l3
+                if next_url is not None:
+                    api_response = els_client.exec_request(next_url)
+                else:
+                    return results
+                results += api_response['search-results']['entry']
+                next_url = None
+                i += 1
+            return results
+         
+
+def generate_combinations(l1,l2):
+    l3 = []
+    for tup in l1:
+      for word in l2:
+        t = copy.deepcopy(tup)
+        t += (word,)
+        l3.append(t)
+    return l3
     
     
 
-    def adjust_output(self,words):
 
-      scores = []
-
-      wordkeys = list(set(words['words']))
-      
-      ''' adjust for total number of occurrences '''
-      for word in wordkeys:
-          score = np.sum(np.asarray(words['scores'])[np.where(np.asarray(words['words']) == word)])
-          scores.append(score)
-
-      return wordkeys,list(np.asarray(scores)/np.sum(scores))
+def adjust_output(words):
+    
+   scores = []
+   wordkeys = list(set(words['words']))
+   ''' adjust for total number of occurrences '''
+   for word in wordkeys:
+      score = np.sum(np.asarray(words['scores'])[np.where(np.asarray(words['words']) == word)])
+      scores.append(score)
+   return wordkeys,list(np.asarray(scores)/np.sum(scores))
 
 
 

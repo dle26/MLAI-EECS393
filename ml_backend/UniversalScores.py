@@ -163,7 +163,7 @@ class UniversalScores:
             all_scores = None
         else:
             all_scores = np.array(all_scores)/np.sum(all_scores)
-            
+    
         techniques.append(np.random.choice(names,number,p=all_scores))
 
         return list(np.ravel(np.asarray(techniques)))

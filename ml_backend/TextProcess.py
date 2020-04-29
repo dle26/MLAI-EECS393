@@ -7,13 +7,13 @@
 
 import string
 import numpy as np
-
+from collections import OrderedDict as OD
 class TEXTPROCESS: 
     
     def findkeywords(file,searchwords,user_input):
         
          tracker = 0
-         allresults = {}
+         allresults = OD()
          num_matches = 0
          allwords = []
          punctuation = list(string.punctuation)
@@ -46,7 +46,7 @@ class TEXTPROCESS:
             for n,l in enumerate(lines):
 
               seenwords = []
-              results = {}
+              results = OD()
               num_matches = 0
               l = str(l)
               
@@ -62,9 +62,6 @@ class TEXTPROCESS:
                  for key in searchwords:
                      for word in searchwords[key]:
                         if l.lower().find(word) > -1 and word not in seenwords:
-                            if word == 'cnn':
-                                print('here')
-
                             results[word] = 1
                             seenwords.append(word)
                             
@@ -100,7 +97,7 @@ class TEXTPROCESS:
          
          for word in allresults:
              if word in searchwords['specific'] and word not in searchwords['category']:
-                allresults[word] = (allresults[word]/tracker) #+ ((allresults[word]/tracker)*0.1))
+                allresults[word] = (allresults[word]/tracker) + ((allresults[word]/tracker)*0.1)
              else:
                  allresults[word] = (allresults[word]/tracker)
                  
