@@ -84,15 +84,17 @@ class SELECT:
                 scores.append(keywordscores[keywords.index(word)])
         
         scores = np.asarray(scores)
+
         top_vals = np.where(scores > np.percentile(scores,75))
+ 
         scores = list(scores)
         
         technique_names = []
 
-        for n,app in enumerate(np.asarray(names)[top_vals]):
+        for n,app in enumerate(np.asarray(names)[top_vals[0]]):
             if app in searchwords['specific']:
                 technique_names.append(app)
-                scores.remove(scores[n])
+                scores.remove(scores[top_vals[0][n]])
                 names.remove(app)
         
         approaches,scores = two_list_sort(names,scores)
@@ -121,7 +123,7 @@ def two_list_sort(tosort,basis):
         key = basis[i]
         key2 = tosort[i]
         j = i-1
-        while j >=0 and key <basis[j] : 
+        while j >=0 and key < basis[j] :
                 basis[j+1] = basis[j] 
                 tosort[j+1] = tosort[j]
                 j -= 1
@@ -129,7 +131,7 @@ def two_list_sort(tosort,basis):
         basis[j+1] = key 
         tosort[j+1] = key2
         
-      return np.array(tosort),np.asarray(basis)
+      return np.asarray(tosort),np.asarray(basis)
               
             
    
