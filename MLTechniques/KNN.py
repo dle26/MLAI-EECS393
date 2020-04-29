@@ -61,6 +61,7 @@ class KNN(Technique):
         test_labels = []
         test_data = []
         time_constraint = data.time_constraint
+        results = []
         
         if time_constraint == 1:
             
@@ -77,7 +78,7 @@ class KNN(Technique):
                 model = KNC()
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
                 model.fit(X_train,y_train)
-                results = model.predict(X_test)
+                results.extend(model.predict(X_test))
                 test_data.extend(X_test)
                 test_labels.extend(y_test)
                 
