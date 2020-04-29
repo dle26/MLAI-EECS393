@@ -72,7 +72,10 @@ class HAC(Technique):
             best_results = None
             for number in [2,4,8]:
                 for func in ['euclidean','manhattan']:
-                    results = agg(n_clusters=number,affinity=func).fit_predict(test_data)
+                    if func != 'euclidean':
+                        results = agg(n_clusters=number,affinity=func,linkage='complete').fit_predict(test_data)
+                    else:
+                        results = agg(n_clusters=number,affinity=func).fit_predict(test_data)
                     if silhouette_score(test_data,results) > best_score:
                         best_score = silhouette_score(test_data,results)
                         best_results = results
@@ -82,7 +85,10 @@ class HAC(Technique):
             best_results = None
             for number in [2,3,4,5,6,7,8]:
                 for func in ['euclidean','manhattan']:
-                    results = agg(n_clusters=number,affinity=func).fit_predict(test_data)
+                    if func != 'euclidean':
+                        results = agg(n_clusters=number,affinity=func,linkage='complete').fit_predict(test_data)
+                    else:
+                        results = agg(n_clusters=number,affinity=func).fit_predict(test_data)
                     if silhouette_score(test_data,results) > best_score:
                         best_score = silhouette_score(test_data,results)
                         best_results = results
@@ -92,7 +98,11 @@ class HAC(Technique):
             best_results = None
             for number in [2,3,4,5,6,7,8]:
                 for func in ['euclidean','manhattan','l1','l2','cosine']:
-                    results = agg(n_clusters=number,affinity=func).fit_predict(test_data)
+                    if func != 'euclidean':
+                        results = agg(n_clusters=number,affinity=func,linkage='complete').fit_predict(test_data)
+                    else:
+                        results = agg(n_clusters=number,affinity=func).fit_predict(test_data)
+                    
                     if silhouette_score(test_data,results) > best_score:
                         best_score = silhouette_score(test_data,results)
                         best_results = results
