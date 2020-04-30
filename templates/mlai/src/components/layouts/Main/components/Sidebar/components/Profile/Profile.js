@@ -35,7 +35,7 @@ class Profile extends Component {
 
     if(this.state.username != null) {
       axios
-      .post("http://34.66.1.253:5000/userinfo", {
+      .post("http://34.70.151.69:5000/userinfo", {
         "username": this.state.username
       })
       .then(response => {

@@ -65,7 +65,7 @@ class DevSignUp extends Component {
 
   dev_signUp() {
     axios
-      .post("http://34.66.1.253:5000/dev/register", {
+      .post("http://34.70.151.69:5000/dev/register", {
         devname: this.state.devname,
         password: this.state.password,
         firstname: this.state.firstname,
