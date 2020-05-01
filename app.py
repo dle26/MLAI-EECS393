@@ -129,11 +129,18 @@ def upload_file():
     names = []
     sizes = []
     for file in files:
+        if not file or not allowed_file(file.filename):
+            files.remove(file)
+
+    for file in files:
+        
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             names.append(filename)
             size = len(file.read())
             sizes.append(size)
+
+
     if labelFile:
         labelFileName = secure_filename(labelFile.filename)
         labelFileSize = len(labelFile.read())

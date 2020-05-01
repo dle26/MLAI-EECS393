@@ -72,6 +72,7 @@ class TEXTMINE:
             query_size = set_query_number(combos,1000)
     
         i = 0
+        print(query_size)
         for n,combo in enumerate(combos):
              print("SEARCH QUERY " + str(n+1) + ":")
              print(combo)
@@ -93,7 +94,7 @@ class TEXTMINE:
                  if URL not in allurls:
                      r = requests.get(URL)
                      allurls.append(URL)
-                        
+                     print('here')
                      with open(str(self.user_id),'w') as f:
                         f.write(r.text)
                      f.close()
