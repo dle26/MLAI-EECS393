@@ -76,13 +76,3 @@ def testmltechniques():
         test_data,test_labels,results,fi, blind_results = MLTechniques.MeanShift.train(data)
         assert (True == (test_data is not None and results is not None)),"Algorithm error"
         
-        test_data,test_labels,results,fi, blind_results = MLTechniques.DBSCAN.train(data)
-        assert (True == (test_data is not None and results is not None)),"Algorithm error"
-        
-
-    
-        
-        
-    
-    
-    

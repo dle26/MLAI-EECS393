@@ -98,8 +98,12 @@ class DATAPREP:
     def from_fileobject(self):
         
         data_files = []
+        
 
         for n,file in enumerate(self.datafiles):
+            print(file)
+            print(self.datafilenames[n])
+            print()
             data_files.append(self.process_data(file,self.datafilenames[n],self.datafilesize[n]))
 
         

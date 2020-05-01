@@ -90,18 +90,20 @@ class SELECT:
         scores = list(scores)
         
         technique_names = []
-
+        removed = []
         for n,app in enumerate(np.asarray(names)[top_vals[0]]):
             if app in searchwords['specific']:
                 technique_names.append(app)
-                scores.remove(scores[top_vals[0][n]])
                 names.remove(app)
+                removed.append(scores[top_vals[0][n]])
+        
+        for sc in removed:
+            scores.remove(sc)
         
         approaches,scores = two_list_sort(names,scores)
- 
-        
+
         if len(technique_names) == 0:
-            technique_names.append(approaches[[-2,-1]])
+            technique_names.extend(approaches[[-2,-1]])
                 
         if len(technique_names) == 1:
             technique_names.append(approaches[-1])

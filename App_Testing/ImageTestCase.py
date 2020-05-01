@@ -54,7 +54,7 @@ time = datetime.now()
 raw_data = pd.read_csv('training.csv')
 train_data = raw_data[[col for col in raw_data if col != 'label']].values
 labels = raw_data['label'].values
-description = "This dataset contains pitching statistics from the 2016 major league baseball season"
+description = "This dataset contains 21,000 images of handwritten digits. These digits range from 0-9"
 
 bigram = False
 
