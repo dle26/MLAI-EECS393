@@ -51,8 +51,6 @@ class RandomForest(Technique):
         blind_results = None
         results = []
         if data.prior_test_data is not None:
-            print('here')
-            fdks
             model = RandomForestClassifier(n_estimators=50)
             model.fit(X,y)
             blind_results = model.predict(Xtest)

@@ -50,8 +50,17 @@ class INTERPRET:
             print(tech)
             all_results['techniques']['names'].append(tech)
             if self.data.prior_test_data is not None:
-                all_results['techniques']['samples'].append(self.data.prior_test_indicies)
-                all_results['techniques']['results'].append(self.data.blind_prediction_results[n])
+                
+                str_results = []
+                for pti in self.data.prior_test_indicies:
+                    str_results.append(str(pti))
+                all_results['techniques']['samples'].append(str_results)
+                
+                str_results = []
+                for bpr in self.data.blind_prediction_results[n]:
+                    str_results.append(str(bpr))
+                all_results['techniques']['results'].append(str_results)
+        
             else:
                  all_results['techniques']['samples'].append([]) 
                  all_results['techniques']['results'].append([]) 
@@ -108,8 +117,17 @@ class INTERPRET:
             all_results['techniques']['names'].append(tech)
             
             if self.data.prior_test_data is not None:
-                all_results['techniques']['samples'].append(self.data.prior_test_indicies)
-                all_results['techniques']['results'].append(self.data.blind_prediction_results[n])
+                
+                str_results = []
+                for pti in self.data.prior_test_indicies:
+                    str_results.append(str(pti))
+                all_results['techniques']['samples'].append(list(self.data.prior_test_indicies))
+               
+                str_results = []
+                for bpr in self.blind_prediction_results[n]:
+                    str_results.append(str(bpr))
+                all_results['techniques']['results'].append(str_results)
+        
             else:
                  all_results['techniques']['samples'].append([]) 
                  all_results['techniques']['results'].append([]) 
@@ -153,26 +171,24 @@ class INTERPRET:
         
         best_technique = None
         highest_F1 = 0
-        print(list(class_results.keys()))
-        for n,technique in enumerate(class_results.keys()):
+        for n,f1 in enumerate(class_results['techniques']['f1_score']):
             
-            # self.update_result_tup(technique,class_results[technique]["F1 Score"])
-          print(technique)
-          if class_results['techniques']["f1_score"][n] > highest_F1:
-                highest_F1 = class_results[technique]["f1_score"][n]
-                best_technique = class_results[technique]["names"][n]
+          if f1 > highest_F1:
+                highest_F1 = f1
+                best_technique = class_results['techniques']["names"][n]
                 bt_index = n
           
-          if class_results[technique]["f1_score"][n] == highest_F1:
-              if class_results[technique]["accuracy"][n] > class_results['techniques']["accuracy"][bt_index]:
-                    best_technique = class_results[technique]["names"][n]
+          if f1 == highest_F1:
+              if class_results['techniques']["accuracy"][n] > class_results['techniques']["accuracy"][bt_index]:
+                    best_technique = class_results['techniques']["names"][n]
                     bt_index = n
                         
-              elif class_results[technique]["accuracy"][n] == class_results['techniques']["accuracy"][bt_index]:
+              elif class_results['techniques']["accuracy"][n] == class_results['techniques']["accuracy"][bt_index]:
                   if np.random.randint(0,2) > 0:
-                       best_technique = class_results[technique]["names"][n]
+                       best_technique = class_results['techniques']["names"][n]
                        bt_index = n
-          self.data.data_for_update.append((class_results[technique]["names"][n],class_results[technique]["f1_score"][n],self.data.descriptive_info))
+                           
+          self.data.data_for_update.append((class_results['techniques']["names"][n],highest_F1,self.data.descriptive_info))
 
         return best_technique
     
@@ -182,27 +198,26 @@ class INTERPRET:
         best_technique = None
         highest_sil = 0
         
-        for n,technique in enumerate(class_results.keys()):
+        for n,ss in enumerate(class_results['techniques']['silhouette']):
             
-          #self.update_result_tup(technique,class_results['techniques']["silhouette"][n])
           
-          if class_results['techniques']["silhouette"][n] > highest_sil:
-                highest_sil = class_results['techniques']["silhouette"][n]
-                best_technique = class_results[technique]["names"][n]
+          if ss > highest_sil:
+                highest_sil = ss
+                best_technique = class_results['techniques']["names"][n]
                 bt_index = n
                 
-          if class_results['techniques']["silhouette"][n] == highest_sil:
+          if ss == highest_sil:
               if class_results['techniques']["ch_score"][n] > class_results['techniques']["ch_score"][bt_index]:
-                    best_technique = class_results[technique]["names"][n]
+                    best_technique = class_results['techniques']["names"][n]
                     bt_index = n
                         
-              elif class_results[technique]["ch_score"][n] == class_results['techniques']["ch_score"][bt_index]:
+              elif class_results['techniques']["ch_score"][n] == class_results['techniques']["ch_score"][bt_index]:
                   if np.random.randint(0,2) > 0:
-                       best_technique = class_results[technique]["names"][n]
+                       best_technique = class_results['techniques']["names"][n]
                        bt_index = n
 
         
-          self.data.data_for_update.append((class_results[technique]["names"][n],class_results[technique]["silhouette"][n],self.data.descriptive_info))
+          self.data.data_for_update.append((class_results['techniques']["names"][n],highest_sil,self.data.descriptive_info))
         return best_technique
 
 

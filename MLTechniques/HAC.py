@@ -20,13 +20,13 @@ class HAC(Technique):
     TECHNIQUE_TYPE = "unsupervised"
     
     def get_website():
-        pass
+        return 'https://en.wikipedia.org/wiki/Hierarchical_clustering'
 
     def get_class_name():
         return 'HAC'
     
     def get_name():
-        return 'hierarchical agglomerative clustering'
+        return 'hierarchical'
 
     def get_category():
         return 'hierarchical'
