@@ -61,6 +61,7 @@ export default class MoreDetails extends Component {
         //handle success
         console.log(response);
         this.props.setResult(response.data);
+	this.state.labelFile = [];
         this.props.addFile([]);
         this.closeModal();
       })
