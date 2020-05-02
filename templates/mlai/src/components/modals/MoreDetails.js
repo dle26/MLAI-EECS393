@@ -37,7 +37,7 @@ export default class MoreDetails extends Component {
 
   upload() {
     // const url = "http://localhost:5000/test";
-    const url = "http://34.70.151.69:5000:5000/upload";
+    const url = "http://34.70.151.69:5000/upload";
     const formData = new FormData();
     console.log("more details");
     console.log(this.state);
