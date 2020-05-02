@@ -91,11 +91,15 @@ class SELECT:
         
         technique_names = []
         removed = []
-        for n,app in enumerate(np.asarray(names)[top_vals[0]]):
-            if app in searchwords['specific']:
-                technique_names.append(app)
-                names.remove(app)
-                removed.append(scores[top_vals[0][n]])
+        for n,app in enumerate(np.asarray(names)):
+            if app in searchwords['specific'] and app not in searchwords['category']:
+                cat = get_general_category(app)
+                scores[names.index(cat)] = scores[names.index(cat)] + scores[n]
+                if n in top_vals[0]:
+                    technique_names.append(app)
+                    names.remove(app)
+                    removed.append(scores[n])
+
         
         for sc in removed:
             scores.remove(sc)
@@ -150,3 +154,10 @@ def select_approach(app_name,analysis_type):
                             class_names.append(obj.get_class_name())
 
         return approaches_to_select,class_names
+
+
+def get_general_category(app_name):
+    for name, obj in inspect.getmembers(MLTechniques):
+      if inspect.isclass(obj):
+            if obj.get_name() == app_name or obj.get_category() == app_name:
+                return obj.get_category()
