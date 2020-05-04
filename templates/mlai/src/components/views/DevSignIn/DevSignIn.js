@@ -64,7 +64,7 @@ class DevSignIn extends Component {
 
   dev_login() {
     axios
-      .post("http://34.70.151.69:5000/dev/login", {
+      .post("http://34.70.151.69:3110/dev/login", {
         devname: this.state.devname,
         password: this.state.password,
       })
