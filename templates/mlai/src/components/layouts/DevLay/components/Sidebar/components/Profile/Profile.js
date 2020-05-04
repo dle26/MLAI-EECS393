@@ -35,7 +35,7 @@ class Profile extends Component {
 
     if(this.state.devname != null) {
       axios
-      .post("http://34.70.151.69:5000/devuserinfo", {
+      .post("http://34.70.151.69:3110/devuserinfo", {
         "Devname": this.state.devname
       })
       .then(response => {
